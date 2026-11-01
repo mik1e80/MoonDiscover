@@ -27,4 +27,4 @@ python -m http.server 8000 --bind 127.0.0.1 --directory .tools/browser-replay
 
 浏览器打开 `http://127.0.0.1:8000`，加载 `fixtures/live-20261024.jsonl` 并运行。演示后停止本次 HTTP 服务。
 
-当前文档是可执行演示脚本；视频文件的录制和校验另行记录，不把脚本文档当成已录制视频。
+已完成[一分钟离线回放视频](media/moondiscover-demo-20261101.webm)，展示实际 CLI 输出；[来源、散列与解码校验](demo/README.md)单独记录。它不替代上方实网步骤或现场网络录屏。

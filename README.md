@@ -356,6 +356,10 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 
 ## 常见问题
 
+一分钟演示：[实际 CLI 离线回放视频](docs/media/moondiscover-demo-20261101.webm)（60 秒，1280×720，约 1 MiB）。[来源与元数据](docs/demo/README.md)说明命令、公开录制、源码提交和视频散列；画面不代表实时扫描。
+
+[![MoonDiscover 离线回放演示](docs/media/moondiscover-demo-20261101.png)](docs/media/moondiscover-demo-20261101.webm)
+
 | 现象 | 建议检查 |
 | --- | --- |
 | `doctor` 失败 | 接口是否为本机当前 IPv4、接口是否可用；检查错误和共享 5353 绑定条件 |
