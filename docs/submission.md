@@ -1,5 +1,7 @@
 # MoonDiscover 项目说明
 
+十一月报名准备入口：[一页申报书](proposal-november-2026.md)、[固定基线与新增贡献](november-baseline.md)。本页保留详细项目说明。
+
 仓库：[mik1e80/MoonDiscover](https://github.com/mik1e80/MoonDiscover)。模块名：`mik1e80/dnssd`。许可：Apache-2.0。状态：2026-11-01，已发布 0.1.0；main 为 0.2.0-dev，含尚未发布的新功能和修复。本项目尚未报名，用户计划报名 11 月赛。所有能力按版本与证据区分，不宣称完整 RFC 或所有平台验收。
 
 ## 解决的问题
