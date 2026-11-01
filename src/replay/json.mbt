@@ -22,6 +22,23 @@ pub fn snapshot_json(snapshot : @engine.ServiceSnapshot) -> Json {
     "instance": Json(snapshot.instance.to_presentation()),
     "instance_label": Json(label),
     "target": target,
+    "srv_candidates": Json(
+      snapshot.srv_candidates.map(candidate => {
+        Json::object({
+          "priority": Json(candidate.priority),
+          "weight": Json(candidate.weight),
+          "port": Json(candidate.port),
+          "target": Json(candidate.target.to_presentation()),
+          "addresses": Json(
+            candidate.addresses.map(bytes => {
+              @model.address_text(bytes) catch {
+                _ => "<invalid address>"
+              }
+            }),
+          ),
+        })
+      }),
+    ),
     "port": match snapshot.port {
       Some(port) => Json(port)
       None => Json::null()

@@ -6,6 +6,7 @@ pub using @engine {
   type Engine,
   type Event,
   type ServiceSnapshot,
+  type SrvCandidate,
   type EngineError,
   type EngineStats,
 }

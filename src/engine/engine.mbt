@@ -13,6 +13,7 @@ pub struct ServiceSnapshot {
   instance : @model.DnsName
   target : @model.DnsName?
   port : Int32?
+  srv_candidates : Array[SrvCandidate]
   txt : @model.TxtRecord?
   addresses : Array[Bytes]
   missing : Array[String]
@@ -59,6 +60,7 @@ pub struct Engine {
   priv fragments : Array[Outbound]
   priv query_capacity : Int32
   priv mut rng : UInt32
+  priv srv_seed : UInt32
 }
 
 ///|
@@ -95,12 +97,18 @@ pub fn Engine::new(
     fragments: [],
     query_capacity,
     rng: seed,
+    srv_seed: seed,
   }
 }
 
 ///|
 fn clone_snapshot(s : ServiceSnapshot) -> ServiceSnapshot {
-  { ..s, addresses: s.addresses.copy(), missing: s.missing.copy(), }
+  {
+    ..s,
+    addresses: s.addresses.copy(),
+    missing: s.missing.copy(),
+    srv_candidates: s.srv_candidates.map(clone_candidate),
+  }
 }
 
 ///|
@@ -260,16 +268,26 @@ fn Engine::build_snapshot(
   let mut txt : @model.TxtRecord? = None
   let mut expiry = ptr_expiry
   let srv_records = newest(self.cache.records(sub.scope, instance, 33))
-  if srv_records.length() != 1 {
-    missing.push(if srv_records.is_empty() { "srv" } else { "ambiguous_srv" })
-  } else if srv_records[0].record.data is @wire.Srv(_, _, p, host) {
-    if host.labels().is_empty() || p == 0 {
+  let srv_candidates = self.srv_candidates(sub.scope, instance)
+  if srv_candidates.is_empty() {
+    missing.push("srv")
+  } else {
+    let chosen = srv_candidates[0]
+    if chosen.target.labels().is_empty() || chosen.port == 0 {
       missing.push("unavailable_srv")
     } else {
-      target = Some(host)
-      port = Some(p)
+      target = Some(chosen.target)
+      port = Some(chosen.port)
     }
-    expiry = expiry.min(srv_records[0].expires_at)
+    for record in srv_records {
+      if record.record.data is @wire.Srv(priority, weight, p, host) &&
+        priority == chosen.priority &&
+        weight == chosen.weight &&
+        p == chosen.port &&
+        host.same_name(chosen.target) {
+        expiry = expiry.min(record.expires_at)
+      }
+    }
   }
   let txt_records = newest(self.cache.records(sub.scope, instance, 16))
   if txt_records.length() != 1 {
@@ -304,6 +322,7 @@ fn Engine::build_snapshot(
     instance,
     target,
     port,
+    srv_candidates,
     txt,
     addresses,
     missing,
@@ -323,6 +342,7 @@ fn same_identity(a : ServiceSnapshot, b : ServiceSnapshot) -> Bool {
 fn same_content(a : ServiceSnapshot, b : ServiceSnapshot) -> Bool {
   a.target.map(t => t.canonical_key()) == b.target.map(t => t.canonical_key()) &&
   a.port == b.port &&
+  same_candidates(a.srv_candidates, b.srv_candidates) &&
   a.txt.map(t => t.to_wire()) == b.txt.map(t => t.to_wire()) &&
   a.addresses == b.addresses &&
   a.missing == b.missing

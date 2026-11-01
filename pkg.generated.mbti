@@ -50,6 +50,8 @@ pub using @wire {type Section}
 
 pub using @engine {type ServiceSnapshot}
 
+pub using @engine {type SrvCandidate}
+
 pub using @model {type TxtRecord}
 
 pub using @model {type TxtValue}

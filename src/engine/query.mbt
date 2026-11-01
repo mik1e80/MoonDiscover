@@ -83,9 +83,11 @@ fn Engine::sync_queries(self : Engine) -> Unit {
   for service in self.services {
     want({ scope: service.scope, name: service.instance, rr_type: 33, })
     want({ scope: service.scope, name: service.instance, rr_type: 16, })
-    if service.target is Some(host) {
-      want({ scope: service.scope, name: host, rr_type: 1, })
-      want({ scope: service.scope, name: host, rr_type: 28, })
+    for candidate in service.srv_candidates {
+      if candidate.port > 0 && !candidate.target.labels().is_empty() {
+        want({ scope: service.scope, name: candidate.target, rr_type: 1, })
+        want({ scope: service.scope, name: candidate.target, rr_type: 28, })
+      }
     }
   }
   if limited {

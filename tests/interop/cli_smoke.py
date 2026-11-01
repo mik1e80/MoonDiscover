@@ -20,6 +20,9 @@ def main():
     assert events == [json.loads(line) for line in b.stdout.splitlines()]
     resolved = [e for e in events if e["event"] == "resolved"]
     assert len(resolved) == 1 and resolved[0]["service"]["port"] == 43219
+    candidates = resolved[0]["service"]["srv_candidates"]
+    assert len(candidates) == 1 and candidates[0]["port"] == 43219
+    assert candidates[0]["addresses"] == resolved[0]["service"]["addresses"]
     assert any(e["event"] == "unavailable" and e["reason"] == "ttl_expired" for e in events)
     assert any(e["event"] == "removed" and e["reason"] == "ttl_expired" and e["service"]["remaining_ttl_ms"] == 0 and not e["service"]["complete"] for e in events)
     bad = run("browse", "--invalid", "x")
@@ -41,7 +44,11 @@ def main():
     for line in replay_a.stdout.splitlines():
         event = json.loads(line)
         if event.get("service", {}).get("instance", "").startswith(evidence["demo"] + "."):
-            own_events.append({k: v for k, v in event.items() if k != "at_ms"})
+            # Compare the original 0.1.0 fields without rewriting historical
+            # evidence. The new candidate contract is asserted separately above.
+            projected = {k: v for k, v in event.items() if k != "at_ms"}
+            projected["service"] = {k: v for k, v in projected["service"].items() if k != "srv_candidates"}
+            own_events.append(projected)
     assert own_events == evidence["replay_service_events"]
     print(json.dumps({"deterministic_replay": True, "resolved_endpoint": True, "expiry_events": True, "invalid_args_exit": True, "help_version": True, "recorded_live_events_match": True}))
 

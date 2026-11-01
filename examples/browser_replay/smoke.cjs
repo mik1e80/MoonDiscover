@@ -16,13 +16,19 @@ const first = execute(fixture);
 assert.equal(first.ok, true);
 assert.deepEqual(first, execute(fixture));
 assert.equal(first.outputs.find(value => value.event === "resolved").service.port, 43219);
+assert.equal(first.outputs.find(value => value.event === "resolved").service.srv_candidates[0].port, 43219);
 assert(first.outputs.some(value => value.event === "outbound"));
 const live = execute(fs.readFileSync(path.join(root, "fixtures/live-20261024.jsonl"), "utf8"));
 const evidence = JSON.parse(fs.readFileSync(path.join(root, "docs/evidence/windows-live-20261024.json"), "utf8"));
 assert.equal(live.ok, true);
 const liveServices = live.outputs
   .filter(value => value.service?.instance_label === evidence.demo)
-  .map(({ at_ms, ...value }) => value);
+  .map(({ at_ms, ...value }) => {
+    // Project the original schema for the frozen 0.1.0 evidence only.
+    const { srv_candidates, ...service } = value.service;
+    assert(Array.isArray(srv_candidates));
+    return { ...value, service };
+  });
 assert.deepEqual(liveServices, evidence.replay_service_events);
 const config = execute('{"kind":"config","format":1,"seed":4294967295,"at_ms":0}');
 assert.equal(config.ok, true);

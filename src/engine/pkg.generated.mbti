@@ -79,11 +79,20 @@ pub struct ServiceSnapshot {
   instance : @model.DnsName
   target : @model.DnsName?
   port : Int32?
+  srv_candidates : Array[SrvCandidate]
   txt : @model.TxtRecord?
   addresses : Array[Bytes]
   missing : Array[String]
   complete : Bool
   remaining_ttl_ms : Int64
+}
+
+pub struct SrvCandidate {
+  priority : Int32
+  weight : Int32
+  port : Int32
+  target : @model.DnsName
+  addresses : Array[Bytes]
 }
 
 type Subscription
