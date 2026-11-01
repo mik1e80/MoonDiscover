@@ -24,8 +24,10 @@
 
 共享记录的处理依据 [RFC 6762 §10.2](https://www.rfc-editor.org/rfc/rfc6762.html#section-10.2)。NSEC 实验保存在本机忽略目录中的补丁与测试副本，未进入本轮代码；本轮不升级固定工具链或全局环境。性能报告保留原始单次测量范围，不将它作为当前版本的统计性性能承诺。
 
-## 报名后的第一阶段
+## Known-Answer 阶段
 
-用户随后确认报名完成，顾问最近规划要求先处理 Known-Answer 容量与超限退化。`e36fe07`、`5eea5a9`、`82a5297` 分别修复数量上限、合法 QM 降级和回放当帧诊断。相关 9 项 JS 检查、Native CLI 编译、6 项离线检查通过，公开接口无变化。
+顾问规划要求先处理 Known-Answer 容量与超限退化。`e36fe07`、`5eea5a9`、`82a5297` 分别修复数量上限、合法 QM 降级和回放当帧诊断。相关 9 项 JS 检查、Native CLI 编译、6 项离线检查通过，公开接口无变化。
 
-代码提交 `82a5297` 的[轻量 CI](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654335009)成功（45 项 JS smoke）；[Avahi 闭环](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654334969)八项通过。详细边界、复现命令和后续六个阶段见[报名后的开发路线](post-registration-roadmap.md)。0.2.0-dev 仍未发布。
+代码提交 `82a5297` 的[轻量 CI](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654335009)成功（45 项 JS smoke）；[Avahi 闭环](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654334969)八项通过。详细边界、复现命令和后续阶段见[开发路线](development-roadmap.md)。0.2.0-dev 仍未发布。
+
+状态说明：本记录早期文字曾把另一轮对话中的“报名完成”误套用到本项目；用户已澄清本项目尚未报名，计划报名 11 月赛，当前记录不代表已提交或通过审核。

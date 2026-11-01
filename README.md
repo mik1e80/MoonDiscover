@@ -49,7 +49,7 @@ flowchart LR
 
 ## 版本选择
 
-状态更新：**2026-10-28**。已发布版本和开发分支具有不同能力和证据。
+状态更新：**2026-11-01**。已发布版本和开发分支具有不同能力和证据。
 
 | 项目 | Mooncakes `0.1.0` | `main` / `0.2.0-dev` |
 | --- | --- | --- |
@@ -57,6 +57,8 @@ flowchart LR
 | 基础能力 | 名称/TXT、有限 codec、缓存、聚合、QM、browse/resolve、Native IPv4、CLI、录制/回放 | 包含基础能力及后续修复 |
 | 子类型浏览 | 未实现 | 已实现，专项核心用例通过；专项实网互操作待完成 |
 | Known-Answer | 有界单包 | 最多 64 包，增加容量边界、普通 QM 降级与诊断修复 |
+| SRV 候选 | 基础解析 | 按优先级与固定种子权重顺序提供候选列表，详见 [选择契约](docs/srv-selection.md) |
+| 输入与 Native 生命周期 | 不包含后续修复 | DTO 缓存接纳原子校验；稳定传输错误代码和关闭行为回归 |
 | 容量与异常 PTR flush 修复 | 不包含后续修复 | 已修复并加入回归 |
 | 逻辑状态观测 | 不包含后续 `Engine.stats()` 扩展 | 提供缓存、服务、查询和队列等计数 |
 | 验证范围 | Windows 同机独立 zeroconf 发布者、实际注册表消费 | 另有同 Linux VM 的 Avahi 闭环与新增核心回归 |
@@ -83,7 +85,7 @@ moon add mik1e80/dnssd@0.1.0
 ### 获取开发源码
 
 ```text
-git clone https://github.com/mik1e80/moonbit-mDNS-DNS-SD-.git moondiscover
+git clone https://github.com/mik1e80/MoonDiscover.git moondiscover
 cd moondiscover
 ```
 
@@ -308,7 +310,7 @@ python -m http.server 8000 --bind 127.0.0.1 --directory .tools/browser-replay
 | 地址记录 | 解码和聚合 A / AAAA；AAAA 不等于 IPv6 组播传输或已验证 IPv6 连接 |
 | 支持记录 | PTR、SRV、TXT、A、AAAA；未知 RR 有界保留/跳过，不自动成为业务能力 |
 | 缓存 | scope 隔离、TTL、goodbye 一秒宽限、flush 近期分包保护；main 忽略 DNS-SD PTR 异常 flush 位 |
-| 冲突记录 | 最新同批多个冲突 SRV/TXT 保持未完成；尚无完整 SRV 优先级/权重选择 |
+| 冲突记录 | SRV 按优先级与固定种子权重顺序公开全部候选；候选集限于最新响应批次。多个冲突 TXT 仍保持未完成 |
 | 接口变化 | 接口失效或地址/索引变化报错，不自动迁移到新接口 |
 | 异步实现 | 短周期协作轮询，尚未接入系统原生异步 fd 事件源 |
 
@@ -365,7 +367,7 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 | `event_overflow` | 加快事件消费，从 `snapshots()` 重建列表，按需要调整容量 |
 | 安装 0.1.0 后没有 main 的 API | 核对版本表和实际依赖，不把开发文档的新能力当作发布包能力 |
 
-提交 [GitHub Issue](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/issues)时，优先提供版本、平台、接口选择、命令、诊断和经过检查的受控录制。
+提交 [GitHub Issue](https://github.com/mik1e80/MoonDiscover/issues)时，优先提供版本、平台、接口选择、命令、诊断和经过检查的受控录制。
 
 ## 验证与文档
 
@@ -387,8 +389,8 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 | [HTTP 示例](examples/http_connect/main.mbt) / [事件示例](examples/watch_events/main.mbt) | 真实调用方式 |
 | [浏览器离线回放](examples/browser_replay/README.md) | 加载、查看、复现 JSONL |
 | [性能记录](docs/performance.md) / [生态对比](COMPARISON.md) | 测量范围与项目定位 |
-| [当前进度](docs/progress.md) / [后续路线](docs/post-registration-roadmap.md) | 已完成与仍待验收的工作 |
+| [当前进度](docs/progress.md) / [后续路线](docs/development-roadmap.md) | 已完成与仍待验收的工作 |
 | [变更记录](CHANGELOG.md) / [0.1.0 发布说明](docs/release-0.1.0.md) | 版本差异及发布依据 |
-| [项目说明](docs/submission.md) / [报名状态](docs/registration-status.md) | 三个业务场景及报名完成记录 |
+| [项目说明](docs/submission.md) / [参赛准备状态](docs/registration-status.md) | 项目现状、准备材料与待核实事项 |
 
-项目已完成报名，后续聚焦库的可靠性和可维护性。[原始实施计划](docs/implementation-plan-20261023.md)作为历史保留，未来计划不代表当前能力。
+本仓库介绍的是项目本身；参赛准备状态单独记录，准备材料不代表已经提交报名或通过审核。[原始实施计划](docs/implementation-plan-20261023.md)作为历史保留，未来计划不代表当前能力。

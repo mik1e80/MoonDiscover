@@ -1,6 +1,6 @@
 # MoonDiscover 项目说明
 
-仓库：[mik1e80/moonbit-mDNS-DNS-SD-](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-)。模块名：`mik1e80/dnssd`。许可：Apache-2.0。状态：2026-10-28，已发布 0.1.0；main 为 0.2.0-dev，含尚未发布的新功能和修复。所有能力按版本与证据区分，不宣称完整 RFC 或所有平台验收。
+仓库：[mik1e80/MoonDiscover](https://github.com/mik1e80/MoonDiscover)。模块名：`mik1e80/dnssd`。许可：Apache-2.0。状态：2026-11-01，已发布 0.1.0；main 为 0.2.0-dev，含尚未发布的新功能和修复。本项目尚未报名，用户计划报名 11 月赛。所有能力按版本与证据区分，不宣称完整 RFC 或所有平台验收。
 
 ## 解决的问题
 
@@ -27,6 +27,8 @@ MoonDiscover 用 MoonBit 实现发现所需的报文、缓存、查询与状态�
 - 使用发现端点的 HTTP 示例，未通过 Python 发现库代替 MoonBit 内部逻辑。
 - 按实际功能与修复逐步提交的 Git 历史、固定版本工具链和轻量 CI。
 - main 新增子类型浏览与有界多包 Known-Answer，已分别验证成员筛选、身份复用、TC/问题位置/答案完整性与中途取消；专项实网互操作仍待补。
+- main 新增 SRV 优先级与固定种子权重候选顺序、公开候选快照、受支持 DTO 记录的原子校验、恶意报文/共享主机生命周期回归，以及 Native 稳定传输错误分类和失败关闭行为。
+- CI 明确执行类型检查、格式检查和生成接口无差异检查；这些改进尚未发布到 Mooncakes。
 
 ## 演示与证据
 
@@ -36,8 +38,12 @@ MoonDiscover 用 MoonBit 实现发现所需的报文、缓存、查询与状态�
 
 ## 支持范围与后续工作
 
-Windows 证据来自同机独立 zeroconf 进程。main 另有[同 Linux VM 的 Avahi 0.8 实网报告](evidence/linux-avahi-20261028.json)，发现、HTTP、更新、goodbye、取消与回放共八项通过；它不回填为已发布 0.1.0 包的 Linux 验证。尚无第二设备、Bonjour 或长时间实网运行证据。
+Windows 证据来自同机独立 zeroconf 进程。main 另有[同 Linux VM 的 Avahi 0.8 实网报告](evidence/linux-avahi-20261028.json)，发现、HTTP、更新、goodbye、取消与回放共八项通过；它不回填为已发布 0.1.0 包的 Linux 验证。尚无第二设备、Bonjour 或长时间实网运行证据。多包 Known-Answer 和子类型仍缺专项独立实现互操作报告。
 
-实时传输仍为 IPv4 QM 组播，单播接收排除。未实现发布者、IPv6 组播、NSEC 负缓存、自动接口切换与完整 SRV 选择。main 的容量和异常 PTR 防御修复已加入回归；版本状态和剩余限制见 [SCOPE.md](SCOPE.md)。
+实时传输仍为 IPv4 QM 组播，单播接收排除。未实现发布者、IPv6 组播、NSEC 负缓存、自动接口切换与跨响应批次的 SRV RRSet 重组。main 的容量、异常 PTR、防御性 DTO 校验与 SRV 候选选择均有回归；具体契约和限制见 [SCOPE.md](SCOPE.md) 与 [SRV 选择说明](srv-selection.md)。
 
 Mooncakes 0.1.0 已实际发布，[源码标签](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/tree/v0.1.0)对应 `2b922d6`。无 `moon.work` 源码映射的新工程已从注册表安装、运行公开核心 API、编译 Native 并打开/关闭 socket；归档散列及全部 116 个安装文件匹配。详见[发布记录](evidence/release-0.1.0-20261024.json)和[消费记录](evidence/consumer-registry-20261024.json)。
+
+## 11 月参赛准备说明
+
+已发布的 `0.1.0` 是既有项目基线。main 在 2026-11-01 形成的新增工作包括 SRV 候选选择与快照、记录接纳边界校验、协议状态回归、Native 错误/关闭语义和更明确的 CI 检查。它们与原有功能分开记录，不将旧版本工作重复写成新成果。多包/子类型独立互操作和多轮性能统计仍未完成，不列为已验证成果。具体报名入口、规则和提交范围须等官方 11 月公告确认；本说明本身不是报名提交。

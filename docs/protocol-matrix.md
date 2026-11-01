@@ -1,6 +1,6 @@
 # 当前协议矩阵
 
-参考：[RFC 6762](https://www.rfc-editor.org/rfc/rfc6762)、[RFC 6763](https://www.rfc-editor.org/rfc/rfc6763)、[RFC 8553](https://www.rfc-editor.org/rfc/rfc8553)。状态日期：2026-10-28。本表描述 main（0.2.0-dev）的代码和证据，不是完整规范符合性审计；与已发布 0.1.0 的差异见 [范围矩阵](SCOPE.md)。
+参考：[RFC 6762](https://www.rfc-editor.org/rfc/rfc6762)、[RFC 6763](https://www.rfc-editor.org/rfc/rfc6763)、[RFC 8553](https://www.rfc-editor.org/rfc/rfc8553)。状态日期：2026-11-01。本表描述 main（0.2.0-dev）的代码和证据，不是完整规范符合性审计；与已发布 0.1.0 的差异见 [范围矩阵](SCOPE.md)。
 
 | 事项 | 实现与验证 | 状态与限制 |
 | --- | --- | --- |
@@ -15,6 +15,7 @@
 | goodbye 与 flush | cache 用例与实网 goodbye | goodbye 一秒可救回；flush 对旧成员宽限一秒、保护近期分包成员 |
 | 共享 PTR 异常 flush | cache/engine 的 shared_ptr_test.mbt | 忽略错误高位，保留同组其他实例及常规 PTR 查询；此缓存不实现反向 PTR 唯一性 |
 | 服务聚合 | `src/engine/engine.mbt`、乱序/事件用例 | PTR→SRV/TXT→A/AAAA；部分状态、可用性变化、明确移除原因 |
+| SRV 候选 | `src/engine/srv.mbt`、`srv_test.mbt`、`srv_weight_wbtest.mbt`、[选择契约](srv-selection.md) | priority 升序、固定 seed 派生的加权候选顺序；不跨响应批次重组 RRSet；调用方负责连接与失败重试 |
 | 服务容量 | capacity_test.mbt 的两种订阅回归 | 优先保留仍有效的已公布实例；省略新实例只诊断，真实移除后可填入候选 |
 | 唯一记录更新顺序 | `update_order_test.mbt`、实网更新 | 按报文到达序号识别新旧，避免同毫秒误冲突；同批冲突保持未完成 |
 | QM 查询调度 | `src/engine/query.mbt`、注入时钟/种子用例 | 初始 20..120ms 抖动、1s..1h 指数退避、按范围/名称/类型去重 |
@@ -28,4 +29,4 @@
 
 工程上限为单包 9000 字节、问题与 RR 合计 256、单名称解码 256 步。这些是实现限制，不是 RFC 统一规定。资源容量和平台状态见 [范围文档](SCOPE.md)。
 
-当前 SRV 聚合要求最新一批有唯一可用记录，未实现完整优先级/权重选择。单播、接口自动切换、跨子网和 IPv6 组播不在当前适配层范围；不存在完整 RFC 支持的声明。
+SRV 选择已提供有界候选顺序，但不跨多个响应包重组 RRSet，也不替调用方执行连接与失败重试。TXT 冲突仍保守保持未完成。单播、接口自动切换、跨子网和 IPv6 组播不在当前适配层范围；不存在完整 RFC 支持的声明。

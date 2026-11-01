@@ -1,6 +1,8 @@
 # 当前验证证据
 
-状态日期：2026-10-28。已发布 0.1.0 与 main（0.2.0-dev）分别记录。验证按改动运行轻量用例与受控短时实验，不在每步全量运行所有后端。
+状态日期：2026-11-01。已发布 0.1.0 与 main（0.2.0-dev）分别记录。验证按改动运行轻量用例与受控短时实验，不在每步全量运行所有后端。
+
+本次本地轻量检查包括：相关核心 JS `smoke:*` 52 项通过、Native `moon check`、格式检查和 `tests/protocol_probe` 编译通过。当前多包协议网络探针未捕获本机发出的组播副本，故不记为互操作通过；第二设备专项仍待后续环境可用时验证。新近 main 提交的 GitHub CI 结果应以对应提交页面的 Actions 状态为准。
 
 ## 纯核心与实际 CLI
 
@@ -55,9 +57,9 @@
 
 性能与三项故障注入是此前已有的 [单次观察](performance.md)，不将其写成中位数、分位数、普遍速度保证或长时间压力证明。审查处理与验证入口见 [修复记录](review-fixes-20261028.md)。
 
-报名后新增第一阶段回归：默认 16383 条 Known-Answer 可完整编码，16384 条及自定义包预算的越界明确拒绝；单条答案过大时仍发送合法 QM，后续查询和恢复路径正常；无效问题单独诊断，Replay 在当前帧输出诊断。相关 9 项 JS 检查、Native CLI 编译和 6 项离线 CLI 检查通过，API 未变。
+Known-Answer 第一阶段回归：默认 16383 条可完整编码，16384 条及自定义包预算的越界明确拒绝；单条答案过大时仍发送合法 QM，后续查询和恢复路径正常；无效问题单独诊断，Replay 在当前帧输出诊断。相关 9 项 JS 检查、Native CLI 编译和 6 项离线 CLI 检查通过，API 未变。
 
-代码提交 `82a5297` 的[轻量检查](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654335009)45 项 JS smoke 全部通过，其他轻量步骤成功；[Avahi 闭环](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654334969)8 项通过。具体用例和复现命令见[阶段记录](post-registration-roadmap.md)。
+代码提交 `82a5297` 的[轻量检查](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654335009)45 项 JS smoke 全部通过，其他轻量步骤成功；[Avahi 闭环](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654334969)8 项通过。具体用例和复现命令见[阶段记录](development-roadmap.md)。
 
 ## 结论的范围
 

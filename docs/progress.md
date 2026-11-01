@@ -1,14 +1,14 @@
 # 实施进度
 
-开始日期：2026-10-23；状态更新：2026-10-28（Asia/Shanghai）。已发布基线为 0.1.0，main 为未发布的 0.2.0-dev。用户已确认报名完成，当前按[报名后的路线](post-registration-roadmap.md)逐阶段加固库的边界行为。
+开始日期：2026-10-23；状态更新：2026-11-01（Asia/Shanghai）。已发布基线为 0.1.0，main 为未发布的 0.2.0-dev。本项目尚未报名，用户计划报名 11 月赛；按[后续路线](development-roadmap.md)逐阶段加固库的边界行为。
 
 | 工作项 | 当前状态 | 仍需说明 |
 | --- | --- | --- |
 | 依赖与工程 | 固定项目工具链、async 0.22.5、最小 Native shim、GitHub 轻量 CI | 依赖与复用决策已入库 |
 | 模型与报文 | 已实现标签字节/TXT、mDNS 名称边界、有限 wire、公开根 API | 有界子集，不是完整 DNS 实现 |
-| 缓存与聚合 | 已实现范围隔离、TTL/宽限、部分/完整状态、稳定事件和有界队列 | 多条冲突 SRV/TXT 保持未完成 |
+| 缓存与聚合 | 已实现范围隔离、TTL/宽限、部分/完整状态、稳定事件和有界队列；SRV 候选按优先级和确定性权重排序 | TXT 冲突仍保守保持未完成；不跨响应批次重组 SRV RRSet |
 | 查询与 resolve | main 已实现 QM、依赖查询、超时、取消、子类型和有界多包 Known-Answer | 多包/子类型有专项核心测试；专项实网互操作尚未证明，NSEC 暂缓 |
-| Native 与 CLI | 指定 IPv4、入站元数据、异步取消、四个 CLI 命令 | Windows zeroconf 与 Linux Avahi 同机闭环均通过；单播仍排除 |
+| Native 与 CLI | 指定 IPv4、入站元数据、异步取消、稳定错误分类、四个 CLI 命令 | Windows zeroconf 与 Linux Avahi 同机闭环均通过；单播仍排除 |
 | 示例与回放 | HTTP 动态端口、JSON 事件、录制、固定种子回放与浏览器离线界面已实现 | fixture 已逐条核对只含受控服务报文；Node/真实浏览器验证通过 |
 | 互通与发布 | 已发布 0.1.0 的 Windows 证据与包消费；main 新增 Linux 八项实网成功报告 | 0.2.0-dev 未发布，第二设备及 Bonjour 未验证 |
 
@@ -26,7 +26,9 @@
 - 2026-10-28：保存并搁置未完成 NSEC 实验；容量与异常 PTR flush 均用先失败后通过的回归复现并修复。
 - 修复 Linux 录制目录及失败诊断，扩大工作流触发路径；[40645501957](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40645501957) 的八项 Avahi 检查通过。
 - 补强子类型排除非成员和 Known-Answer 中途取消的核心验收。审查逐项结果见 [review-fixes-20261028.md](review-fixes-20261028.md)。
-- 报名后第一阶段：修复 Known-Answer 的 16383 条容量边界和按包预算限制；超大答案退化为合法普通 QM，无效问题单独诊断；Replay 当帧输出诊断。9 项相关 JS 检查、Native CLI 编译、6 项离线 CLI 检查通过，公开接口未变。
+- Known-Answer 阶段：修复 16383 条容量边界和按包预算限制；超大答案退化为合法普通 QM，无效问题单独诊断；Replay 当帧输出诊断。9 项相关 JS 检查、Native CLI 编译、6 项离线 CLI 检查通过，公开接口未变。
+- 2026-11-01：公开并测试 SRV 优先级/固定种子权重候选顺序；增加 DTO 记录原子校验、恶意报文与共享主机生命周期回归；完善 Native 关闭与错误分类，并在 CI 显式检查 `moon check`、格式和生成接口。
+- 本轮轻量检查：相关 JS smoke 52 项通过，Native `moon check`、格式检查和 `tests/protocol_probe` 编译通过。实际本机组播捕获未通过，不能记为专项互操作证据；第二设备仍不可用。
 
 ## 验证与提交约定
 
