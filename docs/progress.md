@@ -6,8 +6,8 @@
 | --- | --- | --- |
 | 依赖与工程 | 固定项目工具链、async 0.22.5、最小 Native shim、GitHub 轻量 CI | 依赖与复用决策已入库 |
 | 模型与报文 | 已实现标签字节/TXT、mDNS 名称边界、有限 wire、公开根 API | 有界子集，不是完整 DNS 实现 |
-| 缓存与聚合 | 已实现范围隔离、TTL/宽限、部分/完整状态、稳定事件和有界队列；SRV 候选按优先级和确定性权重排序 | TXT 冲突仍保守保持未完成；不跨响应批次重组 SRV RRSet |
-| 查询与 resolve | main 已实现 QM、依赖查询、超时、取消、子类型和有界多包 Known-Answer | 多包/子类型有专项核心测试；专项实网互操作尚未证明，NSEC 暂缓 |
+| 缓存与聚合 | 已实现范围隔离、TTL/宽限、部分/完整状态、稳定事件和有界队列；SRV 候选按优先级和确定性权重排序 | TXT 冲突仍保守保持未完成；已跨响应包汇集未过期 SRV RRSet，遵循缓存宽限 |
+| 查询与 resolve | main 已实现 QM、依赖查询、超时、取消、子类型和有界多包 Known-Answer | 多包/子类型有专项核心测试；Linux UDP 与 Avahi 子类型专项已通过，见 specialized-interop.md，NSEC 暂缓 |
 | Native 与 CLI | 指定 IPv4、入站元数据、异步取消、稳定错误分类、四个 CLI 命令 | Windows zeroconf 与 Linux Avahi 同机闭环均通过；单播仍排除 |
 | 示例与回放 | HTTP 动态端口、JSON 事件、录制、固定种子回放与浏览器离线界面已实现 | fixture 已逐条核对只含受控服务报文；Node/真实浏览器验证通过 |
 | 互通与发布 | 已发布 0.1.0 的 Windows 证据与包消费；main 新增 Linux 八项实网成功报告 | 0.2.0-dev 未发布，第二设备及 Bonjour 未验证 |

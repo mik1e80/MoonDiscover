@@ -48,7 +48,7 @@ jobs:
       - name: Independently verify Known-Answer UDP and Avahi subtype publication
         run: moon run scripts/protocol-live.mbtx -- avahi
       - name: Remove and restore an address in an isolated network namespace
-        run: sudo --preserve-env=HOME,PATH unshare --net "$HOME/.moon/bin/moon" run scripts/protocol-live.mbtx -- interface
+        run: sudo --preserve-env=HOME,PATH,GITHUB_SERVER_URL,GITHUB_REPOSITORY,GITHUB_RUN_ID unshare --net "$HOME/.moon/bin/moon" run scripts/protocol-live.mbtx -- interface
       - name: Retain controlled report
         if: always()
         uses: actions/upload-artifact@v4

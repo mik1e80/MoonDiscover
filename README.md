@@ -55,8 +55,8 @@ flowchart LR
 | --- | --- | --- |
 | 获取方式 | `moon add mik1e80/dnssd@0.1.0` | 克隆本仓库；尚无该开发版本的注册表发布 |
 | 基础能力 | 名称/TXT、有限 codec、缓存、聚合、QM、browse/resolve、Native IPv4、CLI、录制/回放 | 包含基础能力及后续修复 |
-| 子类型浏览 | 未实现 | 已实现，专项核心用例通过；专项实网互操作待完成 |
-| Known-Answer | 有界单包 | 最多 64 包，增加容量边界、普通 QM 降级与诊断修复；Engine 实际出站字节另由独立测试解析器验收，专项实网仍待验证 |
+| 子类型浏览 | 未实现 | 已实现，专项核心用例通过；Linux Avahi 子类型专项已通过 |
+| Known-Answer | 有界单包 | 最多 64 包，增加容量边界、普通 QM 降级与诊断修复；Engine 实际出站字节另由独立测试解析器验收，Linux UDP 与独立测试解析器专项已通过 |
 | SRV 候选 | 基础解析 | 按优先级与固定种子权重顺序提供候选列表，详见 [选择契约](docs/srv-selection.md) |
 | 输入与 Native 生命周期 | 不包含后续修复 | DTO 缓存接纳原子校验；稳定传输错误代码和关闭行为回归 |
 | 容量与异常 PTR flush 修复 | 不包含后续修复 | 已修复并加入回归 |
@@ -352,7 +352,7 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 | JS 核心/离线浏览器 | 核心冒烟、独立消费、回放和页面回调 | 不等于浏览器实时局域网扫描 |
 | 其他环境 | 部分核心用例曾在 Wasm/Native 运行，详见验证记录 | 没有全后端验收，不承诺 macOS/Bonjour 或所有设备兼容 |
 
-第二设备、Bonjour、长时间实网运行尚无证据。子类型与多包 Known-Answer 已有专项核心验收；Known-Answer 还通过独立测试解析器检查 Engine 实际生成的完整报文，但尚无对应专项实网互操作。一般 Avahi/zeroconf 闭环不能替代专项实网报告。50/200/500 个合成服务已有三轮单机性能观察，数据范围见[报告](docs/performance.md)，不构成通用性能或峰值资源保证。
+第二设备、Bonjour、长时间实网运行尚无证据。子类型与多包 Known-Answer 已有专项核心验收；Known-Answer 还通过独立测试解析器检查 Engine 实际生成的完整报文，另有 Linux UDP 与 Avahi 子类型专项证据。专项范围与原始报告见[专题验证](docs/specialized-interop.md)。50/200/500 个合成服务已有三轮单机性能观察，数据范围见[报告](docs/performance.md)，不构成通用性能或峰值资源保证。
 
 ## 常见问题
 

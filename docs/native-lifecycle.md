@@ -30,7 +30,7 @@ Engine 诊断事件（例如 `packet_rejected`、`event_overflow`）与此处的
 
 当前仍不自动迁移。应用遇到接口变化后，应关闭旧 Browser、确认新活动 IPv4、打开新 Browser 并重新建立业务订阅。新对象使用新 scope，旧接口缓存不跨网络混合。检测当前约每秒检查一次所选 IPv4 的接口索引，不宣称覆盖所有操作系统链路状态通知。
 
-没有修改本机网卡或断开 Wi-Fi 来模拟故障；实际接口失效/恢复、IPv6、单播与系统原生异步事件源仍待独立验收。
+Linux CI 已在独立 network namespace 的 dummy 网卡上删除并恢复地址，验证错误分类、旧缓存清理、新 scope 与订阅重建；报告见 specialized-interop.md。实验复现并修复了周期接口检查前 I/O 失败被误分类的问题。物理 Wi-Fi、IPv6、单播与系统原生异步事件源仍待后续；用户网卡未被修改。
 
 ## 已执行的短时检查
 

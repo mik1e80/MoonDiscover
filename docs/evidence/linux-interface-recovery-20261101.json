@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "source_commit": "5f246ea54a1e4f541fac2b16508fda3e460e68b4",
+  "source_dirty": false,
+  "binary_sha256": "8c863fec8e0209b406d6499a3dbd523aa3cc2e50fa30d62b151f939d277a4fa8",
+  "system": "Linux 7.0.0-1017-azure x86_64",
+  "ci_run_url": "//actions/runs/",
+  "experiment": "interface",
+  "result": {
+    "passed": true,
+    "isolated_network_namespace": true,
+    "address_removal_detected": true,
+    "old_cache_cleared": true,
+    "unavailable_open_rejected": true,
+    "new_scope": true,
+    "subscription_restored": true,
+    "automatic_migration": false
+  }
+}

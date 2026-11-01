@@ -1,0 +1,10 @@
+{
+  "source_commit": "5f246ea54a1e4f541fac2b16508fda3e460e68b4",
+  "ci_run_url": "https://github.com/mik1e80/MoonDiscover/actions/runs/41296198257",
+  "conclusion": "success",
+  "artifact_id": 13079411489,
+  "artifact_sha256": "ff8fd1c129e01903b0dfd182543313bc7dbfd3e1960509ffd208c57abc94f52a",
+  "reports": ["linux-protocol-20261101.json", "linux-interface-recovery-20261101.json"],
+  "raw_interface_ci_url_missing_due_to_sudo_environment": true,
+  "report_contents_preserved": true
+}
