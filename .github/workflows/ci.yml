@@ -26,6 +26,12 @@ jobs:
           moon version --all
           moonc -v | grep -F 'v0.10.17+d971670cd'
           moon update
+      - name: Explicit type format and public interface checks
+        run: |
+          moon check --target js
+          moon fmt --check
+          moon info
+          git diff --exit-code -- '*.mbti'
       - name: Focused portable smoke tests
         run: moon test dnssd_test.mbt src/model src/wire src/cache src/engine src/replay --target js --filter 'smoke:*'
       - name: Compile Linux native transport probes
