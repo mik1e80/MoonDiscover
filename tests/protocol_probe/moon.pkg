@@ -1,0 +1,7 @@
+import {
+  "mik1e80/dnssd/src/engine",
+  "mik1e80/dnssd/src/model",
+  "mik1e80/dnssd/src/wire",
+}
+
+supported_targets = "js"

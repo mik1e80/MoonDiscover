@@ -19,7 +19,7 @@
 | 服务容量 | capacity_test.mbt 的两种订阅回归 | 优先保留仍有效的已公布实例；省略新实例只诊断，真实移除后可填入候选 |
 | 唯一记录更新顺序 | `update_order_test.mbt`、实网更新 | 按报文到达序号识别新旧，避免同毫秒误冲突；同批冲突保持未完成 |
 | QM 查询调度 | `src/engine/query.mbt`、注入时钟/种子用例 | 初始 20..120ms 抖动、1s..1h 指数退避、按范围/名称/类型去重 |
-| 刷新与 Known-Answer | query、multipacket、known_answer_limits/fallback 及 replay 用例 | 剩余 TTL 至少半寿命；首包问题、后续仅答案、TC 直到末包；最多 64 包/16383 条，另受字节上限约束；超限退化为普通 QM 并当帧诊断；取消中途已验证；专项实网互操作待验证 |
+| 刷新与 Known-Answer | query、multipacket、known_answer_limits/fallback、replay 与 `tests/protocol_probe` | 剩余 TTL 至少半寿命；独立测试解析器检查 Engine 实际出站字节、首包问题、后续答案、TC 链和 260 条答案顺序；最多 64 包/16383 条，另受字节上限约束；超限退化为普通 QM 并当帧诊断；取消中途已验证；UDP 专项实网互操作待验证 |
 | 服务子类型 | subtype_test.mbt | 只接受对应 subtype PTR 的实例，沿用基础 SRV/TXT/身份；基础/子类型重叠不重复事件；专项实网仍待验证 |
 | 指定实例 resolve | `src/engine/resolve.mbt`、resolve 用例 | 不依赖 PTR；初次超时 1..3600000ms，成功后持续观察至取消/关闭 |
 | 订阅与取消 | Engine 与 Native cancel 实验 | 重复订阅共享状态；取消清理关联待发查询；异步退出释放 socket |

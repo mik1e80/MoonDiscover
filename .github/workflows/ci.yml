@@ -34,6 +34,8 @@ jobs:
           git diff --exit-code -- '*.mbti'
       - name: Focused portable smoke tests
         run: moon test dnssd_test.mbt src/model src/wire src/cache src/engine src/replay --target js --filter 'smoke:*'
+      - name: Independently parse Engine Known-Answer output
+        run: moon test tests/protocol_probe --target js --filter 'smoke:*'
       - name: Compile Linux native transport probes
         run: moon build cmd/native_spike cmd/transport_spike cmd/moondiscover examples/http_connect examples/watch_events tests/native_cancel --target native
       - name: Consume public APIs from a separate local workspace

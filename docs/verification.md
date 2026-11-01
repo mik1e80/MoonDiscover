@@ -2,7 +2,11 @@
 
 状态日期：2026-11-01。已发布 0.1.0 与 main（0.2.0-dev）分别记录。验证按改动运行轻量用例与受控短时实验，不在每步全量运行所有后端。
 
-本次本地轻量检查包括：相关核心 JS `smoke:*` 52 项通过、Native `moon check`、格式检查和 `tests/protocol_probe` 编译通过。当前多包协议网络探针未捕获本机发出的组播副本，故不记为互操作通过；第二设备专项仍待后续环境可用时验证。新近 main 提交的 GitHub CI 结果应以对应提交页面的 Actions 状态为准。
+本次本地轻量检查包括：相关核心 JS `smoke:*` 52 项通过；`tests/protocol_probe` 的独立解析器回归 1 项通过；Native `moon check`、格式检查通过。解析器直接验证 Engine 实际出站字节，包括 260 条答案、TC 链、问题位置、取消清理和超限降级。实际本机组播探针未捕获到本机发出的组播副本，故不记为实网互操作通过；第二设备专项仍待后续环境可用时验证。新近 main 提交的 GitHub CI 结果应以对应提交页面的 Actions 状态为准。
+
+```powershell
+.\scripts\moon.ps1 test tests/protocol_probe --target js --frozen --filter 'smoke:*'
+```
 
 ## 纯核心与实际 CLI
 

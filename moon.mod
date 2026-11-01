@@ -15,7 +15,7 @@ version = "0.2.0-dev"
 
 readme = "README.md"
 
-repository = "https://github.com/mik1e80/moonbit-mDNS-DNS-SD-"
+repository = "https://github.com/mik1e80/MoonDiscover"
 
 license = "Apache-2.0"
 
