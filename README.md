@@ -208,7 +208,7 @@ CLI 向 stdout 实时逐行输出 JSONL，可保存或交给程序解析。服�
 | `updated` | 内容变化，重新评估 TXT、端点或连接候选 |
 | `unavailable` | 已观察实例失去完整性，暂缓依赖完整端点的操作 |
 | `removed` | 不再属于当前观察结果，按原因更新列表 |
-| `diagnostic` | 解析、容量、队列或查询降级信息，查看 `code` / `detail` |
+| `diagnostic` | 解析、容量、队列或查询降级信息，查看 `code` / `detail`；代码表见[诊断目录](docs/diagnostics.md) |
 | `resolve_timeout` | 指定实例的初次解析超时 |
 
 重复响应或仅刷新 TTL 不单独制造内容更新事件。CLI 还会输出 `summary`、录制结果或 `error`；回放也可能输出订阅和待发查询。按 `event` 分派，不能假定每行都有 `service`。完整定义见 [JSON 序列化](src/replay/json.mbt)。

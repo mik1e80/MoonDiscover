@@ -22,6 +22,8 @@
 | InterfaceUnavailable | `interface_unavailable` | 打开时接口不可用，或运行检查发现原接口失效/索引变化 |
 | SocketError | `socket_error` | 系统收发/绑定或必要元数据故障，保留操作上下文与 OS 数值 |
 
+Engine 诊断事件（例如 `packet_rejected`、`event_overflow`）与此处的传输异常是不同通道。完整代码目录见[diagnostics.md](diagnostics.md)。
+
 格式错误的入站 DNS 报文产生 `packet_rejected`，接收循环继续。截断/超长 UDP 按已有适配层规则丢弃；它们不等同于真实 socket 失败。
 
 ## 接口恢复边界
