@@ -310,7 +310,7 @@ python -m http.server 8000 --bind 127.0.0.1 --directory .tools/browser-replay
 | 地址记录 | 解码和聚合 A / AAAA；AAAA 不等于 IPv6 组播传输或已验证 IPv6 连接 |
 | 支持记录 | PTR、SRV、TXT、A、AAAA；未知 RR 有界保留/跳过，不自动成为业务能力 |
 | 缓存 | scope 隔离、TTL、goodbye 一秒宽限、flush 近期分包保护；main 忽略 DNS-SD PTR 异常 flush 位 |
-| 冲突记录 | SRV 按优先级与固定种子权重顺序公开全部候选；候选集限于最新响应批次。多个冲突 TXT 仍保持未完成 |
+| 冲突记录 | SRV 汇集同范围未过期 RRSet，按优先级与固定种子权重顺序公开候选；替换遵循 cache-flush 宽限。多个冲突 TXT 仍保持未完成 |
 | 接口变化 | 接口失效或地址/索引变化报错，不自动迁移到新接口 |
 | 异步实现 | 短周期协作轮询，尚未接入系统原生异步 fd 事件源 |
 

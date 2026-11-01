@@ -6,36 +6,46 @@ test "smoke: host port and address changes follow the published event contract" 
   engine.ingest_message(message(records), "wifi", 0)
   let _ = engine.poll_event()
   let _ = engine.poll_event()
-  engine.ingest_message(message([fixture(port=9090)[1]]), "wifi", 100)
-  assert_true(
-    engine.poll_event() is Some(@engine.Updated(s, "response")) &&
-    s.port == Some(9090),
-  )
+  engine.ingest_message(message([fixture(port=9090)[1]]), "wifi", 2000)
+  engine.advance(3000)
+  assert_eq(engine.snapshots()[0].port, Some(9090))
+  let mut updated = false
+  while engine.poll_event() is Some(event) {
+    if event is @engine.Updated(_, _) {
+      updated = true
+    }
+  }
+  assert_true(updated)
   let host = @model.DnsName::parse("replacement.local.")
   engine.ingest_message(
     message([{ ..records[1], data: @wire.Srv(0, 0, 9090, host), }]),
     "wifi",
-    200,
+    5000,
   )
-  assert_true(
-    engine.poll_event() is Some(@engine.Unavailable(s, "response")) &&
-    s.missing.contains("addresses"),
-  )
+  engine.advance(6000)
+  assert_true(engine.snapshots()[0].missing.contains("addresses"))
+  let mut unavailable = false
+  while engine.poll_event() is Some(event) {
+    if event is @engine.Unavailable(_, _) {
+      unavailable = true
+    }
+  }
+  assert_true(unavailable)
   engine.ingest_message(
     message([{ ..records[3], name: host, ttl: 1U, }]),
     "wifi",
-    300,
+    6100,
   )
   assert_true(
     engine.poll_event() is Some(@engine.Resolved(s)) &&
     s.target is Some(t) &&
     t.same_name(host),
   )
-  engine.advance(1300)
+  engine.advance(7100)
   assert_true(
     engine.poll_event() is Some(@engine.Unavailable(_, "ttl_expired")),
   )
-  engine.ingest_message(message([{ ..records[3], name: host, }]), "wifi", 1400)
+  engine.ingest_message(message([{ ..records[3], name: host, }]), "wifi", 7200)
   assert_true(engine.poll_event() is Some(@engine.Resolved(_)))
   assert_true(engine.poll_event() is None)
   assert_eq(engine.stats().services, 1)

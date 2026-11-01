@@ -105,7 +105,9 @@ fn Engine::srv_candidates(
   instance : @model.DnsName,
 ) -> Array[SrvCandidate] {
   let candidates : Array[SrvCandidate] = []
-  for entry in newest(self.cache.records(scope, instance, 33)) {
+  // A cache-flush RRSet may span packets. The cache owns the one-second
+  // grace/rescue rules; every unexpired SRV remains a live alternative.
+  for entry in self.cache.records(scope, instance, 33) {
     if entry.record.data is @wire.Srv(priority, weight, port, target) {
       let addresses : Array[Bytes] = []
       for rr_type in [1, 28] {

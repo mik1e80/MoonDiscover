@@ -72,14 +72,21 @@ test "smoke: alternative hosts are queried while absent and unavailable SRVs sta
       },
     ]),
     "wifi",
-    200,
+    2000,
   )
+  while engine.poll_event() is Some(_) {
+    ()
+  }
+  engine.advance(3000)
   let snapshot = engine.snapshots()[0]
   assert_false(snapshot.complete)
   assert_true(snapshot.target is None && snapshot.port is None)
   assert_true(snapshot.missing.contains("unavailable_srv"))
-  assert_true(engine.poll_event() is Some(@engine.Unavailable(_, "response")))
-  engine.ingest_message(message([records[1]]), "wifi", 300)
-  assert_true(engine.poll_event() is Some(@engine.Resolved(_)))
-  assert_true(engine.poll_event() is None)
+  while engine.poll_event() is Some(_) {
+    ()
+  }
+  engine.ingest_message(message([records[1]]), "wifi", 4001)
+  engine.advance(5001)
+  assert_true(engine.snapshots()[0].complete)
+  assert_eq(engine.snapshots()[0].srv_candidates.length(), 1)
 }

@@ -42,7 +42,7 @@ MoonDiscover 用 MoonBit 实现发现所需的报文、缓存、查询与状态�
 
 Windows 证据来自同机独立 zeroconf 进程。main 另有[同 Linux VM 的 Avahi 0.8 实网报告](evidence/linux-avahi-20261028.json)，发现、HTTP、更新、goodbye、取消与回放共八项通过；它不回填为已发布 0.1.0 包的 Linux 验证。尚无第二设备、Bonjour 或长时间实网运行证据。多包 Known-Answer 和子类型仍缺专项独立实现互操作报告。
 
-实时传输仍为 IPv4 QM 组播，单播接收排除。未实现发布者、IPv6 组播、NSEC 负缓存、自动接口切换与跨响应批次的 SRV RRSet 重组。main 的容量、异常 PTR、防御性 DTO 校验与 SRV 候选选择均有回归；具体契约和限制见 [SCOPE.md](SCOPE.md) 与 [SRV 选择说明](srv-selection.md)。
+实时传输仍为 IPv4 QM 组播，单播接收排除。未实现发布者、IPv6 组播、NSEC 负缓存与自动接口切换。main 的容量、异常 PTR、防御性 DTO 校验与跨响应包 SRV 候选选择均有回归；具体契约和限制见 [SCOPE.md](SCOPE.md) 与 [SRV 选择说明](srv-selection.md)。
 
 Mooncakes 0.1.0 已实际发布，[源码标签](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/tree/v0.1.0)对应 `2b922d6`。无 `moon.work` 源码映射的新工程已从注册表安装、运行公开核心 API、编译 Native 并打开/关闭 socket；归档散列及全部 116 个安装文件匹配。详见[发布记录](evidence/release-0.1.0-20261024.json)和[消费记录](evidence/consumer-registry-20261024.json)。
 

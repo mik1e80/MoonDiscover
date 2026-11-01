@@ -89,7 +89,10 @@ test "smoke: updates expiry and goodbye produce distinct state transitions" {
   let newer = fixture(port=9090, srv_ttl=2)
   engine.ingest_message(message([newer[1]]), "wifi", 1000)
   assert_true(engine.poll_event() is Some(@engine.Updated(_, "response")))
+  assert_eq(engine.snapshots()[0].srv_candidates.length(), 2)
+  engine.advance(2000)
   assert_eq(engine.snapshots()[0].port, Some(9090))
+  assert_true(engine.poll_event() is Some(@engine.Updated(_, "ttl_expired")))
   engine.advance(3000)
   assert_true(
     engine.poll_event() is Some(@engine.Unavailable(_, "ttl_expired")),

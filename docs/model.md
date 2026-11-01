@@ -18,6 +18,8 @@ JSON 保留 `txt_entries_hex`，避免把任意 TXT 字节强行转换为 UTF-8�
 
 Engine 的 `Seen` 表示首次观察实例，`Resolved` 表示成为完整状态，`Updated` 表示内容变化，`Unavailable` 表示已观察实例的完整性丢失，`Removed` 表示不再属于当前观察结果。TTL 刷新或重复包不单独产生内容更新。移除快照保留最后已知字段便于识别，但 `complete=false`、剩余 TTL 为 0。
 
+SRV 候选可跨响应包到达；替换旧记录时，缓存的一秒宽限和最近接收保护仍适用，因此端口/主机更新可能先表现为多个候选，随后由到期移除旧项。详见 [SRV 契约](srv-selection.md)。
+
 多个订阅可共享同一范围的服务；同名实例在不同 scope 中互不合并。Native Browser 将指定接口与本次运行关联为 scope，纯核心调用者负责提供有意义的范围标识。scope 是观察范围，不是服务的永久全局 ID。
 
 事件、服务和缓存均有上限。事件队列溢出会发出 `event_overflow` 诊断并计数；消费者应调用 `snapshots()` 重新同步。返回数组复制以避免消费者修改内部状态。

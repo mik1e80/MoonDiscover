@@ -267,7 +267,7 @@ fn Engine::build_snapshot(
   let mut port : Int32? = None
   let mut txt : @model.TxtRecord? = None
   let mut expiry = ptr_expiry
-  let srv_records = newest(self.cache.records(sub.scope, instance, 33))
+  let srv_records = self.cache.records(sub.scope, instance, 33)
   let srv_candidates = self.srv_candidates(sub.scope, instance)
   if srv_candidates.is_empty() {
     missing.push("srv")
