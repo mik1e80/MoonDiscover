@@ -115,7 +115,7 @@ fn packet_checks(ip : UInt32) -> Json raise {
           rr_type: 16,
           rr_class: 1,
           ttl: 120U,
-          cache_flush: true,
+          cache_flush: false,
           section: @dnssd.Section::Answer,
           data: @dnssd.RData::Txt(
             @dnssd.TxtRecord::from_entries(
