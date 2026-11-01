@@ -39,7 +39,7 @@ jobs:
       - name: Compile Linux native transport probes
         run: moon build cmd/native_spike cmd/transport_spike cmd/moondiscover examples/http_connect examples/watch_events tests/native_cancel tests/resource_soak --target native
       - name: Bounded resource lifecycle smoke
-        run: _build/native/debug/build/tests/resource_soak/resource_soak 2
+        run: _build/native/debug/build/tests/resource_soak/resource_soak.exe 2
       - name: Consume public APIs from a separate local workspace
         run: python3 tests/interop/consumer_smoke.py --moon-home "$HOME/.moon" --version 0.2.0-dev
       - name: Compile and verify offline browser replay callback

@@ -1,9 +1,9 @@
 ----
 import {
-  "moonbitlang/async",
-  "moonbitlang/async/fs",
-  "moonbitlang/async/process",
-  "moonbitlang/async/shell",
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/process",
+  "moonbitlang/async@0.22.5/shell",
   "moonbitlang/core/env",
   "moonbitlang/core/json",
 }
@@ -70,7 +70,8 @@ async fn main {
   let args = @env.args()
   guard args.length() == 2 else { fail("usage: protocol-live.mbtx <avahi|interface>") }
   @fs.mkdir(".tools", recursive=true, allow_exist=true)
-  let binary = @fs.realpath("_build/native/debug/build/tests/protocol_live/protocol_live")
+  let base = "_build/native/debug/build/tests/protocol_live/protocol_live"
+  let binary = @fs.realpath(if @fs.exists(base) { base } else { base + ".exe" })
   let result = match args[1] {
     "avahi" => avahi(binary)
     "interface" => interface(binary)
