@@ -1,0 +1,130 @@
+{
+  "date": "2026-11-01",
+  "source_commit": "e0131eecbdd96e251a9e64d81a238d31bbffdc12",
+  "source_dirty_at_build_and_start": false,
+  "binary_sha256": "c86353a251c2807554eeca52fe06643e68611eeba9c9d68bb3ef8773929a844d",
+  "platform": "Windows Native release",
+  "warmup_cycles": 20,
+  "passed": true,
+  "result": {
+    "passed": true,
+    "duration_ms": "600000",
+    "cycles": 19298,
+    "services_per_cycle": 50,
+    "duplicate_packets_per_cycle": 5,
+    "cache_peak_records": 201,
+    "snapshot_resync_cycles": 19298,
+    "intentional_queue_drops": "4322752",
+    "initial_rss_bytes": "7983104",
+    "peak_rss_bytes": "8298496",
+    "final_rss_bytes": "8298496",
+    "initial_handles": "122",
+    "peak_handles": "122",
+    "final_handles": "122",
+    "all_closed_state_counts_zero": true
+  },
+  "progress_samples": [
+    {
+      "progress_cycles": 966,
+      "elapsed_ms": "30000",
+      "rss_bytes": "8073216"
+    },
+    {
+      "progress_cycles": 1931,
+      "elapsed_ms": "60000",
+      "rss_bytes": "8007680"
+    },
+    {
+      "progress_cycles": 2896,
+      "elapsed_ms": "90015",
+      "rss_bytes": "8052736"
+    },
+    {
+      "progress_cycles": 3861,
+      "elapsed_ms": "120015",
+      "rss_bytes": "8122368"
+    },
+    {
+      "progress_cycles": 4826,
+      "elapsed_ms": "150031",
+      "rss_bytes": "8114176"
+    },
+    {
+      "progress_cycles": 5793,
+      "elapsed_ms": "180062",
+      "rss_bytes": "8114176"
+    },
+    {
+      "progress_cycles": 6759,
+      "elapsed_ms": "210078",
+      "rss_bytes": "8044544"
+    },
+    {
+      "progress_cycles": 7724,
+      "elapsed_ms": "240093",
+      "rss_bytes": "8122368"
+    },
+    {
+      "progress_cycles": 8689,
+      "elapsed_ms": "270109",
+      "rss_bytes": "8122368"
+    },
+    {
+      "progress_cycles": 9654,
+      "elapsed_ms": "300109",
+      "rss_bytes": "8142848"
+    },
+    {
+      "progress_cycles": 10621,
+      "elapsed_ms": "330125",
+      "rss_bytes": "8261632"
+    },
+    {
+      "progress_cycles": 11584,
+      "elapsed_ms": "360140",
+      "rss_bytes": "8241152"
+    },
+    {
+      "progress_cycles": 12549,
+      "elapsed_ms": "390140",
+      "rss_bytes": "8241152"
+    },
+    {
+      "progress_cycles": 13516,
+      "elapsed_ms": "420156",
+      "rss_bytes": "8278016"
+    },
+    {
+      "progress_cycles": 14480,
+      "elapsed_ms": "450156",
+      "rss_bytes": "8220672"
+    },
+    {
+      "progress_cycles": 15445,
+      "elapsed_ms": "480171",
+      "rss_bytes": "8278016"
+    },
+    {
+      "progress_cycles": 16411,
+      "elapsed_ms": "510187",
+      "rss_bytes": "8224768"
+    },
+    {
+      "progress_cycles": 17375,
+      "elapsed_ms": "540203",
+      "rss_bytes": "8278016"
+    },
+    {
+      "progress_cycles": 18341,
+      "elapsed_ms": "570218",
+      "rss_bytes": "8232960"
+    }
+  ],
+  "limits": [
+    "10 actual wall-clock minutes, not day-long leak proof",
+    "synthetic decoded records, no live multicast in this workload",
+    "queue drops are intentional; every cycle verifies snapshot resynchronization",
+    "RSS and process handle samples include runtime; final growth thresholds are 32 MiB and 8 handles",
+    "does not measure repeated Browser/socket creation"
+  ]
+}
