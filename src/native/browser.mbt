@@ -103,12 +103,27 @@ pub fn Browser::cancel(self : Browser, id : Int32) -> Unit raise {
 }
 
 ///|
+fn Browser::classify_io_error(
+  self : Browser,
+  error : TransportError,
+) -> TransportError {
+  // An address may disappear between the periodic interface check and I/O.
+  if interface_index(self.interface_ipv4) != self.interface_index {
+    InterfaceUnavailable
+  } else {
+    error
+  }
+}
+
+///|
 fn Browser::send_pending(self : Browser) -> Unit raise {
   while self.engine.poll_outbound() is Some(packet) {
     guard packet.scope == self.scope else {
       raise SocketError("outbound scope does not match browser interface", 0)
     }
-    self.socket.send(packet.bytes)
+    self.socket.send(packet.bytes) catch {
+      error => raise self.classify_io_error(error)
+    }
   }
 }
 
@@ -139,7 +154,10 @@ pub fn Browser::poll(
     wait = wait.min((deadline - now).max(0L).min(50L).to_int())
   }
   for _ in 0..<64 {
-    match self.socket.receive(timeout_ms=wait) {
+    let received = self.socket.receive(timeout_ms=wait) catch {
+      error => raise self.classify_io_error(error)
+    }
+    match received {
       None => break
       Some(packet) => {
         wait = 0

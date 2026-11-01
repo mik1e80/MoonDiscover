@@ -81,7 +81,9 @@ pub fn MulticastSocket::send(
     raise InvalidArgument("datagram length outside 12..9000")
   }
   let n = socket_send(self.handle, data, data.length())
-  guard n == data.length() else { raise SocketError("send", n.to_int64()) }
+  guard n == data.length() else {
+    raise SocketError("send", if n < 0 { -n.to_int64() } else { n.to_int64() })
+  }
 }
 
 ///|

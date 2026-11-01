@@ -15,9 +15,12 @@ async fn command(program : String, args : Array[String]) -> String {
   output.stdout().trim().to_owned()
 }
 
-async fn wait_marker(path : String) -> Unit {
+async fn wait_marker(path : String, child : @process.Process) -> Unit {
   for _ in 0..<500 {
     if @fs.exists(path) { return }
+    if child.try_wait() is Some(code) {
+      fail("interface probe exited \{code}: " + @fs.read_file(".tools/interface-probe-stderr.log").text())
+    }
     @async.sleep(20)
   }
   fail("timed out waiting for " + path)
@@ -58,9 +61,9 @@ async fn interface(binary : String) -> Json {
     let stderr = @process.redirect_to_file(".tools/interface-probe-stderr.log")
     let child = @process.spawn(group, binary, ["interface", "10.255.240.1", marker], stdout~, stderr~, no_wait=true)
     defer child.cancel()
-    wait_marker(marker)
+    wait_marker(marker, child)
     let _ = command("ip", ["addr", "del", "10.255.240.1/24", "dev", "mdprobe0"])
-    wait_marker(marker + ".failed")
+    wait_marker(marker + ".failed", child)
     let _ = command("ip", ["addr", "add", "10.255.240.1/24", "dev", "mdprobe0"])
     guard child.wait() == 0 else { fail("interface probe failed: " + @fs.read_file(".tools/interface-probe-stderr.log").text()) }
     @fs.read_file(".tools/interface-probe-stdout.json").json()
