@@ -1,0 +1,323 @@
+{
+  "date": "2026-11-01T17:29:22.975053+08:00",
+  "source_commit": "8a7f1ab51fd714f6e53c3ef3a6f13497d73bbb04",
+  "source_dirty": false,
+  "binary_sha256": "6f7e7e737ef31755f2c1dff5ad63ee4bfe246f3209f20edf6c52d0a172f0a6e7",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "",
+  "logical_cpus": 32,
+  "build_mode": "native release",
+  "memory_method": "sampled process peak working set",
+  "sample_interval_ms": 10,
+  "runs_per_size": 3,
+  "workload": {
+    "service_counts": [
+      50,
+      200,
+      500
+    ],
+    "records_per_service": 4,
+    "virtual_idle_ticks": 3600,
+    "virtual_elapsed_ms": 3600000,
+    "input": "synthetic decoded records; no multicast and no wire decoding"
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "results": [
+        {
+          "services": 50,
+          "records": 200,
+          "batches": 2,
+          "ingest_ms": 0,
+          "duplicate_ms": 0,
+          "idle_ticks": 3600,
+          "virtual_elapsed_ms": 3600000,
+          "idle_ms": 15,
+          "cache_peak_records": 200,
+          "event_peak": 100,
+          "query_jobs": 201,
+          "outbound_queries": 612,
+          "diagnostics": 0,
+          "dropped_events": 0,
+          "invariants_passed": true,
+          "wall_ms": 68.29,
+          "sampled_peak_process_bytes": 9809920
+        },
+        {
+          "services": 200,
+          "records": 800,
+          "batches": 7,
+          "ingest_ms": 16,
+          "duplicate_ms": 62,
+          "idle_ticks": 3600,
+          "virtual_elapsed_ms": 3600000,
+          "idle_ms": 32,
+          "cache_peak_records": 800,
+          "event_peak": 400,
+          "query_jobs": 801,
+          "outbound_queries": 2424,
+          "diagnostics": 876,
+          "dropped_events": 0,
+          "invariants_passed": true,
+          "wall_ms": 181.13,
+          "sampled_peak_process_bytes": 9261056
+        },
+        {
+          "services": 500,
+          "records": 2000,
+          "batches": 16,
+          "ingest_ms": 329,
+          "duplicate_ms": 843,
+          "idle_ticks": 3600,
+          "virtual_elapsed_ms": 3600000,
+          "idle_ms": 63,
+          "cache_peak_records": 2000,
+          "event_peak": 1000,
+          "query_jobs": 2001,
+          "outbound_queries": 6048,
+          "diagnostics": 7924,
+          "dropped_events": 0,
+          "invariants_passed": true,
+          "wall_ms": 1418.59,
+          "sampled_peak_process_bytes": 10452992
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "results": [
+        {
+          "services": 50,
+          "records": 200,
+          "batches": 2,
+          "ingest_ms": 0,
+          "duplicate_ms": 0,
+          "idle_ticks": 3600,
+          "virtual_elapsed_ms": 3600000,
+          "idle_ms": 16,
+          "cache_peak_records": 200,
+          "event_peak": 100,
+          "query_jobs": 201,
+          "outbound_queries": 612,
+          "diagnostics": 0,
+          "dropped_events": 0,
+          "invariants_passed": true,
+          "wall_ms": 27.12,
+          "sampled_peak_process_bytes": 8998912
+        },
+        {
+          "services": 200,
+          "records": 800,
+          "batches": 7,
+          "ingest_ms": 31,
+          "duplicate_ms": 62,
+          "idle_ticks": 3600,
+          "virtual_elapsed_ms": 3600000,
+          "idle_ms": 16,
+          "cache_peak_records": 800,
+          "event_peak": 400,
+          "query_jobs": 801,
+          "outbound_queries": 2424,
+          "diagnostics": 876,
+          "dropped_events": 0,
+          "invariants_passed": true,
+          "wall_ms": 161.12,
+          "sampled_peak_process_bytes": 9228288
+        },
+        {
+          "services": 500,
+          "records": 2000,
+          "batches": 16,
+          "ingest_ms": 312,
+          "duplicate_ms": 813,
+          "idle_ticks": 3600,
+          "virtual_elapsed_ms": 3600000,
+          "idle_ms": 78,
+          "cache_peak_records": 2000,
+          "event_peak": 1000,
+          "query_jobs": 2001,
+          "outbound_queries": 6048,
+          "diagnostics": 7924,
+          "dropped_events": 0,
+          "invariants_passed": true,
+          "wall_ms": 1381.43,
+          "sampled_peak_process_bytes": 10301440
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "results": [
+        {
+          "services": 50,
+          "records": 200,
+          "batches": 2,
+          "ingest_ms": 0,
+          "duplicate_ms": 0,
+          "idle_ticks": 3600,
+          "virtual_elapsed_ms": 3600000,
+          "idle_ms": 16,
+          "cache_peak_records": 200,
+          "event_peak": 100,
+          "query_jobs": 201,
+          "outbound_queries": 612,
+          "diagnostics": 0,
+          "dropped_events": 0,
+          "invariants_passed": true,
+          "wall_ms": 27.52,
+          "sampled_peak_process_bytes": 9007104
+        },
+        {
+          "services": 200,
+          "records": 800,
+          "batches": 7,
+          "ingest_ms": 31,
+          "duplicate_ms": 62,
+          "idle_ticks": 3600,
+          "virtual_elapsed_ms": 3600000,
+          "idle_ms": 16,
+          "cache_peak_records": 800,
+          "event_peak": 400,
+          "query_jobs": 801,
+          "outbound_queries": 2424,
+          "diagnostics": 876,
+          "dropped_events": 0,
+          "invariants_passed": true,
+          "wall_ms": 160.75,
+          "sampled_peak_process_bytes": 9244672
+        },
+        {
+          "services": 500,
+          "records": 2000,
+          "batches": 16,
+          "ingest_ms": 328,
+          "duplicate_ms": 828,
+          "idle_ticks": 3600,
+          "virtual_elapsed_ms": 3600000,
+          "idle_ms": 78,
+          "cache_peak_records": 2000,
+          "event_peak": 1000,
+          "query_jobs": 2001,
+          "outbound_queries": 6048,
+          "diagnostics": 7924,
+          "dropped_events": 0,
+          "invariants_passed": true,
+          "wall_ms": 1424.91,
+          "sampled_peak_process_bytes": 10473472
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "50": {
+      "ingest_ms": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      },
+      "duplicate_ms": {
+        "min": 0,
+        "median": 0,
+        "max": 0
+      },
+      "idle_ms": {
+        "min": 15,
+        "median": 16,
+        "max": 16
+      },
+      "wall_ms": {
+        "min": 27.12,
+        "median": 27.52,
+        "max": 68.29
+      },
+      "sampled_peak_process_bytes": {
+        "min": 8998912,
+        "median": 9007104,
+        "max": 9809920
+      },
+      "records": 200,
+      "cache_peak_records": 200,
+      "event_peak": 100,
+      "outbound_queries": 612,
+      "diagnostics": 0,
+      "dropped_events": 0,
+      "invariants_passed_all_runs": true
+    },
+    "200": {
+      "ingest_ms": {
+        "min": 16,
+        "median": 31,
+        "max": 31
+      },
+      "duplicate_ms": {
+        "min": 62,
+        "median": 62,
+        "max": 62
+      },
+      "idle_ms": {
+        "min": 16,
+        "median": 16,
+        "max": 32
+      },
+      "wall_ms": {
+        "min": 160.75,
+        "median": 161.12,
+        "max": 181.13
+      },
+      "sampled_peak_process_bytes": {
+        "min": 9228288,
+        "median": 9244672,
+        "max": 9261056
+      },
+      "records": 800,
+      "cache_peak_records": 800,
+      "event_peak": 400,
+      "outbound_queries": 2424,
+      "diagnostics": 876,
+      "dropped_events": 0,
+      "invariants_passed_all_runs": true
+    },
+    "500": {
+      "ingest_ms": {
+        "min": 312,
+        "median": 328,
+        "max": 329
+      },
+      "duplicate_ms": {
+        "min": 813,
+        "median": 828,
+        "max": 843
+      },
+      "idle_ms": {
+        "min": 63,
+        "median": 78,
+        "max": 78
+      },
+      "wall_ms": {
+        "min": 1381.43,
+        "median": 1418.59,
+        "max": 1424.91
+      },
+      "sampled_peak_process_bytes": {
+        "min": 10301440,
+        "median": 10452992,
+        "max": 10473472
+      },
+      "records": 2000,
+      "cache_peak_records": 2000,
+      "event_peak": 1000,
+      "outbound_queries": 6048,
+      "diagnostics": 7924,
+      "dropped_events": 0,
+      "invariants_passed_all_runs": true
+    }
+  },
+  "passed": true,
+  "limits": [
+    "single Windows host observation; timings are not a general performance guarantee",
+    "process memory includes runtime, generated inputs, and protocol state, not exact library-object size",
+    "0 ms values are below the monotonic clock resolution, not zero work",
+    "virtual elapsed time is accelerated and is not a wall-clock soak"
+  ]
+}
