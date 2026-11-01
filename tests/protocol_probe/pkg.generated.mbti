@@ -1,11 +1,43 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "mik1e80/dnssd/tests/protocol_probe"
 
+import {
+  "mik1e80/dnssd/src/engine",
+  "mik1e80/dnssd/src/model",
+}
+
 // Values
+pub fn check_cancellation() -> Int32 raise
+
+pub fn check_full_burst() -> Int32 raise
+
+pub fn check_oversize_fallback() -> Unit raise
+
+pub fn independent_packet(Bytes) -> ProbePacket raise
+
+pub fn populated(@model.DnsName) -> (@engine.Engine, Int32) raise
 
 // Errors
 
 // Types and methods
+pub struct ProbeAnswer {
+  owner : String
+  rr_type : Int32
+  rr_class : Int32
+  target : String
+}
+
+pub struct ProbePacket {
+  flags : Int32
+  questions : Array[ProbeQuestion]
+  answers : Array[ProbeAnswer]
+}
+
+pub struct ProbeQuestion {
+  name : String
+  rr_type : Int32
+  rr_class : Int32
+}
 
 // Type aliases
 

@@ -10,6 +10,10 @@ on:
       - cmd/**
       - examples/**
       - tests/native_cancel/**
+      - tests/protocol_live/**
+      - tests/protocol_probe/**
+      - scripts/protocol-live.mbtx
+      - fixtures/**
       - moon.mod
       - moon.pkg
       - toolchain.json
@@ -32,19 +36,27 @@ jobs:
           curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- "$version"
           echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
           sudo apt-get update -qq
-          sudo apt-get install -y avahi-daemon python3-dbus
+          sudo apt-get install -y avahi-daemon avahi-utils python3-dbus iproute2
           sudo systemctl start dbus avahi-daemon
           avahi-daemon --version
       - name: Build only live experiment entry points
         run: |
           moon update
-          moon build cmd/moondiscover examples/http_connect tests/native_cancel --target native
+          moon build cmd/moondiscover examples/http_connect tests/native_cancel tests/protocol_live --target native
       - name: Observe actual IPv4 multicast HTTP update goodbye and replay
         run: /usr/bin/python3 tests/interop/avahi_smoke.py --output .tools/avahi-linux.json
+      - name: Independently verify Known-Answer UDP and Avahi subtype publication
+        run: moon run scripts/protocol-live.mbtx -- avahi
+      - name: Remove and restore an address in an isolated network namespace
+        run: sudo --preserve-env=HOME,PATH unshare --net "$HOME/.moon/bin/moon" run scripts/protocol-live.mbtx -- interface
       - name: Retain controlled report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: linux-avahi-evidence
-          path: .tools/avahi-linux.json
+          path: |
+            .tools/avahi-linux.json
+            .tools/protocol-live-*.json
+            .tools/interface-probe-*.log
+            .tools/protocol-*.log
           include-hidden-files: true

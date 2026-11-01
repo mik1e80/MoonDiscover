@@ -1,0 +1,85 @@
+----
+import {
+  "moonbitlang/async",
+  "moonbitlang/async/fs",
+  "moonbitlang/async/process",
+  "moonbitlang/async/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+----
+
+async fn command(program : String, args : Array[String]) -> String {
+  let output = @shell.Cmd(program, args).output(timeout_ms=20000)
+  guard output.exit_code() == 0 else { fail(program + " failed: " + output.stderr()) }
+  output.stdout().trim().to_owned()
+}
+
+async fn wait_marker(path : String) -> Unit {
+  for _ in 0..<500 {
+    if @fs.exists(path) { return }
+    @async.sleep(20)
+  }
+  fail("timed out waiting for " + path)
+}
+
+async fn avahi(binary : String) -> Json {
+  let route = @json.parse(command("ip", ["-j", "-4", "route", "get", "224.0.0.251"]))
+  guard route is [{ "prefsrc": String(ip), .. }, ..] else { fail("no IPv4 multicast route") }
+  let packets = @json.parse(command(binary, ["packets", ip]))
+  let subtypes = @async.with_task_group(group => {
+    let printer_log = @process.redirect_to_file(".tools/protocol-printer.log")
+    let scanner_log = @process.redirect_to_file(".tools/protocol-scanner.log")
+    let printer = @process.spawn(group, "avahi-publish-service", ["--subtype=_printer._sub._mdprobe._tcp", "printer-probe", "_mdprobe._tcp", "18321", "role=printer"], stdout=printer_log, stderr=printer_log, no_wait=true)
+    defer printer.cancel()
+    let scanner = @process.spawn(group, "avahi-publish-service", ["--subtype=_scanner._sub._mdprobe._tcp", "scanner-probe", "_mdprobe._tcp", "18322", "role=scanner"], stdout=scanner_log, stderr=scanner_log, no_wait=true)
+    defer scanner.cancel()
+    @async.sleep(1800)
+    guard printer.try_wait() is None && scanner.try_wait() is None else { fail("Avahi publisher exited") }
+    @json.parse(command(binary, ["subtypes", ip]))
+  })
+  Json::object({"packets": packets, "subtypes": subtypes, "interface_ipv4": Json(ip), "avahi_version": Json(command("avahi-daemon", ["--version"])), "limits": Json::array([Json("same Linux VM, not second-device interoperability"), Json("Known-Answer bytes originate from Engine and cross actual multicast UDP; independent test parser does not call production decode"), Json("subtype records originate from independent Avahi daemon")])})
+}
+
+async fn interface(binary : String) -> Json {
+  let current_ns = command("readlink", ["/proc/self/ns/net"])
+  let host_ns = command("readlink", ["/proc/1/ns/net"])
+  guard current_ns != host_ns else { fail("refusing interface changes outside an isolated network namespace") }
+  let _ = command("ip", ["link", "set", "lo", "up"])
+  let _ = command("ip", ["link", "add", "mdprobe0", "type", "dummy"])
+  let _ = command("ip", ["link", "set", "mdprobe0", "multicast", "on", "up"])
+  let _ = command("ip", ["addr", "add", "10.255.240.1/24", "dev", "mdprobe0"])
+  let _ = command("ip", ["route", "add", "224.0.0.0/4", "dev", "mdprobe0"])
+  let marker = ".tools/interface-probe-ready"
+  for path in [marker, marker + ".failed"] { if @fs.exists(path) { @fs.remove(path) } }
+  @async.with_task_group(group => {
+    let stdout = @process.redirect_to_file(".tools/interface-probe-stdout.json")
+    let stderr = @process.redirect_to_file(".tools/interface-probe-stderr.log")
+    let child = @process.spawn(group, binary, ["interface", "10.255.240.1", marker], stdout~, stderr~, no_wait=true)
+    defer child.cancel()
+    wait_marker(marker)
+    let _ = command("ip", ["addr", "del", "10.255.240.1/24", "dev", "mdprobe0"])
+    wait_marker(marker + ".failed")
+    let _ = command("ip", ["addr", "add", "10.255.240.1/24", "dev", "mdprobe0"])
+    guard child.wait() == 0 else { fail("interface probe failed: " + @fs.read_file(".tools/interface-probe-stderr.log").text()) }
+    @fs.read_file(".tools/interface-probe-stdout.json").json()
+  })
+}
+
+async fn main {
+  let args = @env.args()
+  guard args.length() == 2 else { fail("usage: protocol-live.mbtx <avahi|interface>") }
+  @fs.mkdir(".tools", recursive=true, allow_exist=true)
+  let binary = @fs.realpath("_build/native/debug/build/tests/protocol_live/protocol_live")
+  let result = match args[1] {
+    "avahi" => avahi(binary)
+    "interface" => interface(binary)
+    _ => fail("unknown protocol experiment")
+  }
+  let hash = command("sha256sum", [binary])
+  let report = Json::object({
+    "passed": Json(true), "source_commit": Json(command("git", ["rev-parse", "HEAD"])), "source_dirty": Json(!command("git", ["status", "--porcelain"]).is_empty()), "binary_sha256": Json(hash[:hash.find(" ").unwrap()].to_owned()), "system": Json(command("uname", ["-srm"])), "ci_run_url": Json(@env.get_env_var("GITHUB_SERVER_URL").unwrap_or("") + "/" + @env.get_env_var("GITHUB_REPOSITORY").unwrap_or("") + "/actions/runs/" + @env.get_env_var("GITHUB_RUN_ID").unwrap_or("")), "experiment": Json(args[1]), "result": result,
+  })
+  @fs.write_file(".tools/protocol-live-" + args[1] + ".json", report.stringify(indent=2) + "\n")
+  println(Json::object({"passed": Json(true), "experiment": Json(args[1])}).stringify())
+}
