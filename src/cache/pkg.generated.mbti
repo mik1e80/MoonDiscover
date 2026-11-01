@@ -14,6 +14,7 @@ pub suberror CacheError {
   InvalidTime
   InvalidScope
   CapacityExceeded
+  InvalidRecord(String)
 }
 #deprecated
 pub fn CacheError::output(Self, &Logger) -> Unit

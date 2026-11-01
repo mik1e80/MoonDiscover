@@ -3,6 +3,7 @@ pub suberror CacheError {
   InvalidTime
   InvalidScope
   CapacityExceeded
+  InvalidRecord(String)
 }
 
 ///|
@@ -88,6 +89,32 @@ fn supported(record : @wire.Record) -> Bool {
 }
 
 ///|
+// ingest_message is a public boundary too: constructed DTOs do not pass through
+// the wire decoder. Reject malformed supported IN records atomically.
+fn validate_record(record : @wire.Record) -> Unit raise CacheError {
+  if record.rr_class != 1 {
+    return
+  }
+  let valid = match (record.rr_type, record.data) {
+    (1, @wire.A(bytes)) => bytes.length() == 4
+    (28, @wire.Aaaa(bytes)) => bytes.length() == 16
+    (33, @wire.Srv(priority, weight, port, _)) =>
+      priority >= 0 &&
+      priority <= 65535 &&
+      weight >= 0 &&
+      weight <= 65535 &&
+      port >= 0 &&
+      port <= 65535
+    (12, @wire.Ptr(_)) | (16, @wire.Txt(_)) => true
+    (1, _) | (28, _) | (33, _) | (12, _) | (16, _) => false
+    _ => true
+  }
+  guard valid else {
+    raise InvalidRecord("invalid IN record type/data or field bounds")
+  }
+}
+
+///|
 pub fn RecordCache::len(self : RecordCache) -> Int32 {
   self.entries.length()
 }
@@ -147,6 +174,9 @@ pub fn RecordCache::ingest(
       raise CapacityExceeded
     }
     next.revision += 1
+    for record in message.records {
+      validate_record(record)
+    }
     // PTRs in this DNS-SD cache represent shared membership. Ignore a sender's
     // invalid flush bit both for cache eviction and subsequent query scheduling.
     let records = message.records
