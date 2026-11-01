@@ -1,0 +1,74 @@
+{
+  "format": 1,
+  "started_at": "2026-11-01T15:35:24.005440+00:00",
+  "mode": "registry",
+  "version": "0.2.0",
+  "workspace": "C:\\Users\\MIKE\\AppData\\Local\\Temp\\moondiscover-0.2-consumer-20261101",
+  "source_context": {
+    "commit": null,
+    "dirty": null
+  },
+  "consumption": "published registry dependency",
+  "registry_consumption_verified": true,
+  "commands": [
+    {
+      "command": [
+        "C:\\Users\\MIKE\\Documents\\ChatGPT\\moonbit\\moondiscover\\.tools\\moon\\bin\\moon.exe",
+        "--version"
+      ],
+      "cwd": "C:\\Users\\MIKE\\AppData\\Local\\Temp\\moondiscover-0.2-consumer-20261101\\consumer",
+      "returncode": 0,
+      "stdout": "moon 0.1.20261023 (3778465 2026-10-23) ~\\Documents\\ChatGPT\\moonbit\\moondiscover\\.tools\\moon\\bin\\moon.exe\nmoonc v0.10.17+d971670cd (2026-10-23) \\\\?\\C:\\Users\\MIKE\\Documents\\ChatGPT\\moonbit\\moondiscover\\.tools\\moon\\bin\\moonc.exe\nmoonrun 0.1.20261023 (3778465 2026-10-23) \\\\?\\C:\\Users\\MIKE\\Documents\\ChatGPT\\moonbit\\moondiscover\\.tools\\moon\\bin\\moonrun.exe\n\nFeature flags enabled: rr_moon_mod,rr_moon_pkg\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\MIKE\\Documents\\ChatGPT\\moonbit\\moondiscover\\.tools\\moon\\bin\\moon.exe",
+        "run",
+        "cmd/core",
+        "--target",
+        "js"
+      ],
+      "cwd": "C:\\Users\\MIKE\\AppData\\Local\\Temp\\moondiscover-0.2-consumer-20261101\\consumer",
+      "returncode": 0,
+      "stdout": "consumer_core_ok\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "C:\\Users\\MIKE\\Documents\\ChatGPT\\moonbit\\moondiscover\\.tools\\moon\\bin\\moon.exe",
+        "build",
+        "cmd/native",
+        "--target",
+        "native"
+      ],
+      "cwd": "C:\\Users\\MIKE\\AppData\\Local\\Temp\\moondiscover-0.2-consumer-20261101\\consumer",
+      "returncode": 0,
+      "stdout": "Artifacts:\n  mik1e80/dnssd-consumer-check/cmd/native  native  C:\\Users\\MIKE\\AppData\\Local\\Temp\\moondiscover-0.2-consumer-20261101\\consumer\\_build\\native\\debug\\build\\cmd\\native\\native.exe\n",
+      "stderr": "stub.c\nkqueue.c\nstub.c\nc_buffer.c\nio_unix.c\nopenssl.c\nio_unix.c\nepoll.c\nepoll.c\nkqueue.c\nsocket.c\nstub.c\niocp.c\nio_windows.c\nevent_bus.c\nprocess.c\nstdio.c\nstub.c\nthread_pool.c\nevent_bus.c\nstub.c\ndir.c\nstub.c\nsignal.c\nwatch_inotify.c\nenv.c\nfs.c\nC:\\Users\\MIKE\\AppData\\Local\\Temp\\moondiscover-0.2-consumer-20261101\\consumer\\.mooncakes\\moonbitlang\\async\\src\\internal\\event_loop\\fs.c(32): warning C4005: “EINVAL”: 宏重定义\nC:\\Windows Kits\\10\\include\\10.0.26100.0\\ucrt\\errno.h(78): note: 参见“EINVAL”的前一个定义\nsocket.c\nwatch_kqueue.c\nutf.c\niocp.c\nio_windows.c\nfd_util.c\nfs.c\nruntime.c\nbacktrace.c\nstdio.c\nsignal.c\nsync_io.c\nschannel.c\nprocess.c\nwatch_windows.c\nthread_pool.c\nsocket.c\n  正在创建库 C:\\Users\\MIKE\\AppData\\Local\\Temp\\moondiscover-0.2-consumer-20261101\\consumer\\_build\\native\\debug\\build\\cmd\\native\\native.lib 和对象 C:\\Users\\MIKE\\AppData\\Local\\Temp\\moondiscover-0.2-consumer-20261101\\consumer\\_build\\native\\debug\\build\\cmd\\native\\native.exp\nFinished. moon: ran 79 tasks, now up to date\n"
+    },
+    {
+      "command": [
+        "C:\\Users\\MIKE\\Documents\\ChatGPT\\moonbit\\moondiscover\\.tools\\moon\\bin\\moon.exe",
+        "run",
+        "cmd/native",
+        "--target",
+        "native",
+        "--",
+        "10.12.179.23"
+      ],
+      "cwd": "C:\\Users\\MIKE\\AppData\\Local\\Temp\\moondiscover-0.2-consumer-20261101\\consumer",
+      "returncode": 0,
+      "stdout": "consumer_native_ok\n",
+      "stderr": ""
+    }
+  ],
+  "checks": {
+    "core_public_api": true,
+    "native_public_api_build": true,
+    "native_socket_open_close": true
+  },
+  "passed": true,
+  "interface": "10.12.179.23",
+  "finished_at": "2026-11-01T15:35:34.173295+00:00"
+}

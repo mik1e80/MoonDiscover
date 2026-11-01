@@ -1,0 +1,38 @@
+{
+  "recorded_date": "2026-11-01",
+  "version": "0.2.0",
+  "source_commit": "aaf6ced5d87a063a22718f841b93b6930cddc808",
+  "source_dirty_at_publication": false,
+  "github_tag": "v0.2.0",
+  "github_release_url": "https://github.com/mik1e80/MoonDiscover/releases/tag/v0.2.0",
+  "github_release_id": 430677095,
+  "asset_id": 698737038,
+  "archive_sha256": "c6d9a43a5964ee2584de49597f6ccd9bc04d3bf0b2110d1762e98ac2a8e4eebf",
+  "archive_entries": 187,
+  "archive_bytes": 1294098,
+  "publication": {
+    "server_status": "200 OK",
+    "exit_code": 0,
+    "extracted_package_check": true,
+    "fixed_toolchain": "moon 0.1.20261023 / moonc v0.10.17+d971670cd"
+  },
+  "dry_run": {
+    "server_status": "202 Accepted",
+    "server_detail": "Dry run completed successfully. No changes were made.",
+    "client_exit_code": 1,
+    "note": "fixed client's dry-run response handling returns failure for accepted 202; actual publish returned 200 and exit 0"
+  },
+  "ci": {
+    "lightweight": "https://github.com/mik1e80/MoonDiscover/actions/runs/41321819265",
+    "specialized_linux": "https://github.com/mik1e80/MoonDiscover/actions/runs/41321819223",
+    "conclusion": "success"
+  },
+  "registry_consumer": "consumer-registry-0.2.0-20261101.json",
+  "new_api_consumer": "consumer-new-api-0.2.0-20261101.json",
+  "archive_verification": "archive-0.2.0-20261101.json",
+  "downloaded_archive_matches_publication": true,
+  "github_asset_digest_matches_publication": true,
+  "installed_files_identical_to_source": true,
+  "consumer_source_context_note": "raw registry runner could not read repository Git ownership context; immutable tag plus byte-identical archive verification associates the package with the source commit",
+  "old_release_tag_unchanged": "v0.1.0 -> 2b922d6ac0db5c6261aea917545776dfc488b1ec"
+}

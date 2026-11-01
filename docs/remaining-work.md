@@ -5,7 +5,8 @@
 | 工作 | 当前结果 |
 | --- | --- |
 | 三个完整业务场景 | 已补入 submission.md，关联实际公开 API 与证据 |
-| GitHub Release | 已创建 v0.1.0 发布页，附带与 Mooncakes 同 SHA256 的模块 ZIP |
+| GitHub Release | v0.1.0 / v0.2.0 均已发布，附件各自与 Mooncakes 下载 ZIP 同 SHA256 |
+| Mooncakes 0.2.0 | 已上传，仓库外注册表安装、核心与六项新 API、Native 构建/开关通过；187 个安装文件核对通过 |
 | 演示视频 | 一分钟实际 CLI 离线回放视频已生成并解码检查，含预览图、源码与散列；见 demo/README.md |
 | GitHub About | 已补项目简介及 Mooncakes 包主页 |
 | 11 月参赛准备 | 项目尚未报名；已准备项目说明与开发成果摘要，需等官方 11 月入口及规则确认后再提交 |

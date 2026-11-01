@@ -49,7 +49,7 @@ flowchart LR
 
 ## 版本选择
 
-状态更新：**2026-11-01**。0.1.0 与 0.2.0 的能力和证据分别列出。发布验证入口见 docs/release-0.2.0.md。
+状态更新：**2026-11-01**。`0.2.0` 已发布至 Mooncakes，0.1.0 与 0.2.0 的能力和证据分别列出。详见[发布与独立安装验证](docs/release-0.2.0.md)。
 
 | 项目 | Mooncakes `0.1.0` | `0.2.0` / 当前源码 |
 | --- | --- | --- |
@@ -64,6 +64,8 @@ flowchart LR
 | 验证范围 | Windows 同机独立 zeroconf 发布者、实际注册表消费 | 另有同 Linux VM 的 Avahi 闭环与新增核心回归 |
 
 `v0.1.0` 固定到发布源码 `2b922d6`，标签和归档保持原样。[GitHub Release](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/releases/tag/v0.1.0) 提供已校验的模块 ZIP；[注册表消费报告](docs/evidence/consumer-registry-20261024.json)保存下载散列及安装文件匹配结果。
+
+`v0.2.0` 固定到 `aaf6ced`，[新 Release](https://github.com/mik1e80/MoonDiscover/releases/tag/v0.2.0) 的模块 ZIP 与 Mooncakes 下载归档一致。新工程的注册表消费、新 API、Native 构建/开关及 187 个安装文件核对均通过，详见[发布记录](docs/evidence/release-0.2.0-20261101.json)。
 
 新接入建议固定 `0.2.0`；继续使用 `0.1.0` 时，应了解表中的旧版本边界。源码集成应固定提交。下面仓库内的构建和 CLI 命令面向当前 main，不能由安装旧包推断已取得这些修复。差异见 [CHANGELOG](CHANGELOG.md) 和 [支持矩阵](docs/SCOPE.md)。
 

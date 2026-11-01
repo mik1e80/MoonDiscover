@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "version": "0.2.0",
+  "consumption": "installed registry package, no moon.work",
+  "checks": [
+    "cross-packet SRV priority/candidate API",
+    "TXT case-insensitive lookup",
+    "logical stats",
+    "snapshot copy isolation",
+    "lifecycle uniqueness",
+    "subscription cancellation"
+  ],
+  "stdout": "consumer_new_api_ok\n"
+}
