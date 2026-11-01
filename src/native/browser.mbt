@@ -74,7 +74,7 @@ pub fn Browser::browse(
   self : Browser,
   service_type : @model.DnsName,
 ) -> Int32 raise {
-  guard !self.closed else { raise SocketError("browser closed", 0) }
+  guard !self.closed else { raise BrowserClosed }
   let now = self.elapsed()
   let id = self.engine.browse(service_type, self.scope, now)
   self.capture_frame(BrowseFrame(now, service_type))
@@ -87,7 +87,7 @@ pub fn Browser::resolve(
   instance : @model.DnsName,
   timeout_ms~ : Int32 = 5000,
 ) -> Int32 raise {
-  guard !self.closed else { raise SocketError("browser closed", 0) }
+  guard !self.closed else { raise BrowserClosed }
   let now = self.elapsed()
   let id = self.engine.resolve(instance, self.scope, now, timeout_ms~)
   self.capture_frame(ResolveFrame(now, instance, timeout_ms))
@@ -96,6 +96,7 @@ pub fn Browser::resolve(
 
 ///|
 pub fn Browser::cancel(self : Browser, id : Int32) -> Unit raise {
+  guard !self.closed else { raise BrowserClosed }
   let now = self.elapsed()
   self.engine.cancel(id, now)
   self.capture_frame(CancelFrame(now, id))
@@ -118,14 +119,14 @@ pub fn Browser::poll(
   self : Browser,
   timeout_ms~ : Int32 = 20,
 ) -> Array[@engine.Event] raise {
-  guard !self.closed else { raise SocketError("browser closed", 0) }
+  guard !self.closed else { raise BrowserClosed }
   guard timeout_ms >= 0 && timeout_ms <= 1000 else {
-    raise SocketError("poll timeout outside 0..1000ms", 0)
+    raise InvalidArgument("poll timeout outside 0..1000ms")
   }
   let now = self.elapsed()
   if now - self.last_interface_check >= 1000L {
     guard interface_index(self.interface_ipv4) == self.interface_index else {
-      raise SocketError("selected interface became unavailable or changed", 0)
+      raise InterfaceUnavailable
     }
     self.last_interface_check = now
   }
@@ -179,10 +180,10 @@ pub async fn Browser::run(
   on_event : async (@engine.Event) -> Unit,
   on_tick~ : async () -> Unit = () => (),
 ) -> Unit {
-  guard duration_ms > 0 && duration_ms <= 86400000 else {
-    raise SocketError("duration outside 1..86400000ms", 0)
-  }
   defer self.close()
+  guard duration_ms > 0 && duration_ms <= 86400000 else {
+    raise InvalidArgument("duration outside 1..86400000ms")
+  }
   let deadline = self.elapsed() + duration_ms.to_int64()
   while self.elapsed() < deadline {
     for event in self.poll(timeout_ms=0) {

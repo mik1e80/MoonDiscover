@@ -14,7 +14,11 @@ pub fn monotonic_ms() -> Int64
 // Errors
 pub suberror TransportError {
   SocketError(String, Int64)
+  BrowserClosed
+  InvalidArgument(String)
+  InterfaceUnavailable
 }
+pub fn TransportError::diagnostic_code(Self) -> String
 #deprecated
 pub fn TransportError::output(Self, &Logger) -> Unit
 #deprecated

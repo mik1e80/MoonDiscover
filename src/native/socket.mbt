@@ -1,6 +1,9 @@
 ///|
 pub suberror TransportError {
   SocketError(String, Int64)
+  BrowserClosed
+  InvalidArgument(String)
+  InterfaceUnavailable
 }
 
 ///|
@@ -51,12 +54,10 @@ pub fn MulticastSocket::open(
   interface_ipv4 : UInt32,
 ) -> MulticastSocket raise TransportError {
   guard interface_ipv4 != 0 else {
-    raise SocketError("explicit IPv4 interface required", 0)
+    raise InvalidArgument("explicit IPv4 interface required")
   }
   let index = interface_index(interface_ipv4)
-  guard index > 0 else {
-    raise SocketError("interface unavailable or inactive", index.to_int64())
-  }
+  guard index > 0 else { raise InterfaceUnavailable }
   let handle = socket_open(interface_ipv4)
   guard handle >= 0 else { raise SocketError("open/bind/join", -handle) }
   { handle, interface_index: index, }
@@ -75,9 +76,9 @@ pub fn MulticastSocket::send(
   self : MulticastSocket,
   data : Bytes,
 ) -> Unit raise TransportError {
-  guard self.handle >= 0 else { raise SocketError("socket closed", 0) }
+  guard self.handle >= 0 else { raise BrowserClosed }
   guard data.length() >= 12 && data.length() <= 9000 else {
-    raise SocketError("datagram length outside 12..9000", 0)
+    raise InvalidArgument("datagram length outside 12..9000")
   }
   let n = socket_send(self.handle, data, data.length())
   guard n == data.length() else { raise SocketError("send", n.to_int64()) }
@@ -91,9 +92,9 @@ pub fn MulticastSocket::receive(
   self : MulticastSocket,
   timeout_ms~ : Int32 = 50,
 ) -> Datagram? raise TransportError {
-  guard self.handle >= 0 else { raise SocketError("socket closed", 0) }
+  guard self.handle >= 0 else { raise BrowserClosed }
   guard timeout_ms >= 0 && timeout_ms <= 1000 else {
-    raise SocketError("timeout outside 0..1000ms", 0)
+    raise InvalidArgument("timeout outside 0..1000ms")
   }
   let data = FixedArray::make(9000, b'\x00')
   let metadata = FixedArray::make(4, 0)
