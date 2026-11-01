@@ -1,6 +1,6 @@
 # Native IPv4 生命周期与错误
 
-状态：2026-11-01，main / 0.2.0-dev。
+状态：2026-11-01，main / 0.2.0。
 
 `MulticastSocket::open` 显式选择本机 IPv4，Browser 为本次接口运行生成 scope。单个对象由一个调用方驱动；不要并发运行 poll/run 或在回调中重入 poll。多个独立 Browser 可以共享 5353 绑定。
 

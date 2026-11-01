@@ -1,6 +1,6 @@
 # Diagnostic and transport error codes
 
-Status: `main` / `0.2.0-dev`, updated 2026-11-01.
+Status: `main` / `0.2.0`, updated 2026-11-01.
 
 `Engine` emits `Diagnostic(code, detail)` events for recoverable protocol, capacity, and scheduling conditions. JSON event output uses `event: "diagnostic"`, `code`, and `detail`. The code is the machine-readable category; the detail is for logs and may change. Consumers should handle unknown codes by logging or counting them rather than failing.
 

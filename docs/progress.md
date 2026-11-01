@@ -1,6 +1,6 @@
 # 实施进度
 
-开始日期：2026-10-23；状态更新：2026-11-01（Asia/Shanghai）。已发布基线为 0.1.0，main 为未发布的 0.2.0-dev。本项目尚未报名，用户计划报名 11 月赛；按[后续路线](development-roadmap.md)逐阶段加固库的边界行为。
+开始日期：2026-10-23；状态更新：2026-11-01（Asia/Shanghai）。已发布基线为 0.1.0，当前代码为 0.2.0，发布执行记录见 release-0.2.0.md。本项目尚未报名，用户计划报名 11 月赛；按[后续路线](development-roadmap.md)逐阶段加固库的边界行为。
 
 | 工作项 | 当前状态 | 仍需说明 |
 | --- | --- | --- |
@@ -10,7 +10,7 @@
 | 查询与 resolve | main 已实现 QM、依赖查询、超时、取消、子类型和有界多包 Known-Answer | 多包/子类型有专项核心测试；Linux UDP 与 Avahi 子类型专项已通过，见 specialized-interop.md，NSEC 暂缓 |
 | Native 与 CLI | 指定 IPv4、入站元数据、异步取消、稳定错误分类、四个 CLI 命令 | Windows zeroconf 与 Linux Avahi 同机闭环均通过；单播仍排除 |
 | 示例与回放 | HTTP 动态端口、JSON 事件、录制、固定种子回放与浏览器离线界面已实现 | fixture 已逐条核对只含受控服务报文；Node/真实浏览器验证通过 |
-| 互通与发布 | 已发布 0.1.0 的 Windows 证据与包消费；main 新增 Linux 八项实网成功报告 | 0.2.0-dev 未发布，第二设备及 Bonjour 未验证 |
+| 互通与发布 | 已发布 0.1.0 的 Windows 证据与包消费；main 新增 Linux 八项实网成功报告 | 0.2.0 发布与消费执行记录见 release-0.2.0.md，第二设备及 Bonjour 未验证 |
 
 ## 已完成的连续步骤
 

@@ -41,7 +41,7 @@ jobs:
       - name: Bounded resource lifecycle smoke
         run: _build/native/debug/build/tests/resource_soak/resource_soak.exe 2
       - name: Consume public APIs from a separate local workspace
-        run: python3 tests/interop/consumer_smoke.py --moon-home "$HOME/.moon" --version 0.2.0-dev
+        run: python3 tests/interop/consumer_smoke.py --moon-home "$HOME/.moon" --version 0.2.0
       - name: Compile and verify offline browser replay callback
         run: |
           moon build examples/browser_replay --target js

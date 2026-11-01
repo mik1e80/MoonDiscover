@@ -2,7 +2,7 @@
 
 十一月报名准备入口：[一页申报书](proposal-november-2026.md)、[固定基线与新增贡献](november-baseline.md)。本页保留详细项目说明。
 
-仓库：[mik1e80/MoonDiscover](https://github.com/mik1e80/MoonDiscover)。模块名：`mik1e80/dnssd`。许可：Apache-2.0。状态：2026-11-01，已发布 0.1.0；main 为 0.2.0-dev，含尚未发布的新功能和修复。本项目尚未报名，用户计划报名 11 月赛。所有能力按版本与证据区分，不宣称完整 RFC 或所有平台验收。
+仓库：[mik1e80/MoonDiscover](https://github.com/mik1e80/MoonDiscover)。模块名：`mik1e80/dnssd`。许可：Apache-2.0。状态：2026-11-01，已发布 0.1.0；当前 0.2.0 包含下述新功能和修复，发布执行记录见 release-0.2.0.md。本项目尚未报名，用户计划报名 11 月赛。所有能力按版本与证据区分，不宣称完整 RFC 或所有平台验收。
 
 ## 解决的问题
 
@@ -30,7 +30,7 @@ MoonDiscover 用 MoonBit 实现发现所需的报文、缓存、查询与状态�
 - 按实际功能与修复逐步提交的 Git 历史、固定版本工具链和轻量 CI。
 - main 新增子类型浏览与有界多包 Known-Answer，已分别验证成员筛选、身份复用、TC/问题位置/答案完整性与中途取消；Linux UDP/独立测试解析器与 Avahi 子类型专项已通过，见 specialized-interop.md。
 - main 新增 SRV 优先级与固定种子权重候选顺序、公开候选快照、受支持 DTO 记录的原子校验、恶意报文/共享主机生命周期回归，以及 Native 稳定传输错误分类和失败关闭行为。
-- CI 明确执行类型检查、格式检查和生成接口无差异检查；这些改进尚未发布到 Mooncakes。
+- CI 明确执行类型检查、格式检查和生成接口无差异检查；改进版本为 0.2.0，发布执行记录见 release-0.2.0.md。
 
 ## 演示与证据
 

@@ -55,7 +55,7 @@ CLI 手工录制为 `browse` 或 `resolve` 添加 `--record path.jsonl`，正常
 仓库外消费验证脚本会新建独立临时工程，只导入公开包，不复制库源码：
 
 ```powershell
-python tests/interop/consumer_smoke.py --mode local --version 0.2.0-dev --interface 192.168.1.10 --output .tools/consumer-local.json
+python tests/interop/consumer_smoke.py --mode local --version 0.2.0 --interface 192.168.1.10 --output .tools/consumer-local.json
 ```
 
 local 模式通过 `moon.work` 指向本地源码，检查 JS 调用、Native 编译和可选 socket 打开/关闭。实际发布后，使用 `--mode registry --version 0.1.0` 验证注册表包；该模式不生成工作区覆盖。两种模式的结果分别记录，失败会返回非零。

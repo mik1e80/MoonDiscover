@@ -1,0 +1,58 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/shell",
+  "moonbitlang/core/env",
+}
+----
+
+async fn main {
+  let args = @env.args()
+  guard args.length() == 4 else { fail("usage: verify-new-api.mbtx <registry-consumer-root> <moon-home> <report-json>") }
+  let consumer = args[1]
+  let moon_home = args[2]
+  guard !@fs.exists(consumer + "/../moon.work") && !@fs.exists(consumer + "/moon.work") else { fail("registry verification cannot use a workspace mapping") }
+  let installed = @fs.read_file(consumer + "/.mooncakes/mik1e80/dnssd/moon.mod").text()
+  guard installed.find("version = \"0.2.0\"") is Some(_) else { fail("installed package is not exactly 0.2.0") }
+  @fs.mkdir(consumer + "/cmd/new_api", recursive=true, allow_exist=true)
+  @fs.write_file(consumer + "/cmd/new_api/moon.pkg", "import { \"mik1e80/dnssd\" }\npkgtype(kind: \"executable\")\n")
+  let source =
+    #|fn main raise {
+    #|  let service = @dnssd.DnsName::parse("_verify._tcp.local.")
+    #|  let instance = @dnssd.DnsName::parse("consumer._verify._tcp.local.")
+    #|  let host = @dnssd.DnsName::parse("consumer.local.")
+    #|  let records : Array[@dnssd.Record] = [
+    #|    { name: service, rr_type: 12, rr_class: 1, cache_flush: false, ttl: 120U, data: @dnssd.RData::Ptr(instance), section: @dnssd.Section::Answer, },
+    #|    { name: instance, rr_type: 33, rr_class: 1, cache_flush: true, ttl: 120U, data: @dnssd.RData::Srv(0, 10, 8081, host), section: @dnssd.Section::Answer, },
+    #|    { name: instance, rr_type: 16, rr_class: 1, cache_flush: true, ttl: 120U, data: @dnssd.RData::Txt(@dnssd.TxtRecord::from_entries([b"role=printer"])), section: @dnssd.Section::Answer, },
+    #|    { name: host, rr_type: 1, rr_class: 1, cache_flush: true, ttl: 120U, data: @dnssd.RData::A(b"\x7f\x00\x00\x01"), section: @dnssd.Section::Answer, },
+    #|  ]
+    #|  let engine = @dnssd.Engine::new(seed=73U)
+    #|  defer engine.close()
+    #|  let id = engine.browse(service, "consumer", 0)
+    #|  engine.ingest_message({ id: 0, flags: 0x8400, questions: [], records, }, "consumer", 0)
+    #|  engine.ingest_message({ id: 0, flags: 0x8400, questions: [], records: [{ ..records[1], data: @dnssd.RData::Srv(10, 20, 8082, host), }], }, "consumer", 500)
+    #|  let snapshot = engine.snapshots()[0]
+    #|  guard snapshot.complete && snapshot.port == Some(8081) && snapshot.srv_candidates.map(c => c.port) == [8081, 8082] else { fail("registry SRV RRSet API") }
+    #|  guard snapshot.txt.unwrap().lookup("ROLE") == @dnssd.TxtValue::Value(b"printer") else { fail("registry TXT lookup API") }
+    #|  guard engine.stats().cached_records == 5 else { fail("registry stats API") }
+    #|  snapshot.srv_candidates.clear()
+    #|  guard engine.snapshots()[0].srv_candidates.length() == 2 else { fail("registry snapshot isolation") }
+    #|  let mut seen = 0
+    #|  let mut resolved = 0
+    #|  while engine.poll_event() is Some(event) {
+    #|    match event { @dnssd.Event::Seen(_) => seen += 1; @dnssd.Event::Resolved(_) => resolved += 1; _ => () }
+    #|  }
+    #|  guard seen == 1 && resolved == 1 else { fail("registry lifecycle API") }
+    #|  engine.cancel(id, 500)
+    #|  guard engine.stats().subscriptions == 0 && engine.stats().query_jobs == 0 else { fail("registry cancellation API") }
+    #|  println("consumer_new_api_ok")
+    #|}
+  @fs.write_file(consumer + "/cmd/new_api/main.mbt", source)
+  let result = @shell.Cmd(moon_home + "/bin/moon.exe", ["run", "cmd/new_api", "--target", "js", "--frozen"], cwd=consumer, env={"MOON_HOME": moon_home, "PATH": moon_home + "/bin;" + @env.get_env_var("PATH").unwrap_or("")}).output(timeout_ms=60000)
+  guard result.exit_code() == 0 && result.stdout().find("consumer_new_api_ok") is Some(_) else { fail("registry new API check failed: " + result.stderr() + result.stdout()) }
+  let report = Json::object({"passed": Json(true), "version": Json("0.2.0"), "consumption": Json("installed registry package, no moon.work"), "checks": Json::array([Json("cross-packet SRV priority/candidate API"), Json("TXT case-insensitive lookup"), Json("logical stats"), Json("snapshot copy isolation"), Json("lifecycle uniqueness"), Json("subscription cancellation")]), "stdout": Json(result.stdout())})
+  @fs.write_file(args[3], report.stringify(indent=2) + "\n")
+  println(report.stringify())
+}
