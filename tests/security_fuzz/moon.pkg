@@ -1,0 +1,10 @@
+import {
+  "mik1e80/dnssd/src/model",
+  "mik1e80/dnssd/src/wire",
+  "mik1e80/dnssd/src/engine",
+  "mik1e80/dnssd/src/replay",
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
+}
+
+pkgtype(kind: "executable")

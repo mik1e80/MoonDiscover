@@ -1,0 +1,32 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+----
+async fn main {
+  let args = @env.args()
+  guard args.length() == 4 else { fail("usage: security-fuzz.mbtx <binary> <seed> <cases>") }
+  @fs.mkdir(".tools", allow_exist=true)
+  let latest = ".tools/security-fuzz-last-case.json"
+  let report = ".tools/security-fuzz-report.json"
+  let mut summary : Json? = None
+  let code = @async.with_timeout(30000, () => {
+    @shell.Cmd(args[1], [args[2], args[3]]).each_line(line => {
+      let json = @json.parse(line)
+      if json is { "case": _, .. } {
+        @fs.write_file(latest, json.stringify(indent=2))
+      } else if json is { "passed": True, .. } {
+        summary = Some(json)
+      }
+    })
+  })
+  guard code == 0 && summary is Some(value) else {
+    fail("fuzz failed; preserve " + latest + " and replay its seed/case")
+  }
+  @fs.write_file(report, value.stringify(indent=2))
+  println(value.stringify())
+}

@@ -37,7 +37,20 @@ jobs:
       - name: Independently parse Engine Known-Answer output
         run: moon test tests/protocol_probe --target js --filter 'smoke:*'
       - name: Compile Linux native transport probes
-        run: moon build cmd/native_spike cmd/transport_spike cmd/moondiscover examples/http_connect examples/watch_events tests/native_cancel tests/resource_soak --target native
+        run: moon build cmd/native_spike cmd/transport_spike cmd/moondiscover examples/http_connect examples/watch_events tests/native_cancel tests/resource_soak tests/security_fuzz --target native
+      - name: Bounded native input fuzz with reproducible fixed and changing seeds
+        run: |
+          moon run scripts/security-fuzz.mbtx -- _build/native/debug/build/tests/security_fuzz/security_fuzz.exe 20261105 192
+          moon run scripts/security-fuzz.mbtx -- _build/native/debug/build/tests/security_fuzz/security_fuzz.exe ${{ github.run_number }} 192
+      - name: Keep fuzz reproducer and summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-fuzz-evidence
+          path: .tools/security-fuzz-*.json
+          include-hidden-files: true
+      - name: Native ingress policy boundary tests
+        run: moon test src/native --target native --filter 'smoke:*'
       - name: Bounded resource lifecycle smoke
         run: _build/native/debug/build/tests/resource_soak/resource_soak.exe 2
       - name: Consume public APIs from a separate local workspace
@@ -65,3 +78,6 @@ jobs:
       - name: Offline CLI smoke
         shell: pwsh
         run: python tests/interop/cli_smoke.py
+      - name: Native ingress policy boundary tests
+        shell: pwsh
+        run: ./scripts/moon.ps1 test src/native --target native --filter 'smoke:*'
