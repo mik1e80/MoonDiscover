@@ -7,6 +7,9 @@ pub suberror EngineError {
 }
 
 ///|
+/// Unauthenticated observations within one network generation. Complete means
+/// required records are present; it does not imply reachable or trusted. Apply
+/// endpoint/address policy and authentication before connecting.
 pub struct ServiceSnapshot {
   scope : String
   service_type : @model.DnsName

@@ -11,7 +11,7 @@
 
 name = "mik1e80/dnssd"
 
-version = "0.2.0"
+version = "0.2.1-dev"
 
 readme = "README.md"
 
