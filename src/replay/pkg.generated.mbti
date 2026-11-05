@@ -26,7 +26,7 @@ pub struct Replay {
   // private fields
 }
 pub fn Replay::from_config(String) -> Self raise
-pub fn Replay::new(seed? : UInt32) -> Self raise
+pub fn Replay::new(seed? : UInt32, max_frames? : Int32, max_input_bytes? : Int32, max_packet_bytes? : Int32, max_output_events? : Int32, max_output_bytes? : Int32) -> Self raise
 pub fn Replay::step_line(Self, String) -> Array[Json] raise
 
 // Type aliases
