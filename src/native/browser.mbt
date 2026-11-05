@@ -5,6 +5,7 @@ pub struct Browser {
   interface_ipv4 : UInt32
   interface_index : Int32
   priv socket : MulticastSocket
+  priv ingress_policy : IngressPolicy
   priv origin : Int64
   priv mut last_interface_check : Int64
   priv mut closed : Bool
@@ -19,6 +20,7 @@ pub fn Browser::open(
   interface_ipv4 : UInt32,
   seed~ : UInt32? = None,
   record~ : Bool = false,
+  ingress_policy~ : IngressPolicy = IngressPolicy::new(),
 ) -> Browser raise {
   let socket = MulticastSocket::open(interface_ipv4)
   errdefer socket.close()
@@ -38,10 +40,17 @@ pub fn Browser::open(
     }
   }
   let index = socket.interface_index
+  // A scope identifies one Browser generation, independently of the scheduling
+  // seed and millisecond clock. Never merge scopes from different processes.
+  let nonce = @env.rand(16)
+  guard nonce is Some(nonce) && nonce.length() == 16 else {
+    raise SocketError("scope random nonce unavailable", 0)
+  }
   {
     engine: @engine.Engine::new(seed~),
     socket,
-    scope: "ipv4:\{index}:\{origin}",
+    ingress_policy,
+    scope: "ipv4:\{interface_ipv4}:\{index}:\{origin}:\{@model.bytes_hex(nonce)}",
     interface_ipv4,
     interface_index: index,
     origin,
@@ -161,12 +170,7 @@ pub fn Browser::poll(
       None => break
       Some(packet) => {
         wait = 0
-        if packet.interface_index != self.interface_index ||
-          packet.destination_ipv4 != 0xe00000fbU ||
-          packet.source_port != 5353 {
-          continue
-        }
-        if packet.bytes.length() >= 12 && (packet.bytes[2].to_int() & 0x80) == 0 {
+        if !self.ingress_policy.accepts(packet, self.interface_index) {
           continue
         }
         let received_at = self.elapsed()

@@ -40,7 +40,7 @@ pub fn Browser::capture_json(Self, CaptureFrame) -> Json
 pub fn Browser::close(Self) -> Unit
 pub fn Browser::dropped_captures(Self) -> Int64
 pub fn Browser::elapsed(Self) -> Int64
-pub fn Browser::open(UInt32, seed? : UInt32?, record? : Bool) -> Self raise
+pub fn Browser::open(UInt32, seed? : UInt32?, record? : Bool, ingress_policy? : IngressPolicy) -> Self raise
 pub fn Browser::poll(Self, timeout_ms? : Int32) -> Array[@engine.Event] raise
 pub fn Browser::poll_capture(Self) -> CaptureFrame?
 pub fn Browser::poll_event(Self) -> @engine.Event?
@@ -63,7 +63,14 @@ pub struct Datagram {
   source_port : Int32
   interface_index : Int32
   destination_ipv4 : UInt32
+  ip_ttl : Int32?
 }
+
+pub struct IngressPolicy {
+  // private fields
+}
+pub fn IngressPolicy::accepts(Self, Datagram, Int32) -> Bool
+pub fn IngressPolicy::new(allowed_sources? : Array[SourceNetwork], require_ip_ttl_255? : Bool) -> Self raise TransportError
 
 pub struct MulticastSocket {
   interface_index : Int32
@@ -73,6 +80,14 @@ pub fn MulticastSocket::close(Self) -> Unit
 pub fn MulticastSocket::open(UInt32) -> Self raise TransportError
 pub fn MulticastSocket::receive(Self, timeout_ms? : Int32) -> Datagram? raise TransportError
 pub fn MulticastSocket::send(Self, Bytes) -> Unit raise TransportError
+
+pub struct SourceNetwork {
+  network : UInt32
+  prefix_length : Int32
+  // private fields
+}
+pub fn SourceNetwork::contains(Self, UInt32) -> Bool
+pub fn SourceNetwork::new(UInt32, Int32) -> Self raise TransportError
 
 // Type aliases
 

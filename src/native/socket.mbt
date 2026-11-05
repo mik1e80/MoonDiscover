@@ -19,6 +19,7 @@ pub struct Datagram {
   source_port : Int32
   interface_index : Int32
   destination_ipv4 : UInt32
+  ip_ttl : Int32?
 }
 
 ///|
@@ -99,7 +100,8 @@ pub fn MulticastSocket::receive(
     raise InvalidArgument("timeout outside 0..1000ms")
   }
   let data = FixedArray::make(9000, b'\x00')
-  let metadata = FixedArray::make(4, 0)
+  let metadata = FixedArray::make(5, 0)
+  metadata[4] = -1
   let n = socket_receive(self.handle, data, 9000, metadata, timeout_ms)
   if n == 0 || n > data.length() {
     return None
@@ -114,5 +116,10 @@ pub fn MulticastSocket::receive(
     source_port: metadata[1],
     interface_index: metadata[2],
     destination_ipv4: metadata[3].reinterpret_as_uint(),
+    ip_ttl: if metadata[4] >= 0 && metadata[4] <= 255 {
+      Some(metadata[4])
+    } else {
+      None
+    },
   })
 }

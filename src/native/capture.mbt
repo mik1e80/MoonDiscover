@@ -88,6 +88,10 @@ pub fn Browser::capture_json(self : Browser, frame : CaptureFrame) -> Json {
       object["source_port"] = Json(packet.source_port)
       object["interface_index"] = Json(packet.interface_index)
       object["destination_ipv4"] = Json(ipv4_text(packet.destination_ipv4))
+      object["ip_ttl"] = match packet.ip_ttl {
+        Some(ttl) => Json(ttl)
+        None => Json::null()
+      }
     }
   }
   Json::object(object)

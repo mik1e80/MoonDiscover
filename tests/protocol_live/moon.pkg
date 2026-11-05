@@ -2,6 +2,7 @@ import {
   "mik1e80/dnssd",
   "mik1e80/dnssd/src/native",
   "mik1e80/dnssd/src/model",
+  "mik1e80/dnssd/src/wire",
   "mik1e80/dnssd/tests/protocol_probe" @probe,
   "moonbitlang/async",
   "moonbitlang/async/fs",

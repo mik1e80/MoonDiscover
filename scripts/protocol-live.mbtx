@@ -30,6 +30,8 @@ async fn avahi(binary : String) -> Json {
   let route = @json.parse(command("ip", ["-j", "-4", "route", "get", "224.0.0.251"]))
   guard route is [{ "prefsrc": String(ip), .. }, ..] else { fail("no IPv4 multicast route") }
   let packets = @json.parse(command(binary, ["packets", ip]))
+  let ingress = @json.parse(command(binary, ["ingress", ip]))
+  @fs.write_file(".tools/protocol-live-ingress.json", ingress.stringify(indent=2))
   @fs.write_file(".tools/protocol-live-packets.json", packets.stringify(indent=2))
   let subtypes = @async.with_task_group(group => {
     let printer_log = @process.redirect_to_file(".tools/protocol-printer.log")

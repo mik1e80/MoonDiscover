@@ -105,6 +105,11 @@ MOONBIT_FFI_EXPORT int64_t moondiscover_socket_open(uint32_t ip) {
 #endif
   if (MD_SET(s, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes)) != 0) goto socket_failure;
   if (MD_SET(s, IPPROTO_IP, IP_PKTINFO, &yes, sizeof(yes)) != 0) goto socket_failure;
+  /* Optional ancillary TTL. Failure leaves it absent; strict policy rejects it.
+     IP_RECVTTL enables it; providers may use IP_TTL or IP_RECVTTL cmsgs. */
+#ifdef IP_RECVTTL
+  (void)MD_SET(s, IPPROTO_IP, IP_RECVTTL, &yes, sizeof(yes));
+#endif
   memset(&local, 0, sizeof(local));
   local.sin_family = AF_INET;
   local.sin_port = htons(5353);
@@ -154,7 +159,8 @@ MOONBIT_FFI_EXPORT int moondiscover_socket_receive(
   md_socket s = (md_socket)handle;
   struct sockaddr_in source;
   memset(&source, 0, sizeof(source));
-  memset(metadata, 0, 4 * sizeof(int32_t));
+  memset(metadata, 0, 5 * sizeof(int32_t));
+  metadata[4] = -1;
 #ifdef _WIN32
   fd_set readable;
   FD_ZERO(&readable);
@@ -194,6 +200,15 @@ MOONBIT_FFI_EXPORT int moondiscover_socket_receive(
       metadata[2] = (int32_t)info->ipi_ifindex;
       metadata[3] = (int32_t)ntohl(info->ipi_addr.s_addr);
     }
+#ifdef IP_RECVTTL
+    if (c->cmsg_level == IPPROTO_IP &&
+        (c->cmsg_type == IP_RECVTTL || c->cmsg_type == IP_TTL) &&
+        c->cmsg_len >= WSA_CMSG_LEN(sizeof(DWORD))) {
+      DWORD ttl;
+      memcpy(&ttl, WSA_CMSG_DATA(c), sizeof(ttl));
+      if (ttl <= 255) metadata[4] = (int32_t)ttl;
+    }
+#endif
   }
 #else
   struct pollfd p = { s, POLLIN, 0 };
@@ -218,6 +233,12 @@ MOONBIT_FFI_EXPORT int moondiscover_socket_receive(
       struct in_pktinfo *info = (struct in_pktinfo *)CMSG_DATA(c);
       metadata[2] = (int32_t)info->ipi_ifindex;
       metadata[3] = (int32_t)ntohl(info->ipi_addr.s_addr);
+    }
+    if (c->cmsg_level == IPPROTO_IP && c->cmsg_type == IP_TTL &&
+        c->cmsg_len >= CMSG_LEN(sizeof(int))) {
+      int ttl;
+      memcpy(&ttl, CMSG_DATA(c), sizeof(ttl));
+      if (ttl >= 0 && ttl <= 255) metadata[4] = ttl;
     }
   }
 #endif
