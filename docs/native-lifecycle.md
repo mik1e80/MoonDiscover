@@ -1,8 +1,10 @@
 # Native IPv4 生命周期与错误
 
-状态：2026-11-01，main / 0.2.0。
+状态：2026-11-05，main / 0.2.1-dev（未发布）。
 
 `MulticastSocket::open` 显式选择本机 IPv4，Browser 为本次接口运行生成 scope。单个对象由一个调用方驱动；不要并发运行 poll/run 或在回调中重入 poll。多个独立 Browser 可以共享 5353 绑定。
+
+main 的 scope 含独立随机 nonce、接口地址/索引和本次运行原点，固定 seed 仅控制调度，不控制身份。每次重开或已知网络变化都应使用新 scope。地址和索引未变的换网需宿主主动通知；不保证自动识别。完整定义和事件/容量契约见[行为契约](behavior-contract.md)。
 
 ## 关闭与取消
 
@@ -25,6 +27,8 @@
 Engine 诊断事件（例如 `packet_rejected`、`event_overflow`）与此处的传输异常是不同通道。完整代码目录见[diagnostics.md](diagnostics.md)。
 
 格式错误的入站 DNS 报文产生 `packet_rejected`，接收循环继续。截断/超长 UDP 按已有适配层规则丢弃；它们不等同于真实 socket 失败。
+
+入站来源策略先于录制与 Engine 执行。错误接口、目标、源端口或不满足可选 CIDR/TTL 策略的包静默丢弃，不为每个拒绝包产生诊断。接收 IP TTL 缺失时 Datagram.ip_ttl=None，严格模式拒绝。默认不按子网或 TTL=255 增加硬性限制；身份认证边界见[安全模型](security-model.md)。
 
 ## 接口恢复边界
 

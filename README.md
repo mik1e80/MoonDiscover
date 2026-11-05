@@ -6,6 +6,8 @@ MoonDiscover 是 mDNS / DNS-SD 服务浏览与解析库，模块名 `mik1e80/dns
 
 项目包含纯 MoonBit 协议核心、Native IPv4 组播适配层、命令行工具，以及录制和离线回放功能。**当前适合在明确支持范围内接入服务发现；0.2.0 聚焦已经说明的 IPv4 浏览与解析范围，不宣称完整 RFC 或所有平台支持。**
 
+**发现结果未经身份认证。** 名称、TXT、SRV 和地址都可能由同链路设备伪造；连接前执行自己的地址/端口许可和 TLS、配对等认证策略。来源白名单也不是身份认证。[安全模型](docs/security-model.md)说明输入、文件和连接的责任边界。
+
 [项目作用](#项目作用) · [版本选择](#版本选择) · [安装与构建](#安装与构建) · [命令行使用](#命令行使用) · [作为库使用](#作为库使用) · [使用边界](#使用边界) · [常见问题](#常见问题) · [验证与文档](#验证与文档)
 
 ## 项目作用
@@ -49,9 +51,9 @@ flowchart LR
 
 ## 版本选择
 
-状态更新：**2026-11-01**。`0.2.0` 已发布至 Mooncakes，0.1.0 与 0.2.0 的能力和证据分别列出。详见[发布与独立安装验证](docs/release-0.2.0.md)。
+状态更新：**2026-11-05**。`0.2.0` 已发布至 Mooncakes。main 为 **0.2.1-dev（未发布）**，新增可选来源/TTL 策略、Replay 累计预算和脱敏导出，安装 0.2.0 不包含这些改进。下面比较已发布版本；开发改进见 [CHANGELOG](CHANGELOG.md)和[本轮验证](docs/security-review-20261105.md)。[0.2.0 发布与独立安装验证](docs/release-0.2.0.md)。
 
-| 项目 | Mooncakes `0.1.0` | `0.2.0` / 当前源码 |
+| 项目 | Mooncakes `0.1.0` | Mooncakes `0.2.0` |
 | --- | --- | --- |
 | 获取方式 | `moon add mik1e80/dnssd@0.1.0` | `moon add mik1e80/dnssd@0.2.0`；源码标签 `v0.2.0` |
 | 基础能力 | 名称/TXT、有限 codec、缓存、聚合、QM、browse/resolve、Native IPv4、CLI、录制/回放 | 包含基础能力及后续修复 |
@@ -188,7 +190,13 @@ CLI browse/resolve 的时长范围为 `1..3600000` 毫秒，默认 5000。CLI �
 & $cli replay --file fixtures/live-20261024.jsonl
 ```
 
-录制可能包含同接口其他服务的名称、地址和 TXT，分享前应检查。公开 fixture 已筛选为本项目受控服务相关报文，来源见 [fixtures](fixtures)。
+录制可能包含同接口其他服务的名称、地址和 TXT，分享前应检查。公开 fixture 已筛选为本项目受控服务相关报文，来源见 [fixtures](fixtures)。main 还提供脱敏事件摘要：
+
+```powershell
+.\scripts\moon.ps1 run cmd/moondiscover --target native -- redact --file trace.jsonl
+```
+
+摘要只保留固定事件类型、完整性和数量，删除名称、scope、端点、TXT、原始包及诊断原文；失败时不回显私密输入。摘要不能回放，序列与数量仍可能透露活动模式，不保证匿名。
 
 ### 5. 理解 JSONL 输出
 
@@ -273,7 +281,19 @@ async fn main {
 
 Browser 提供 `browse`、`resolve`、`cancel`、同步有界 `poll`、异步 `run`、`snapshots` 和幂等 `close`。保存 browse/resolve 返回的订阅 ID，以便取消。`run` 结束、错误或异步取消时关闭 Browser；再次观察需要重新打开。同步轮询调用方应持续 poll 并负责 close；不要在同一个 Browser 上并发驱动 poll/run。
 
-库的 resolve 超时覆盖初次解析；成功后继续订阅变化，直到 cancel/close。HTTP 示例按 TXT demo token 选择受控服务，再请求发现的 IPv4 和端口；它不是通用 HTTP、打印或数据库客户端。
+库的 resolve 超时覆盖初次解析；成功后继续订阅变化，直到 cancel/close。HTTP 示例按 TXT demo token 选择受控服务，并仅连接显式选择的本机 IPv4 上广告的动态端口。token 不是认证凭据；示例用于同机受控实验，其他应用应制定自己的连接和认证策略。
+
+main 的 Native 入站来源限制可这样配置（0.2.0 没有这些新增 API）：
+
+```mbt nocheck
+let policy = @native.IngressPolicy::new(
+  allowed_sources=[@native.SourceNetwork::new(0xc0a80100U, 24)],
+  require_ip_ttl_255=true,
+)
+let browser = @native.Browser::open(0xc0a80117U, ingress_policy=policy)
+```
+
+CLI 对应 `--allow-source 192.168.1.0/24,10.0.0.8/32 --require-ttl 255`，可附于 browse/resolve。默认允许正确接口上的 mDNS 组播响应，包括叠加子网；严格 TTL 模式在缺少接收 TTL 时也拒绝。来源规则只检查发包者，不限制记录中广告的地址；完整语义见[安全模型](docs/security-model.md)。
 
 ### 自行集成 Engine
 
@@ -390,6 +410,8 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 | 文档 | 内容 |
 | --- | --- |
 | [支持范围](docs/SCOPE.md) / [协议矩阵](docs/protocol-matrix.md) | 按版本、协议、环境划分能力 |
+| [安全模型](docs/security-model.md) / [行为契约](docs/behavior-contract.md) | 不可信输入、Scope、事件、资源退化与恢复 |
+| [解析契约](docs/dnssd-resolution-contract.md) / [RFC 对照](docs/rfc-conformance.md) | 完整解析条件、条款、测试与有意简化 |
 | [验证记录](docs/verification.md) / [开发指南](docs/development.md) | 测过什么、复现方法、轻量开发 |
 | [模型说明](docs/model.md) | 原始字节、快照、时间、生命周期 |
 | [HTTP 示例](examples/http_connect/main.mbt) / [事件示例](examples/watch_events/main.mbt) | 真实调用方式 |

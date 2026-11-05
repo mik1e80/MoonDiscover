@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "received_ip_ttl": 255,
+  "source_allowlist_accepted": true,
+  "source_denied_before_cache_and_capture": true,
+  "distinct_browser_scopes": true
+}

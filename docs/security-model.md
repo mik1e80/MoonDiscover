@@ -25,6 +25,10 @@ Native 默认只接纳所选入站接口、目标 `224.0.0.251`、源 UDP 端口
 
 自定义 Engine 适配器须自行执行网络来源检查；Engine 的 scope 字符串不是网络来源证明。不要将多个接口的数据标记成同一 scope。
 
+main 可通过 `IngressPolicy::new(allowed_sources=[SourceNetwork::new(ip, prefix)], require_ip_ttl_255=true)` 传给 `Browser::open(..., ingress_policy=policy)`；空列表表示只执行默认路径检查，列表上限 64 个。CIDR 地址按 prefix 归一化；/32 允许一个来源，/0 允许所有来源。策略复制调用者数组，之后的数组变更不改变 Browser 行为。Datagram.ip_ttl 是可选值，缺失不伪造成 255；来源策略拒绝发生在录制和缓存之前，并静默丢弃以避免诊断放大。
+
+接收 TTL 使用 Windows 的 IP_RECVTTL/WSARecvMsg 和 Linux 的 IP_RECVTTL/recvmsg 附加信息；字段读取有长度检查。操作系统不提供时默认策略继续工作，严格策略拒绝。平台接口依据 [Microsoft IPPROTO_IP 文档](https://learn.microsoft.com/en-us/windows/win32/winsock/ipproto-ip-socket-options)，实际运行状态见[验证记录](security-review-20261105.md)。
+
 ## 文件与隐私
 
 可用 Replay 检查第三方文件，但文件仍不可信。CLI 先检查文件大小，库还限制每次回放的输入、报文字节和累计输出。为不可信任务设置外部超时和进程内存限额；这些工程上限不保证特定 CPU 或 RSS 峰值。

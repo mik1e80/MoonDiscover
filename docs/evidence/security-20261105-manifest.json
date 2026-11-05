@@ -1,0 +1,45 @@
+{
+  "date": "2026-11-05",
+  "source_commit": "84f63fe2733a7a254f14491113d3e2cba4c3782d",
+  "source_dirty_in_ci": false,
+  "release_status": "main 0.2.1-dev, not published to Mooncakes",
+  "lightweight": {
+    "url": "https://github.com/mik1e80/MoonDiscover/actions/runs/42046563635",
+    "conclusion": "success",
+    "fuzz_artifact_id": 13425420813,
+    "artifact_zip_sha256": "f2e1cecc66de1fd4243e1493f4072701dfe635f21fa403f8434a9189ee2bcef5",
+    "fuzz_artifact_summary": "security-fuzz-20261105.json",
+    "fuzz_summary_seed": 42,
+    "fuzz_summary_cases": 192,
+    "fuzz_summary_rejected_packets": 133,
+    "fixed_seed": 20261105,
+    "fixed_seed_cases": 192,
+    "fixed_seed_rejected_packets": 118,
+    "fixed_seed_result_location": "workflow step log; artifact contains the second seed's last-case and summary"
+  },
+  "linux_live": {
+    "url": "https://github.com/mik1e80/MoonDiscover/actions/runs/42046563972",
+    "conclusion": "success",
+    "artifact_id": 13425710649,
+    "artifact_zip_sha256": "25910608ebba89c7f6c73d26a4f6d8de3169e278ed6d08f316066a64997952b8",
+    "binary_sha256": "5fad26b736fa3cd4e7b7b3baf7a5ed935f92a96f5047559fbfed5605966c8c4d",
+    "ingress_report": "linux-ingress-20261105.json",
+    "binding": "ingress report is copied unchanged from this run's artifact; aggregate protocol-live-avahi.json binds the same probe binary and clean source commit",
+    "checks": [
+      "actual received IP TTL 255",
+      "allowed source accepted",
+      "denied source excluded before cache and capture",
+      "distinct Browser scopes",
+      "existing Avahi lifecycle and HTTP checks",
+      "Known-Answer UDP and subtype checks",
+      "isolated interface remove/restore"
+    ]
+  },
+  "limits": [
+    "same-machine or same-VM checks, no second physical device",
+    "Windows TTL reception not verified in this round: neither the ingress nor preexisting packet loopback probe received its own datagram locally",
+    "bounded seeded mutation checks, not coverage-guided continuous fuzzing or a security audit",
+    "latest runner initializes passed=false before launch; the archived successful report predates that runner-only refinement",
+    "no Bonjour or long-duration live-network pressure claim"
+  ]
+}

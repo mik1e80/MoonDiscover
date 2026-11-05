@@ -16,7 +16,7 @@
 
 截至录制实现 `f2baff7`，JS 有 29 个 `smoke:*` 用例：根 API 1、模型 5、wire 5、缓存 4、引擎/查询/resolve 11、回放 3。覆盖乱序、重复、范围隔离、goodbye/flush 宽限、到期、队列溢出、抖动/退避、剩余 TTL Known-Answer、resolve 超时、同毫秒更新和回放种子。部分引擎用例另外在 Wasm、Native 运行通过；没有全量运行所有后端。
 
-`tests/interop/cli_smoke.py` 对实际 Windows CLI 二进制离线验证相同输入的两次回放、fixture 端口解析、TTL 到期的 unavailable/removed、移除后的 TTL=0/complete=false、非法参数退出、help/version 和完整 UInt32 种子恢复。构建通过不等于实网通过。
+当前使用 `scripts/cli-smoke.mbtx` 对实际 CLI 二进制离线验证相同输入的两次回放、fixture 端口解析、TTL 到期的 unavailable/removed、移除后的 TTL=0/complete=false、非法参数退出、help/version、完整 UInt32 种子恢复和脱敏输出/错误不回显原文。旧 `tests/interop/cli_smoke.py` 保留为历史 0.2.0 检查，不用于当前版本验收。构建通过不等于实网通过。
 
 后续另补三项定向回归，验证同一 tick 中不同服务的移除原因和范围隔离；同时失效的 goodbye 与自然 TTL 到期不会互相覆盖。公开实网 fixture 的两次回放及完整服务事件对照也已纳入离线 CLI 冒烟。
 

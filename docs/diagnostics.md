@@ -1,6 +1,6 @@
 # Diagnostic and transport error codes
 
-Status: `main` / `0.2.0`, updated 2026-11-01.
+Status: `main` / `0.2.1-dev` (unreleased), updated 2026-11-05.
 
 `Engine` emits `Diagnostic(code, detail)` events for recoverable protocol, capacity, and scheduling conditions. JSON event output uses `event: "diagnostic"`, `code`, and `detail`. The code is the machine-readable category; the detail is for logs and may change. Consumers should handle unknown codes by logging or counting them rather than failing.
 
@@ -13,12 +13,14 @@ Status: `main` / `0.2.0`, updated 2026-11-01.
 | `outbound_limit` | The pending outbound-query queue is full; due queries were deferred. | Keep draining `poll_outbound()` and advancing the Engine. |
 | `service_limit` | More matching instances exist than the configured service capacity allows. | Increase capacity if appropriate or narrow the subscription. |
 | `unsupported_instance_domain` | A PTR target does not match the subscribed local service type. | Ignore that target; check the publisher or the subscribed type if unexpected. |
-| `packet_rejected` | An inbound packet could not be decoded. Native polling continues after this diagnostic. | Record the detail for troubleshooting; no service state is admitted from that packet. |
+| `packet_rejected` | An inbound packet failed decoding or cache admission. Native polling continues after this diagnostic. | Treat detail as untrusted text; no state from the rejected packet is admitted. Existing entries may still expire when the adapter advances time. |
 | `query_invalid` | The question itself could not be encoded. | Check the service name and record type supplied by the caller. |
 | `known_answer_limit` | Known-Answer data exceeded an encoding budget; a valid question was sent as plain QM instead. | Usually no action is needed; inspect the detail if this is frequent. |
 | `outbound_batch_interrupted` | A multi-packet Known-Answer burst was interrupted before it was fully drained. | Drain and send each continuation packet before changing Engine input or time. |
 
 `packet_rejected` is also used by Replay for malformed recorded packet bytes. Diagnostic events describe a condition; they are not all fatal and do not imply the Browser has closed.
+
+Ingress policy rejections (interface, target, source port, optional source CIDR or TTL) are silent and precede capture/cache admission. They do not produce a diagnostic per hostile packet. Replay budget exhaustion raises ReplayError/InvalidCommand and closes that Replay; see [behavior contract](behavior-contract.md). Redacted CLI errors omit the original detail.
 
 ## Native transport error codes
 

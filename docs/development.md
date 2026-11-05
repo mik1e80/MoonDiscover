@@ -11,7 +11,7 @@ Windows 已安装 Visual Studio C++ 工具和 Windows SDK 时：
 .\scripts\moon.ps1 run examples/encode_query --target js
 .\scripts\moon.ps1 test src/engine --target js --frozen --filter 'smoke:*'
 .\scripts\moon.ps1 build cmd/moondiscover examples/http_connect examples/watch_events tests/native_cancel --target native
-python tests/interop/cli_smoke.py
+.\scripts\moon.ps1 run scripts/cli-smoke.mbtx -- _build/native/debug/build/cmd/moondiscover/moondiscover.exe
 ```
 
 bootstrap 将官方固定工具链装在项目 `.tools/moon`，校验归档散列并构建 core bundle；不会升级全局工具链。工具链和依赖已安装时，可用 `bootstrap.ps1 -Offline`。
