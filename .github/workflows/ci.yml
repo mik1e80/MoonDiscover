@@ -51,6 +51,8 @@ jobs:
           include-hidden-files: true
       - name: Native ingress policy boundary tests
         run: moon test src/native --target native --filter 'smoke:*'
+      - name: Offline CLI and redacted error smoke
+        run: moon run scripts/cli-smoke.mbtx -- _build/native/debug/build/cmd/moondiscover/moondiscover.exe
       - name: Bounded resource lifecycle smoke
         run: _build/native/debug/build/tests/resource_soak/resource_soak.exe 2
       - name: Consume public APIs from a separate local workspace
@@ -77,7 +79,7 @@ jobs:
         run: ./_build/native/debug/build/tests/resource_soak/resource_soak.exe 2
       - name: Offline CLI smoke
         shell: pwsh
-        run: python tests/interop/cli_smoke.py
+        run: ./scripts/moon.ps1 run scripts/cli-smoke.mbtx -- _build/native/debug/build/cmd/moondiscover/moondiscover.exe
       - name: Native ingress policy boundary tests
         shell: pwsh
         run: ./scripts/moon.ps1 test src/native --target native --filter 'smoke:*'

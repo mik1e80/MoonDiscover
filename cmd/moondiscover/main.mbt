@@ -4,6 +4,24 @@ async fn write_line(text : String) -> Unit {
 }
 
 ///|
+async fn read_trace(path : String) -> String {
+  let file = @fs.open(path, mode=ReadOnly)
+  defer file.close()
+  guard file.size() <= 8388608L else { fail("replay file exceeds 8 MiB") }
+  let bytes : Array[Byte] = []
+  while file.read_some(max_len=65536) is Some(chunk) {
+    // Keep the read itself bounded if the file grows after the initial stat.
+    guard chunk.length() <= 8388608 - bytes.length() else {
+      fail("replay file exceeds 8 MiB")
+    }
+    for byte in chunk {
+      bytes.push(byte)
+    }
+  }
+  @utf8.decode(Bytes::makei(bytes.length(), i => bytes[i]))
+}
+
+///|
 async fn usage() -> Unit {
   write_line(
     "MoonDiscover 0.2.1-dev\n  browse --interface IPV4 --service _http._tcp.local. [--duration-ms 5000] [--record trace.jsonl] [--allow-source CIDR,CIDR] [--require-ttl 255]\n  resolve --interface IPV4 --instance 'Demo._http._tcp.local.' [--duration-ms 5000] [--record trace.jsonl] [--allow-source CIDR,CIDR] [--require-ttl 255]\n  doctor --interface IPV4\n  replay --file trace.jsonl [--seed 1]\n  redact --file trace.jsonl [--seed 1]\nRedact exports lossy event summaries, not a replay trace. Names support DNS presentation escaping. JSONL is written to stdout.",
@@ -114,7 +132,7 @@ async fn run_command(args : Array[String]) -> Unit {
     return
   }
   if args[1] == "--version" {
-    write_line("0.2.0-dev")
+    write_line("0.2.1-dev")
     return
   }
   let options = options(args)
@@ -138,15 +156,14 @@ async fn run_command(args : Array[String]) -> Unit {
     }
     "replay" | "redact" => {
       let path = required(options, "--file")
-      guard @fs.file_size(path) <= 8388608L else {
-        fail("replay file exceeds 8 MiB")
-      }
-      let data = @fs.read_file(path)
-      let content = data.text()
+      let content = read_trace(path)
       let mut first_line : String? = None
       for line in content.split("\n") {
         let text = line.trim().to_owned()
         if text != "" {
+          guard text.length() <= 32768 else {
+            fail("line exceeds 32768 characters")
+          }
           first_line = Some(text)
           break
         }
@@ -283,13 +300,25 @@ async fn run_command(args : Array[String]) -> Unit {
 
 ///|
 async fn main {
+  let args = @env.args()
   let failure = try {
-    run_command(@env.args())
+    run_command(args)
     None
   } catch {
     error => Some(error)
   }
   if failure is Some(error) {
+    if args.length() > 1 && args[1] == "redact" {
+      // Parse/file errors may embed private source fragments or file paths.
+      write_line(
+        Json::object({
+          "event": Json("error"),
+          "redacted": Json(true),
+          "message": Json("redaction failed"),
+        }).stringify(),
+      )
+      fail("redaction failed")
+    }
     write_line(
       Json::object({ "event": Json("error"), "message": Json("\{error}") }).stringify(),
     )

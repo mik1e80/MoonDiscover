@@ -1,0 +1,66 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+----
+fn events(text : String) -> Array[Json] raise {
+  let result : Array[Json] = []
+  for line in text.split("\n") {
+    let line = line.trim().to_owned()
+    if line != "" { result.push(@json.parse(line)) }
+  }
+  result
+}
+async fn main {
+  let args = @env.args()
+  guard args.length() == 2 else { fail("usage: cli-smoke.mbtx <CLI binary>") }
+  let binary = args[1]
+  let replay = ["replay", "--file", "fixtures/replay-basic.jsonl", "--seed", "7"]
+  let a = @shell.Cmd(binary, replay).output(timeout_ms=5000)
+  let b = @shell.Cmd(binary, replay).output(timeout_ms=5000)
+  a.check(); b.check()
+  assert_eq(a.stdout(), b.stdout())
+  let output = events(a.stdout())
+  assert_eq(output.filter(e => e is { "event": "resolved", "service": { "port": 43219, "srv_candidates": [{ "port": 43219, .. }], .. }, .. }).length(), 1)
+  assert_true(output.any(e => e is { "event": "unavailable", "reason": "ttl_expired", .. }))
+  assert_true(output.any(e => e is { "event": "removed", "service": { "complete": False, "remaining_ttl_ms": 0, .. }, .. }))
+  let version = @shell.Cmd(binary, ["--version"]).output(timeout_ms=5000)
+  version.check()
+  assert_eq(version.stdout().trim(), "0.2.1-dev")
+  let help = @shell.Cmd(binary, ["--help"]).output(timeout_ms=5000)
+  help.check()
+  let invalid = @shell.Cmd(binary, ["browse", "--invalid", "x"]).output(timeout_ms=5000)
+  assert_true(invalid.exit_code() != 0)
+  assert_true(events(invalid.stdout())[0] is { "event": "error", .. })
+  @fs.mkdir(".tools", allow_exist=true)
+  @fs.write_file(".tools/config-smoke.jsonl", "{\"kind\":\"config\",\"format\":1,\"seed\":4294967295,\"at_ms\":0}\n")
+  let config = @shell.Cmd(binary, ["replay", "--file", ".tools/config-smoke.jsonl"]).output(timeout_ms=5000)
+  config.check()
+  assert_true(events(config.stdout())[0] is { "event": "configured", "seed": 4294967295, .. })
+  let live = ["replay", "--file", "fixtures/live-20261024.jsonl"]
+  let first = @shell.Cmd(binary, live).output(timeout_ms=5000)
+  let second = @shell.Cmd(binary, live).output(timeout_ms=5000)
+  first.check(); second.check()
+  assert_eq(first.stdout(), second.stdout())
+  let redacted = @shell.Cmd(binary, ["redact", "--file", "fixtures/live-20261024.jsonl"]).output(timeout_ms=5000)
+  redacted.check()
+  let rows = events(redacted.stdout())
+  assert_eq(rows.length(), events(first.stdout()).length())
+  assert_true(rows.any(e => e is { "event": "resolved", "complete": True, .. }))
+  for row in rows {
+    let fields : Map[String, Json] = @json.from_json(row)
+    for key in fields.keys() {
+      assert_true(["event", "redacted", "complete", "address_count", "srv_candidate_count"].contains(key))
+    }
+  }
+  @fs.write_file(".tools/private-redact.jsonl", "{\"kind\":\"private-secret-value\",\"at_ms\":0}\n")
+  let bad = @shell.Cmd(binary, ["redact", "--file", ".tools/private-redact.jsonl"]).output(timeout_ms=5000)
+  assert_true(bad.exit_code() != 0)
+  assert_true(bad.stdout().find("private-secret-value") is None)
+  assert_true(bad.stderr().find("private-secret-value") is None)
+  println("{\"cli_smoke\":true,\"redaction\":true,\"redacted_errors\":true}")
+}

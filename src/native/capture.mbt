@@ -43,6 +43,14 @@ pub fn Browser::capture_config(self : Browser) -> Json {
     "seed": Json(self.seed),
     "scope": Json(self.scope),
     "mode": Json("ipv4_qm_multicast_only"),
+    "ingress_policy": Json::object({
+      "require_ip_ttl_255": Json(self.ingress_policy.require_ip_ttl_255),
+      "allowed_sources": Json(
+        self.ingress_policy.allowed_sources.map(source => {
+          "\{ipv4_text(source.network)}/\{source.prefix_length}"
+        }),
+      ),
+    }),
   })
 }
 
