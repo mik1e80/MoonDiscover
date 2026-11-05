@@ -102,8 +102,8 @@ fn main raise {
       }
     }
     let packet = Bytes::makei(raw.length(), i => raw[i])
-    // The runner persists the last full reproducer before invoking risky code,
-    // including when the native process aborts rather than returning an error.
+    // Emit before risky code. The runner persists the last received case; if
+    // stdout was buffered at a crash, replay the saved seed through that run.
     println(
       Json::object({
         "case": Json(i),

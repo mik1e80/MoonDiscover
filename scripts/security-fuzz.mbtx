@@ -13,6 +13,11 @@ async fn main {
   @fs.mkdir(".tools", allow_exist=true)
   let latest = ".tools/security-fuzz-last-case.json"
   let report = ".tools/security-fuzz-report.json"
+  let started = Json::object({ "passed": Json(false), "status": Json("started"), "seed_argument": Json(args[2]), "cases_argument": Json(args[3]) })
+  // Replace prior success before launching; an interrupted second seed must
+  // never leave the first seed's success masquerading as its own result.
+  @fs.write_file(latest, started.stringify(indent=2))
+  @fs.write_file(report, started.stringify(indent=2))
   let mut summary : Json? = None
   let code = @async.with_timeout(30000, () => {
     @shell.Cmd(args[1], [args[2], args[3]]).each_line(line => {

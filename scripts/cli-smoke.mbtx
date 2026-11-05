@@ -46,6 +46,26 @@ async fn main {
   let second = @shell.Cmd(binary, live).output(timeout_ms=5000)
   first.check(); second.check()
   assert_eq(first.stdout(), second.stdout())
+  let historical = @json.parse(@fs.read_file("docs/evidence/windows-live-20261024.json").text())
+  guard historical is { "demo": String(demo), "replay_service_events": Array(expected), .. } else { fail("missing historical fixture evidence") }
+  let actual : Array[Json] = []
+  for event in events(first.stdout()) {
+    if event is { "service": { "instance": String(instance), .. }, .. } && instance.has_prefix(demo + ".") {
+      let fields : Map[String, Json] = @json.from_json(event)
+      let projected : Map[String, Json] = Map([])
+      for key, value in fields {
+        if key == "at_ms" { continue }
+        if key == "service" {
+          let service : Map[String, Json] = @json.from_json(value)
+          let original : Map[String, Json] = Map([])
+          for field, entry in service { if field != "srv_candidates" { original[field] = entry } }
+          projected[key] = Json::object(original)
+        } else { projected[key] = value }
+      }
+      actual.push(Json::object(projected))
+    }
+  }
+  assert_eq(actual, expected)
   let redacted = @shell.Cmd(binary, ["redact", "--file", "fixtures/live-20261024.jsonl"]).output(timeout_ms=5000)
   redacted.check()
   let rows = events(redacted.stdout())
@@ -57,10 +77,12 @@ async fn main {
       assert_true(["event", "redacted", "complete", "address_count", "srv_candidate_count"].contains(key))
     }
   }
-  @fs.write_file(".tools/private-redact.jsonl", "{\"kind\":\"private-secret-value\",\"at_ms\":0}\n")
-  let bad = @shell.Cmd(binary, ["redact", "--file", ".tools/private-redact.jsonl"]).output(timeout_ms=5000)
-  assert_true(bad.exit_code() != 0)
-  assert_true(bad.stdout().find("private-secret-value") is None)
-  assert_true(bad.stderr().find("private-secret-value") is None)
+  for private_input in ["{\"kind\":\"private-secret-value\",\"at_ms\":0}\n", "{\"private-secret-value\":"] {
+    @fs.write_file(".tools/private-redact.jsonl", private_input)
+    let bad = @shell.Cmd(binary, ["redact", "--file", ".tools/private-redact.jsonl"]).output(timeout_ms=5000)
+    assert_true(bad.exit_code() != 0)
+    assert_true(bad.stdout().find("private-secret-value") is None)
+    assert_true(bad.stderr().find("private-secret-value") is None)
+  }
   println("{\"cli_smoke\":true,\"redaction\":true,\"redacted_errors\":true}")
 }
