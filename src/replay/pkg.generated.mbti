@@ -8,6 +8,8 @@ import {
 // Values
 pub fn event_json(@engine.Event) -> Json
 
+pub fn redacted_output(Json) -> Json
+
 pub fn snapshot_json(@engine.ServiceSnapshot) -> Json
 
 // Errors

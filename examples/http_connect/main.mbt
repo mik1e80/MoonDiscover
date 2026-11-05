@@ -8,6 +8,8 @@ async fn main {
   guard !interface.is_ipv6() else { fail("IPv4 required") }
   let expected = args[2]
   let browser = @native.Browser::open(interface.ip())
+  // Controlled same-machine interoperability demo only. The TXT token is a
+  // selector, not authentication; never connect to an arbitrary advertised IP.
   defer browser.close()
   let _ = browser.browse(@dnssd.DnsName::parse("_http._tcp.local."))
   let mut chosen : @dnssd.ServiceSnapshot? = None
@@ -30,6 +32,13 @@ async fn main {
   let mut address : Bytes? = None
   for bytes in service.addresses {
     if bytes.length() == 4 {
+      let advertised = (bytes[0].to_int().reinterpret_as_uint() << 24) |
+        (bytes[1].to_int().reinterpret_as_uint() << 16) |
+        (bytes[2].to_int().reinterpret_as_uint() << 8) |
+        bytes[3].to_int().reinterpret_as_uint()
+      if advertised != interface.ip() {
+        continue
+      }
       address = Some(bytes)
       break
     }

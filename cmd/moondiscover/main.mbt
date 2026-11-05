@@ -6,7 +6,7 @@ async fn write_line(text : String) -> Unit {
 ///|
 async fn usage() -> Unit {
   write_line(
-    "MoonDiscover 0.2.0-dev\n  browse --interface IPV4 --service _http._tcp.local. [--duration-ms 5000] [--record trace.jsonl]\n  resolve --interface IPV4 --instance 'Demo._http._tcp.local.' [--duration-ms 5000] [--record trace.jsonl]\n  doctor --interface IPV4\n  replay --file trace.jsonl [--seed 1]\nNames support DNS presentation escaping. JSONL is written to stdout.",
+    "MoonDiscover 0.2.1-dev\n  browse --interface IPV4 --service _http._tcp.local. [--duration-ms 5000] [--record trace.jsonl] [--allow-source CIDR,CIDR] [--require-ttl 255]\n  resolve --interface IPV4 --instance 'Demo._http._tcp.local.' [--duration-ms 5000] [--record trace.jsonl] [--allow-source CIDR,CIDR] [--require-ttl 255]\n  doctor --interface IPV4\n  replay --file trace.jsonl [--seed 1]\n  redact --file trace.jsonl [--seed 1]\nRedact exports lossy event summaries, not a replay trace. Names support DNS presentation escaping. JSONL is written to stdout.",
   )
 }
 
@@ -14,10 +14,18 @@ async fn usage() -> Unit {
 fn options(args : Array[String]) -> Map[String, String] raise {
   let result : Map[String, String] = Map([])
   let allowed = match args[1] {
-    "browse" => ["--interface", "--service", "--duration-ms", "--record"]
-    "resolve" => ["--interface", "--instance", "--duration-ms", "--record"]
+    "browse" =>
+      [
+        "--interface", "--service", "--duration-ms", "--record", "--allow-source",
+        "--require-ttl",
+      ]
+    "resolve" =>
+      [
+        "--interface", "--instance", "--duration-ms", "--record", "--allow-source",
+        "--require-ttl",
+      ]
     "doctor" => ["--interface"]
-    "replay" => ["--file", "--seed"]
+    "replay" | "redact" => ["--file", "--seed"]
     _ => []
   }
   let mut i = 2
@@ -32,6 +40,35 @@ fn options(args : Array[String]) -> Map[String, String] raise {
     i += 2
   }
   result
+}
+
+///|
+fn ingress_policy(options : Map[String, String]) -> @native.IngressPolicy raise {
+  let sources : Array[@native.SourceNetwork] = []
+  if options.get("--allow-source") is Some(text) {
+    // Bound parsing before materializing an arbitrarily long CIDR list.
+    guard text.length() <= 2048 else {
+      fail("source allowlist exceeds 2048 characters")
+    }
+    for entry in text.split(",") {
+      guard sources.length() < 64 else { fail("source network limit (64)") }
+      guard entry.split_once("/") is Some((ip, prefix)) else {
+        fail("source must use IPv4/prefix CIDR syntax")
+      }
+      let address = @socket.Addr::parse(ip.to_owned() + ":0")
+      guard !address.is_ipv6() else { fail("source CIDR must be IPv4") }
+      sources.push(
+        @native.SourceNetwork::new(address.ip(), number(prefix.to_owned(), 32)),
+      )
+    }
+  }
+  let strict = options.get("--require-ttl") is Some(_)
+  if strict {
+    guard options.get("--require-ttl") == Some("255") else {
+      fail("--require-ttl accepts only 255")
+    }
+  }
+  @native.IngressPolicy::new(allowed_sources=sources, require_ip_ttl_255=strict)
 }
 
 ///|
@@ -99,7 +136,7 @@ async fn run_command(args : Array[String]) -> Unit {
         }).stringify(),
       )
     }
-    "replay" => {
+    "replay" | "redact" => {
       let path = required(options, "--file")
       guard @fs.file_size(path) <= 8388608L else {
         fail("replay file exceeds 8 MiB")
@@ -121,7 +158,8 @@ async fn run_command(args : Array[String]) -> Unit {
           )
         None =>
           if first_line is Some(line) &&
-            @json.parse(line) is { "kind": "config", .. } {
+            @json.parse(line, max_nesting_depth=16, reject_duplicate_keys=true)
+            is { "kind": "config", .. } {
             @dnssd.Replay::from_config(line)
           } else {
             @dnssd.Replay::new(seed=1U)
@@ -136,7 +174,13 @@ async fn run_command(args : Array[String]) -> Unit {
         count += 1
         guard count <= 10000 else { fail("replay command count exceeds 10000") }
         for event in replay.step_line(line) {
-          write_line(event.stringify())
+          write_line(
+            (if args[1] == "redact" {
+              @replay.redacted_output(event)
+            } else {
+              event
+            }).stringify(),
+          )
         }
       }
     }
@@ -150,6 +194,7 @@ async fn run_command(args : Array[String]) -> Unit {
       let browser = @native.Browser::open(
         interface_ipv4(options),
         record=record_path is Some(_),
+        ingress_policy=ingress_policy(options),
       )
       defer browser.close()
       let trace : Array[String] = []
