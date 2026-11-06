@@ -1,6 +1,6 @@
 # Engine 与 Browser 行为契约
 
-状态：2026-11-05，main / 0.2.1-dev。0.2.0 发布归档不包含新增来源策略、TTL 元数据、Replay 总量预算和脱敏导出。服务完整性的具体条件见[解析契约](dnssd-resolution-contract.md)，不可信输入见[安全模型](security-model.md)。
+状态：2026-11-06，main / 0.2.1-dev（未发布）。0.2.0 归档不包含本轮来源、预算、版本化事件和恢复 API；最新验证见[第四轮记录](security-review-20261106.md)。服务完整性的具体条件见[解析契约](dnssd-resolution-contract.md)，不可信输入见[安全模型](security-model.md)。
 
 ## 分层与调用顺序
 
@@ -51,7 +51,7 @@ Removed 快照保留最后已知识别和内容字段，但 complete=false、rem
 | 单包 | 9000 字节；问题+RR 合计 256；单名称 256 步 | 整包拒绝，不能半写入缓存 |
 | 缓存记录 | 2048 / 16384 | 新包无法完整接纳则抛 CapacityExceeded，原状态不提交；不逐出有效旧记录 |
 | 服务 | 512 / 4096 | 保留仍有效旧服务；新实例省略并诊断 service_limit，实际空位出现后可接纳 |
-| 查询任务 | 256 / 8192 | 诊断 query_limit，省略超额查询；订阅保留，下一次重建再评估；没有公平服务保证 |
+| 查询任务 | 256 / 8192 | 超额进入 deferred_queries；每 1000ms 轮换容量窗口，next_deadline 包含轮换。稳定集合在 ceil(N/capacity) 个窗口中获得排期；持续任意增删无无条件延迟保证 |
 | 订阅 | 64 / 64 | 新增失败，旧兴趣保留 |
 | 待发问题 | 64 / 64 | outbound_limit；到期任务延后 1000ms；不丢弃订阅 |
 | 一组 Known Answers | 64 包、16383 答案，另受字节预算限制 | 编码错误；Engine 对有效问题退化为普通 QM 并诊断 known_answer_limit；无效问题诊断 query_invalid |
@@ -59,6 +59,7 @@ Removed 快照保留最后已知识别和内容字段，但 complete=false、rem
 | Browser 录制队列 | 256 帧 | 丢最旧帧并累计 dropped_captures；Browser 可继续浏览；CLI 拒绝保存有丢帧的 trace |
 | CLI trace 累积 | 8 MiB / 10000 帧 | 超限结束该 CLI 操作并释放 Browser，不保存不完整录制 |
 | 单次 Replay | 10000 帧、8 MiB 输入 UTF-8、4 MiB 解码包、65536 个输出、8 MiB 输出 UTF-8 | 累计计数含多次 step_line；预算耗尽关闭 Engine，该 Replay 后续调用均失败；当前帧不返回部分结果 |
+| 实时包速率 | Engine/Browser 默认 256 包/s，来源 64 包/s；上限 65536，0 显式关闭 | 令牌桶突发等于每秒速率，Native 用尽全局预算暂停收包；来源满表拒绝新来源，1 秒闲置后回收。无逐包限速诊断，见资源保护说明 |
 
 Replay.new 可降低预算，不能突破硬上限；每帧限 32768 个 UTF-16 代码单元、JSON 深度 16、重复键拒绝，packet_hex 在解码前限 18000 字符。输入/输出字节预算含每行一个换行。通过单行长度检查的非法命令仍消耗帧和输入预算；普通格式错误可继续输入有效帧，预算耗尽则必须创建新 Replay。不能自行向其公开的 engine 注入额外工作再宣称遵守回放预算。
 
@@ -66,6 +67,14 @@ Replay.new 可降低预算，不能突破硬上限；每帧限 32768 个 UTF-16 
 
 ## 恢复
 
-处理 event_overflow 后，取尽当前批事件，并用 snapshots() 整体替换应用视图。若把状态复制到异步下游，应再比较 dropped_events；这些同步 API 的调用之间不要重入 Engine。
+Engine.poll_envelope 返回 EventEnvelope(epoch, sequence, event)，溢出时 epoch 增长，sequence 为该 Engine 的事件水位。state_view 原子返回同一时刻的 epoch/sequence/快照。异步消费者用新 view 整体替换后，丢弃旧 epoch 或 sequence <= view.sequence 的已复制事件；不要在替换快照后再逐条应用这批旧事件。poll_event 仍兼容，但不会携带版本信息；两种 poll 消费同一队列。版本仅在同一 Engine/Browser scope 内比较，不跨重开和进程比较。
+
+Browser.poll_batch 返回事件与完整 StateView，适合异步界面整体替换；state_view 和 engine_stats 也可单独读取。读取之后的时间与状态可能继续变化；宿主跨线程共享这些对象不受支持。记录观察来源变化本身不作为服务内容更新事件。
 
 同步 Browser.poll 报错时由调用方关闭；异步 run 使用 defer，在正常结束、回调抛错或取消时关闭。接口失效报告 InterfaceUnavailable；新建 Browser、恢复订阅并重建视图。不会自动重试连接或转移接口。录制在关闭后仍可取走；原始录制和脱敏摘要均按[隐私约束](security-model.md)分享。
+
+Native 操作检测单调时钟不可用/倒退时报告 socket_error；elapsed 显示值不倒退。close 即使检测到时钟失败，仍使用最后有效时间结束录制并释放 socket/Engine。不要用系统 UTC 时间代替注入单调时间；长期暂停最多补满一个速率突发，但缓存和 resolver 到期仍按实际推进时间处理。
+
+run 活动期间，另一个 run、公开 poll、browse/resolve/cancel 抛 DriverBusy；检查发生在第二个 run 的关闭 defer 之前，不会误关第一个驱动者。只允许一个协作式驱动者；这不是多线程互斥锁。外部 close 或 notify_network_changed 可用于停止，run 在下一协作边界退出；关闭幂等。地址/索引未变的换网由宿主调用 notify_network_changed，旧对象立即关闭，重新 open/browse 后使用新 scope。库不自动恢复业务订阅。
+
+查询容量压力中的轮换只保留当前窗口任务，重新进入窗口的任务重新建立退避/刷新安排；不宣称压力状态与无限容量时的发送时刻完全相同。query_limit 在进入压力状态时诊断一次，退出后再进入可再次诊断。按 next_deadline 推进时钟，否则任何定时公平性都无法执行。

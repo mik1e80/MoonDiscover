@@ -35,6 +35,10 @@ Native methods can raise `TransportError`. Call `TransportError::diagnostic_code
 
 Transport errors are separate from Engine diagnostic events. The transport currently does not migrate subscriptions automatically when an interface changes; see [Native lifecycle](native-lifecycle.md).
 
+`DriverBusy` maps to `browser_driver_busy`. Ingress `EngineError::RateLimited` displays `ingress_rate_limited`; it is a synchronous rejection, counted by Engine.stats().rate_dropped, not a per-packet Diagnostic. Invalid ingestion time displays `invalid_ingress_time`. Native packet_rejected, source_rate_dropped, policy_dropped and receive_pauses are distinct counters; the last one counts polling pauses, not unobservable kernel drops. Clock failure/regression remains `socket_error` with clock context.
+
+During query pressure, query_limit is coalesced on entry and deferred work rotates every second while the host drives deadlines. It is not a permanent rejection of the associated subscription; see [behavior contract](behavior-contract.md).
+
 ## Consumer guidance
 
 - Branch on the diagnostic `code`, not on English `detail` text.

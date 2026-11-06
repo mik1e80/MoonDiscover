@@ -1,0 +1,62 @@
+{
+  "date": "2026-11-06",
+  "source_commit": "a824ad0a9490431039a01970e797a4b534fd711d",
+  "source_dirty_in_ci": false,
+  "release_status": "0.2.1-dev, not published",
+  "lightweight_run": "https://github.com/mik1e80/MoonDiscover/actions/runs/42234247044",
+  "linux_interop_run": "https://github.com/mik1e80/MoonDiscover/actions/runs/42234246712",
+  "artifacts": [
+    {
+      "platform": "Windows",
+      "id": 13510578652,
+      "name": "windows-native-evidence",
+      "zip_sha256": "7aab66307199cf644d48f0b509c300e5542a23941727e9b8b997b47e20e9235f",
+      "copied_reports": {
+        "native_ttl-report.json": "windows-ttl-20261106.json",
+        "native_fault-report.json": "windows-native-fault-20261106.json",
+        "replay-guard-report.json": "windows-replay-guard-20261106.json",
+        "live_soak-report.json": "windows-live-soak-20261106.json"
+      }
+    },
+    {
+      "platform": "Linux portable job",
+      "id": 13510083982,
+      "name": "security-fuzz-evidence",
+      "zip_sha256": "64f163d0f0619f2a849cfc303c14acab3a7942454f7d4a2e3bcdd1f532fe7292",
+      "copied_reports": {
+        "native_ttl-report.json": "linux-ttl-20261106.json",
+        "native_fault-report.json": "linux-native-fault-20261106.json",
+        "replay-guard-report.json": "linux-replay-guard-20261106.json",
+        "live_soak-report.json": "linux-live-soak-20261106.json",
+        "security-fuzz-wire-report.json": "fuzz-wire-20261106.json",
+        "security-fuzz-cache-report.json": "fuzz-cache-20261106.json",
+        "security-fuzz-engine-report.json": "fuzz-engine-20261106.json"
+      }
+    },
+    {
+      "platform": "Linux controlled multicast",
+      "id": 13510033912,
+      "name": "linux-avahi-evidence",
+      "zip_sha256": "a20ddb87daa7825809ae277e862952ca0b104a1a1eb36eec61c95924edab580a",
+      "copied_reports": { "protocol-live-ingress.json": "linux-ingress-20261106.json" }
+    }
+  ],
+  "coverage": {
+    "source": "portable-smoke job log 127947644482",
+    "report": "coverage-selected-20261106.log",
+    "covered_points": 712,
+    "total_instrumented_points": 1275,
+    "selected_tests": 6,
+    "scope": "only selected security regressions, not full-module or fuzz feedback coverage",
+    "note": "fixed toolchain summary printed to log despite -o; timestamped summary lines are extracted unchanged. scripts/save-coverage.mbtx now persists output explicitly in subsequent runs."
+  },
+  "checks": { "core_js_smoke": 70, "native_smoke": 4, "wire_cases_each_seed": 192, "cache_cases": 192, "engine_cases": 192, "srv_distribution_seeds": 4096 },
+  "limits": [
+    "copied reports are byte-for-byte artifact files; source association is established by this manifest and workflow head SHA",
+    "TTL reports are unicast loopback through production receive, not Windows mdns multicast or second-device proof",
+    "live soak duration is two seconds and observed zero services; this is a resource lifetime check, not a discovery or hours-long pressure proof",
+    "resource failures and BUG minimizer sentinel are synthetic validation, not discovered vulnerabilities",
+    "bounded mutations plus selected coverage observation are not coverage-guided fuzzing or independent audit",
+    "subsequent coverage capture and documentation changes do not rewrite these historical report files"
+  ]
+}

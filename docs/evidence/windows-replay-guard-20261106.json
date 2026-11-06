@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "normal_replay": {
+    "child_exit": 0,
+    "passed": true,
+    "wall_ms": 32,
+    "peak_rss_or_commit_bytes": 1835008,
+    "timed_out": false,
+    "cpu_limited": false,
+    "output": "discarded; this command reports resource results only"
+  },
+  "synthetic_resource_cases": [
+    {
+      "mode": "stall",
+      "result": {
+        "child_exit": 124,
+        "passed": false,
+        "wall_ms": 250,
+        "peak_rss_or_commit_bytes": 1687552,
+        "timed_out": true,
+        "cpu_limited": false,
+        "output": "discarded; this command reports resource results only"
+      }
+    },
+    {
+      "mode": "memory",
+      "result": {
+        "child_exit": -1073740791,
+        "passed": false,
+        "wall_ms": 297,
+        "peak_rss_or_commit_bytes": 127787008,
+        "timed_out": false,
+        "cpu_limited": false,
+        "output": "discarded; this command reports resource results only"
+      }
+    },
+    {
+      "mode": "cpu",
+      "result": {
+        "child_exit": 125,
+        "passed": false,
+        "wall_ms": 1000,
+        "peak_rss_or_commit_bytes": 1630208,
+        "timed_out": false,
+        "cpu_limited": true,
+        "output": "discarded; this command reports resource results only"
+      }
+    }
+  ],
+  "limits": "synthetic child failures verify process budgets, not parser vulnerabilities; output is discarded"
+}

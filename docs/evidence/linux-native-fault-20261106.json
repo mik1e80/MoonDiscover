@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "initialization_failures": 6,
+  "io_failures": 2,
+  "balanced_handles": true,
+  "peer_unaffected": true,
+  "reopened": true
+}

@@ -1,6 +1,6 @@
 # Native IPv4 生命周期与错误
 
-状态：2026-11-05，main / 0.2.1-dev（未发布）。
+状态：2026-11-06，main / 0.2.1-dev（未发布）。最新运行证据见[第四轮记录](security-review-20261106.md)。
 
 `MulticastSocket::open` 显式选择本机 IPv4，Browser 为本次接口运行生成 scope。单个对象由一个调用方驱动；不要并发运行 poll/run 或在回调中重入 poll。多个独立 Browser 可以共享 5353 绑定。
 
@@ -20,6 +20,7 @@ main 的 scope 含独立随机 nonce、接口地址/索引和本次运行原点�
 | 分类 | 代码 | 行为 |
 | --- | --- | --- |
 | BrowserClosed | `transport_closed` | 已关闭的 Browser 或底层 socket 被调用 |
+| DriverBusy | `browser_driver_busy` | run 已有驱动者；第二个 run 或公开 poll/browse/resolve/cancel 被拒绝，不关闭原驱动者 |
 | InvalidArgument | `invalid_transport_argument` | 接口值、时长、收发长度等参数非法 |
 | InterfaceUnavailable | `interface_unavailable` | 打开时接口不可用，或运行检查发现原接口失效/索引变化 |
 | SocketError | `socket_error` | 系统收发/绑定或必要元数据故障，保留操作上下文与 OS 数值 |
@@ -33,6 +34,10 @@ Engine 诊断事件（例如 `packet_rejected`、`event_overflow`）与此处的
 ## 接口恢复边界
 
 当前仍不自动迁移。应用遇到接口变化后，应关闭旧 Browser、确认新活动 IPv4、打开新 Browser 并重新建立业务订阅。新对象使用新 scope，旧接口缓存不跨网络混合。检测当前约每秒检查一次所选 IPv4 的接口索引，不宣称覆盖所有操作系统链路状态通知。
+
+宿主可调用 notify_network_changed 主动结束旧代次，即使地址和索引没变也会关闭；重建与恢复订阅仍由宿主执行。只支持单一协作式驱动者，DriverBusy 不是多线程锁。回调内读快照/版本可用，不能重入变更方法；close/通知允许用于停止运行。
+
+操作中的单调时钟不可用或倒退归类为 socket_error；elapsed 显示值不倒退。关闭时若时钟异常，用最后有效时间结束录制并照常释放资源，不生成负时间帧。该分类有注入原始时间值的纯函数测试；没有声称改写或破坏实际 OS 单调时钟。
 
 Linux CI 已在独立 network namespace 的 dummy 网卡上删除并恢复地址，验证错误分类、旧缓存清理、新 scope 与订阅重建；报告见 specialized-interop.md。实验复现并修复了周期接口检查前 I/O 失败被误分类的问题。物理 Wi-Fi、IPv6、单播与系统原生异步事件源仍待后续；用户网卡未被修改。
 

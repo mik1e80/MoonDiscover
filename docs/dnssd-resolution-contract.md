@@ -11,4 +11,8 @@
 
 名称与 TXT 的细节见[模型说明](model.md)。无效键仍保留于原始 TXT 中但不参与 lookup；键 ASCII 不区分大小写、重复键第一项胜出、flag 与空值区分。不要将任意值隐式当作 UTF-8 或可信配置。
 
+main 另有 `endpoints(accept, ipv4_only=true)`：完整快照经应用地址/端口策略后才产生连接候选，默认排除 AAAA，部分快照返回空数组。只存在 AAAA 时 complete 仍可为 true，但默认 IPv4 候选为空。显式开启 IPv6 时，链路本地地址带 requires_ipv6_zone，scope 仍须由宿主映射为真实接口。阶段应区分 Discovered → Resolved → Reachable → Authenticated；本库只提供前两者的发现证据。
+
+observations/observations_truncated 是最多 64 项的关联记录链来源观察，缺少元数据时为空；不是完整来源历史或认证。来源更新不会单独产生 Updated，快照读取可取得当前观察。现有 snapshot_json 保持旧字段契约，不序列化该扩展；需要它的应用直接读取 API 字段。
+
 对应验证：`engine_test.mbt`、`subtype_test.mbt`、`srv_rrset_test.mbt`、`lifecycle_contract_test.mbt`、`update_order_test.mbt`、`resolve_test.mbt`、`removal_reason_test.mbt`、`model_test.mbt`。它们验证可观察行为；独立实现、平台及实网范围见[协议矩阵](protocol-matrix.md)，不合并成完整 RFC 认证。

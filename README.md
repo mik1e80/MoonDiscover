@@ -51,7 +51,9 @@ flowchart LR
 
 ## 版本选择
 
-状态更新：**2026-11-05**。`0.2.0` 已发布至 Mooncakes。main 为 **0.2.1-dev（未发布）**，新增可选来源/TTL 策略、Replay 累计预算和脱敏导出，安装 0.2.0 不包含这些改进。下面比较已发布版本；开发改进见 [CHANGELOG](CHANGELOG.md)和[本轮验证](docs/security-review-20261105.md)。[0.2.0 发布与独立安装验证](docs/release-0.2.0.md)。
+状态更新：**2026-11-06**。`0.2.0` 已发布至 Mooncakes。main 为 **0.2.1-dev（未发布）**，包含后续来源/TTL、资源保护与恢复改进，安装 0.2.0 不包含这些改进。下面比较已发布版本；开发改进见 [CHANGELOG](CHANGELOG.md)和[本轮验证](docs/security-review-20261106.md)。[0.2.0 发布与独立安装验证](docs/release-0.2.0.md)。
+
+2026-11-06 又补充了[高频输入保护](docs/resource-protection.md)、查询轮换、版本化视图、广告端点筛选、来源观察、[独立进程回放预算](docs/replay-isolation.md)及三类状态变异测试。最新证据和未完成验证见[第四轮落实记录](docs/security-review-20261106.md)；这些能力仍未发布到 Mooncakes。
 
 | 项目 | Mooncakes `0.1.0` | Mooncakes `0.2.0` |
 | --- | --- | --- |
@@ -294,6 +296,8 @@ let browser = @native.Browser::open(0xc0a80117U, ingress_policy=policy)
 ```
 
 CLI 对应 `--allow-source 192.168.1.0/24,10.0.0.8/32 --require-ttl 255`，可附于 browse/resolve。默认允许正确接口上的 mDNS 组播响应，包括叠加子网；严格 TTL 模式在缺少接收 TTL 时也拒绝。来源规则只检查发包者，不限制记录中广告的地址；完整语义见[安全模型](docs/security-model.md)。
+
+实时速率可用 `--packet-rate 256 --source-rate 64` 配置，0 显式关闭。连接端用 `snapshot.endpoints((address, port) => address == approved_ip && port == approved_port)` 按应用预先配置的地址和端口许可单独筛选，默认只返回 IPv4；通过筛选仍不代表认证。异步界面可用 `state_view` / `poll_batch` 整体替换，并丢弃旧版本的排队工作。网络环境变化时调用 `notify_network_changed()` 关闭旧代次，再打开对象并恢复订阅，详见[行为契约](docs/behavior-contract.md)。
 
 ### 自行集成 Engine
 

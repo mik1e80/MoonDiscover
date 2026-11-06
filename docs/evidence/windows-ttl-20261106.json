@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "production_receive": true,
+  "transport": "IPv4 unicast loopback ephemeral port",
+  "received_ttls": [
+    255,
+    254,
+    1
+  ],
+  "mdns_multicast_tested": false
+}

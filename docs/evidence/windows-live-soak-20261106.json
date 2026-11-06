@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "requested_seconds": 2,
+  "actual_ms": 2000,
+  "samples": [
+    {
+      "at_ms": 0,
+      "rss_bytes": 10117120,
+      "handles_or_fds": 159,
+      "services": 0,
+      "cached_records": 0,
+      "query_jobs": 1,
+      "dropped_events": 0,
+      "rate_dropped": 0,
+      "network_errors": 0,
+      "interface_index": 14,
+      "events": 0
+    }
+  ],
+  "final_rss_bytes": 10153984,
+  "final_handles_or_fds": 157,
+  "closed_both": true,
+  "recovery": "transport errors fail this observation; this test does not claim automatic migration or cross-device verification"
+}
