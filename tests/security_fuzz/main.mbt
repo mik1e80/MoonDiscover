@@ -1,13 +1,29 @@
 ///|
-fn main raise {
+async fn main {
   let args = @env.args()
-  guard args.length() == 3 else {
+  if args.length() == 3 && args[1] == "--oracle" {
+    guard @fs.file_size(args[2]) <= 18000L else {
+      fail("oracle sample too large")
+    }
+    let packet = @model.bytes_from_hex(
+      @fs.read_file(args[2]).text().trim().to_owned(),
+    )
+    let _ = @wire.decode(packet) catch {
+      _ => { id: 0, flags: 0, questions: [], records: [], }
+    }
+    return
+  }
+  guard args.length() == 3 || args.length() == 4 else {
     fail("usage: security_fuzz <UInt32 seed> <cases 1..10000>")
   }
   let initial = @string.parse_uint(args[1])
   let count = @string.parse_int(args[2])
   guard count > 0 && count <= 10000 else {
     fail("case budget outside 1..10000")
+  }
+  if args.length() == 4 && args[3] != "wire" {
+    state_checks(args[3], initial, count)
+    return
   }
   let mut state = initial
   fn random(n : Int32) -> Int32 {
