@@ -1,0 +1,11 @@
+import {
+  "mik1e80/dnssd/src/native",
+}
+
+supported_targets = "native"
+
+pkgtype(kind: "executable")
+
+options(
+  "native-stub": [ "ttl.c" ],
+)

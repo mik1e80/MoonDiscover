@@ -84,6 +84,14 @@ MOONBIT_FFI_EXPORT int moondiscover_guard_replay(const char *exe, const char *tr
   }
   DWORD exit_code = 126;
   GetExitCodeProcess(process.hProcess, &exit_code);
+  if (exit_code && !metrics[2]) {
+    FILETIME created, ended, kernel, user; ULARGE_INTEGER k, u;
+    if (GetProcessTimes(process.hProcess, &created, &ended, &kernel, &user)) {
+      k.LowPart = kernel.dwLowDateTime; k.HighPart = kernel.dwHighDateTime;
+      u.LowPart = user.dwLowDateTime; u.HighPart = user.dwHighDateTime;
+      if (k.QuadPart + u.QuadPart >= (ULONGLONG)cpu * 10000000) metrics[2] = 2;
+    }
+  }
   result = metrics[2] == 1 ? 124 : metrics[2] == 2 ? 125 : (int)exit_code;
   if (QueryInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits), NULL)) metrics[1] = (int64_t)limits.PeakProcessMemoryUsed;
 done:

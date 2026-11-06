@@ -49,7 +49,10 @@ pub fn Replay::new(
     raise InvalidCommand("replay budget outside hard limits")
   }
   {
-    engine: @engine.Engine::new(seed~),
+    // Offline traces may legitimately contain more than one network burst at
+    // the same timestamp. Their cumulative byte/frame/output budgets apply;
+    // do not impose an adapter's live receive rate on deterministic replay.
+    engine: @engine.Engine::new(seed~, packet_limit=0),
     now_ms: 0,
     seed,
     started: false,

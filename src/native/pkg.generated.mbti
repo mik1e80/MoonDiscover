@@ -41,6 +41,7 @@ pub fn Browser::capture_json(Self, CaptureFrame) -> Json
 pub fn Browser::close(Self) -> Unit
 pub fn Browser::dropped_captures(Self) -> Int64
 pub fn Browser::elapsed(Self) -> Int64
+pub fn Browser::engine_stats(Self) -> @engine.EngineStats
 pub fn Browser::notify_network_changed(Self) -> Unit
 pub fn Browser::open(UInt32, seed? : UInt32?, record? : Bool, ingress_policy? : IngressPolicy, packet_limit? : Int32, source_limit? : Int32, source_capacity? : Int32) -> Self raise
 pub fn Browser::poll(Self, timeout_ms? : Int32) -> Array[@engine.Event] raise

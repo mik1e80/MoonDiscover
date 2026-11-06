@@ -20,6 +20,7 @@ pub struct Browser {
   priv mut receive_pauses : Int64
   priv mut packet_rejected : Int64
   priv mut running : Bool
+  priv packet_limit : Int32
 }
 
 ///|
@@ -80,6 +81,7 @@ pub fn Browser::open(
     receive_pauses: 0,
     packet_rejected: 0,
     running: false,
+    packet_limit,
   }
 }
 

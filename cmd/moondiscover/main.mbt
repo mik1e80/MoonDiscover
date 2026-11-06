@@ -35,12 +35,12 @@ fn options(args : Array[String]) -> Map[String, String] raise {
     "browse" =>
       [
         "--interface", "--service", "--duration-ms", "--record", "--allow-source",
-        "--require-ttl",
+        "--require-ttl", "--packet-rate", "--source-rate",
       ]
     "resolve" =>
       [
         "--interface", "--instance", "--duration-ms", "--record", "--allow-source",
-        "--require-ttl",
+        "--require-ttl", "--packet-rate", "--source-rate",
       ]
     "doctor" => ["--interface"]
     "replay" | "redact" => ["--file", "--seed"]
@@ -212,6 +212,11 @@ async fn run_command(args : Array[String]) -> Unit {
         interface_ipv4(options),
         record=record_path is Some(_),
         ingress_policy=ingress_policy(options),
+        packet_limit=number(
+          options.get("--packet-rate").unwrap_or("256"),
+          65536,
+        ),
+        source_limit=number(options.get("--source-rate").unwrap_or("64"), 65536),
       )
       defer browser.close()
       let trace : Array[String] = []

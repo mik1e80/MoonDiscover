@@ -37,17 +37,30 @@ jobs:
       - name: Independently parse Engine Known-Answer output
         run: moon test tests/protocol_probe --target js --filter 'smoke:*'
       - name: Compile Linux native transport probes
-        run: moon build cmd/native_spike cmd/transport_spike cmd/moondiscover examples/http_connect examples/watch_events tests/native_cancel tests/resource_soak tests/security_fuzz --target native
+        run: moon build cmd/native_spike cmd/transport_spike cmd/moondiscover cmd/replay_guard examples/http_connect examples/watch_events tests/native_cancel tests/native_ttl tests/native_fault tests/live_soak tests/guard_probe tests/resource_soak tests/security_fuzz --target native
       - name: Bounded native input fuzz with reproducible fixed and changing seeds
         run: |
           moon run scripts/security-fuzz.mbtx -- _build/native/debug/build/tests/security_fuzz/security_fuzz.exe 20261105 192
           moon run scripts/security-fuzz.mbtx -- _build/native/debug/build/tests/security_fuzz/security_fuzz.exe ${{ github.run_number }} 192
+          moon run scripts/security-fuzz.mbtx -- _build/native/debug/build/tests/security_fuzz/security_fuzz.exe 20261106 192 cache
+          moon run scripts/security-fuzz.mbtx -- _build/native/debug/build/tests/security_fuzz/security_fuzz.exe 20261106 192 engine
+      - name: Minimize a synthetic sentinel and enforce replay process budgets
+        run: |
+          moon run scripts/minimizer-smoke.mbtx
+          moon run scripts/guard-smoke.mbtx
+      - name: Short transport lifetime fault and TTL metadata observations
+        run: moon run scripts/native-local-smoke.mbtx
       - name: Keep fuzz reproducer and summary
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: security-fuzz-evidence
-          path: .tools/security-fuzz-*.json
+          path: |
+            .tools/security-fuzz-*.json
+            .tools/replay-guard-*.json
+            .tools/native*-report.json
+            .tools/live*-report.json
+            .tools/minimizer-synthetic-output.hex.json
           include-hidden-files: true
       - name: Native ingress policy boundary tests
         run: moon test src/native --target native --filter 'smoke:*'
@@ -73,7 +86,23 @@ jobs:
         run: ./scripts/bootstrap.ps1
       - name: Compile Windows native transport probes
         shell: pwsh
-        run: ./scripts/moon.ps1 build cmd/native_spike cmd/transport_spike cmd/moondiscover examples/http_connect examples/watch_events tests/native_cancel tests/resource_soak --target native
+        run: ./scripts/moon.ps1 build cmd/native_spike cmd/transport_spike cmd/moondiscover cmd/replay_guard examples/http_connect examples/watch_events tests/native_cancel tests/native_ttl tests/native_fault tests/live_soak tests/guard_probe tests/resource_soak --target native
+      - name: Short transport lifetime fault and TTL metadata observations
+        shell: pwsh
+        run: ./scripts/moon.ps1 run scripts/native-local-smoke.mbtx
+      - name: Enforce replay process budgets
+        shell: pwsh
+        run: ./scripts/moon.ps1 run scripts/guard-smoke.mbtx
+      - name: Retain Windows native evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-native-evidence
+          path: |
+            .tools/replay-guard-*.json
+            .tools/native*-report.json
+            .tools/live*-report.json
+          include-hidden-files: true
       - name: Bounded resource lifecycle smoke
         shell: pwsh
         run: ./_build/native/debug/build/tests/resource_soak/resource_soak.exe 2

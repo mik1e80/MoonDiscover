@@ -50,3 +50,18 @@ test "smoke: oversized packet hex is rejected before decoding and valid input st
   )
   assert_true(replay.step_line("{\"kind\":\"advance\",\"at_ms\":0}").is_empty())
 }
+
+///|
+test "smoke: offline replay does not silently apply live packet rate limits" {
+  let replay = @replay.Replay::new()
+  for _ in 0..<300 {
+    assert_true(
+      replay
+      .step_line(
+        "{\"kind\":\"packet\",\"at_ms\":0,\"scope\":\"lab\",\"packet_hex\":\"000084000000000000000000\"}",
+      )
+      .is_empty(),
+    )
+  }
+  assert_eq(replay.engine.stats().rate_dropped, 0L)
+}

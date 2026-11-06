@@ -10,6 +10,11 @@ pub fn Browser::state_view(self : Browser) -> @engine.StateView {
 }
 
 ///|
+pub fn Browser::engine_stats(self : Browser) -> @engine.EngineStats {
+  self.engine.stats()
+}
+
+///|
 /// Prefer whole-view replacement across asynchronous UI/task queues. Compare
 /// sequence within the same Browser scope; older queued batches must be ignored.
 pub fn Browser::poll_batch(

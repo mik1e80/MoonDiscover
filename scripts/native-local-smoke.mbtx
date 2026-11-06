@@ -1,0 +1,37 @@
+----
+import { "moonbitlang/async@0.22.5", "moonbitlang/async@0.22.5/fs", "moonbitlang/async@0.22.5/shell", "moonbitlang/core/env", "moonbitlang/core/json" }
+----
+async fn command(program : String, args : Array[String]) -> String {
+  let result = @shell.Cmd(program, args).output(timeout_ms=15000, max_output_bytes=30000)
+  result.check()
+  result.stdout()
+}
+async fn main {
+  let args = @env.args()
+  @fs.mkdir(".tools", allow_exist=true)
+  let ip = if args.length() == 2 { args[1] } else if @env.get_env_var("OS") == Some("Windows_NT") {
+    let data = @json.parse(command("powershell.exe", ["-NoProfile", "-Command", "Get-NetIPAddress -AddressFamily IPv4 -AddressState Preferred | ConvertTo-Json -Compress"]))
+    let entries = if data is Array(entries) { entries } else { [data] }
+    let mut selected : String? = None
+    for entry in entries {
+      if entry is { "IPAddress": String(value), .. } && !value.has_prefix("127.") && !value.has_prefix("169.254.") {
+        selected = Some(value)
+        if value.has_prefix("10.") || value.has_prefix("192.168.") { break }
+      }
+    }
+    guard selected is Some(value) else { fail("no active IPv4 for transport smoke") }
+    value
+  } else {
+    let data = @json.parse(command("ip", ["-j", "-4", "route", "get", "224.0.0.251"]))
+    guard data is [{ "prefsrc": String(value), .. }, ..] else { fail("no multicast route") }
+    value
+  }
+  let base = "_build/native/debug/build/tests/"
+  for (name, arguments) in [
+    ("native_ttl", []), ("native_cancel", [ip]), ("native_fault", [ip]), ("live_soak", [ip, "2"]),
+  ] {
+    let report = @json.parse(command(base + name + "/" + name + ".exe", arguments))
+    @fs.write_file(".tools/" + name + "-report.json", report.stringify(indent=2))
+    println(Json::object({ "probe": Json(name), "report": report }).stringify())
+  }
+}

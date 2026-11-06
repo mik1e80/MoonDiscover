@@ -29,23 +29,15 @@ async fn main {
   guard chosen is Some(service) else {
     fail("expected demo service not resolved")
   }
-  let mut address : Bytes? = None
-  for bytes in service.addresses {
-    if bytes.length() == 4 {
-      let advertised = (bytes[0].to_int().reinterpret_as_uint() << 24) |
-        (bytes[1].to_int().reinterpret_as_uint() << 16) |
-        (bytes[2].to_int().reinterpret_as_uint() << 8) |
-        bytes[3].to_int().reinterpret_as_uint()
-      if advertised != interface.ip() {
-        continue
-      }
-      address = Some(bytes)
-      break
-    }
-  }
-  guard address is Some(ip) && service.port is Some(port) else {
+  let permitted_ip = Bytes::makei(4, i => {
+    (interface.ip() >> (24 - i * 8)).to_byte()
+  })
+  let candidates = service.endpoints((bytes, _) => bytes == permitted_ip)
+  guard candidates.get(0) is Some(endpoint) else {
     fail("demo has no IPv4 endpoint")
   }
+  let ip = endpoint.address
+  let port = endpoint.port
   let host = (ip[0].to_int().reinterpret_as_uint() << 24) |
     (ip[1].to_int().reinterpret_as_uint() << 16) |
     (ip[2].to_int().reinterpret_as_uint() << 8) |
