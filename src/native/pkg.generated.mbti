@@ -17,6 +17,7 @@ pub suberror TransportError {
   BrowserClosed
   InvalidArgument(String)
   InterfaceUnavailable
+  DriverBusy
 }
 pub fn TransportError::diagnostic_code(Self) -> String
 #deprecated
@@ -40,13 +41,32 @@ pub fn Browser::capture_json(Self, CaptureFrame) -> Json
 pub fn Browser::close(Self) -> Unit
 pub fn Browser::dropped_captures(Self) -> Int64
 pub fn Browser::elapsed(Self) -> Int64
-pub fn Browser::open(UInt32, seed? : UInt32?, record? : Bool, ingress_policy? : IngressPolicy) -> Self raise
+pub fn Browser::notify_network_changed(Self) -> Unit
+pub fn Browser::open(UInt32, seed? : UInt32?, record? : Bool, ingress_policy? : IngressPolicy, packet_limit? : Int32, source_limit? : Int32, source_capacity? : Int32) -> Self raise
 pub fn Browser::poll(Self, timeout_ms? : Int32) -> Array[@engine.Event] raise
+pub fn Browser::poll_batch(Self, timeout_ms? : Int32) -> BrowserBatch raise
 pub fn Browser::poll_capture(Self) -> CaptureFrame?
 pub fn Browser::poll_event(Self) -> @engine.Event?
 pub fn Browser::resolve(Self, @model.DnsName, timeout_ms? : Int32) -> Int32 raise
 pub async fn Browser::run(Self, Int32, async (@engine.Event) -> Unit, on_tick? : async () -> Unit) -> Unit
 pub fn Browser::snapshots(Self) -> Array[@engine.ServiceSnapshot]
+pub fn Browser::state_view(Self) -> @engine.StateView
+pub fn Browser::stats(Self) -> BrowserStats
+
+pub struct BrowserBatch {
+  events : Array[@engine.Event]
+  view : @engine.StateView
+}
+
+pub struct BrowserStats {
+  received : Int64
+  accepted : Int64
+  policy_dropped : Int64
+  source_rate_dropped : Int64
+  receive_pauses : Int64
+  packet_rejected : Int64
+  core_rate_dropped : Int64
+}
 
 pub(all) enum CaptureFrame {
   BrowseFrame(Int64, @model.DnsName)
@@ -80,6 +100,8 @@ pub fn MulticastSocket::close(Self) -> Unit
 pub fn MulticastSocket::open(UInt32) -> Self raise TransportError
 pub fn MulticastSocket::receive(Self, timeout_ms? : Int32) -> Datagram? raise TransportError
 pub fn MulticastSocket::send(Self, Bytes) -> Unit raise TransportError
+
+type ReceiveBudget
 
 pub struct SourceNetwork {
   network : UInt32

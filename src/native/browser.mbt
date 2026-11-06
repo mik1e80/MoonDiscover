@@ -13,6 +13,13 @@ pub struct Browser {
   priv recording : Bool
   priv captures : Array[CaptureFrame]
   priv mut capture_lost : Int64
+  priv receive_budget : ReceiveBudget
+  priv mut received : Int64
+  priv mut accepted : Int64
+  priv mut policy_dropped : Int64
+  priv mut receive_pauses : Int64
+  priv mut packet_rejected : Int64
+  priv mut running : Bool
 }
 
 ///|
@@ -21,7 +28,13 @@ pub fn Browser::open(
   seed~ : UInt32? = None,
   record~ : Bool = false,
   ingress_policy~ : IngressPolicy = IngressPolicy::new(),
+  packet_limit~ : Int32 = 256,
+  source_limit~ : Int32 = 64,
+  source_capacity~ : Int32 = 128,
 ) -> Browser raise {
+  let receive_budget = ReceiveBudget::new(
+    packet_limit, source_limit, source_capacity,
+  )
   let socket = MulticastSocket::open(interface_ipv4)
   errdefer socket.close()
   let origin = monotonic_ms()
@@ -47,7 +60,7 @@ pub fn Browser::open(
     raise SocketError("scope random nonce unavailable", 0)
   }
   {
-    engine: @engine.Engine::new(seed~),
+    engine: @engine.Engine::new(seed~, packet_limit~),
     socket,
     ingress_policy,
     scope: "ipv4:\{interface_ipv4}:\{index}:\{origin}:\{@model.bytes_hex(nonce)}",
@@ -60,6 +73,13 @@ pub fn Browser::open(
     recording: record,
     captures: [],
     capture_lost: 0,
+    receive_budget,
+    received: 0,
+    accepted: 0,
+    policy_dropped: 0,
+    receive_pauses: 0,
+    packet_rejected: 0,
+    running: false,
   }
 }
 
@@ -84,6 +104,7 @@ pub fn Browser::browse(
   service_type : @model.DnsName,
 ) -> Int32 raise {
   guard !self.closed else { raise BrowserClosed }
+  guard !self.running else { raise DriverBusy }
   let now = self.elapsed()
   let id = self.engine.browse(service_type, self.scope, now)
   self.capture_frame(BrowseFrame(now, service_type))
@@ -97,6 +118,7 @@ pub fn Browser::resolve(
   timeout_ms~ : Int32 = 5000,
 ) -> Int32 raise {
   guard !self.closed else { raise BrowserClosed }
+  guard !self.running else { raise DriverBusy }
   let now = self.elapsed()
   let id = self.engine.resolve(instance, self.scope, now, timeout_ms~)
   self.capture_frame(ResolveFrame(now, instance, timeout_ms))
@@ -106,6 +128,7 @@ pub fn Browser::resolve(
 ///|
 pub fn Browser::cancel(self : Browser, id : Int32) -> Unit raise {
   guard !self.closed else { raise BrowserClosed }
+  guard !self.running else { raise DriverBusy }
   let now = self.elapsed()
   self.engine.cancel(id, now)
   self.capture_frame(CancelFrame(now, id))
@@ -143,6 +166,15 @@ pub fn Browser::poll(
   self : Browser,
   timeout_ms~ : Int32 = 20,
 ) -> Array[@engine.Event] raise {
+  guard !self.running else { raise DriverBusy }
+  self.poll_driven(timeout_ms~)
+}
+
+///|
+fn Browser::poll_driven(
+  self : Browser,
+  timeout_ms~ : Int32,
+) -> Array[@engine.Event] raise {
   guard !self.closed else { raise BrowserClosed }
   guard timeout_ms >= 0 && timeout_ms <= 1000 else {
     raise InvalidArgument("poll timeout outside 0..1000ms")
@@ -163,6 +195,10 @@ pub fn Browser::poll(
     wait = wait.min((deadline - now).max(0L).min(50L).to_int())
   }
   for _ in 0..<64 {
+    if !self.receive_budget.global.available(self.elapsed()) {
+      self.receive_pauses += 1
+      break
+    }
     let received = self.socket.receive(timeout_ms=wait) catch {
       error => raise self.classify_io_error(error)
     }
@@ -170,17 +206,37 @@ pub fn Browser::poll(
       None => break
       Some(packet) => {
         wait = 0
+        self.received += 1
+        if !self.receive_budget.allow(packet.source_ipv4, self.elapsed()) {
+          continue
+        }
         if !self.ingress_policy.accepts(packet, self.interface_index) {
+          self.policy_dropped += 1
           continue
         }
         let received_at = self.elapsed()
         self.capture_frame(PacketFrame(received_at, packet))
-        self.engine.ingest(packet.bytes, self.scope, received_at) catch {
+        self.engine.ingest(
+          packet.bytes,
+          self.scope,
+          received_at,
+          source=Some({
+            source_ipv4: packet.source_ipv4,
+            source_port: packet.source_port,
+            interface_index: packet.interface_index,
+            destination_ipv4: packet.destination_ipv4,
+            ip_ttl: packet.ip_ttl,
+          }),
+        ) catch {
+          @engine.RateLimited => continue
           error => {
+            self.packet_rejected += 1
             self.engine.advance(received_at)
             events.push(@engine.Diagnostic("packet_rejected", "\{error}"))
+            continue
           }
         }
+        self.accepted += 1
       }
     }
   }
@@ -202,18 +258,40 @@ pub async fn Browser::run(
   on_event : async (@engine.Event) -> Unit,
   on_tick~ : async () -> Unit = () => (),
 ) -> Unit {
-  defer self.close()
+  guard !self.running else { raise DriverBusy }
+  guard !self.closed else { raise BrowserClosed }
+  self.running = true
+  defer self.finish_run()
   guard duration_ms > 0 && duration_ms <= 86400000 else {
     raise InvalidArgument("duration outside 1..86400000ms")
   }
   let deadline = self.elapsed() + duration_ms.to_int64()
-  while self.elapsed() < deadline {
-    for event in self.poll(timeout_ms=0) {
+  while !self.closed && self.elapsed() < deadline {
+    for event in self.poll_driven(timeout_ms=0) {
+      if self.closed {
+        break
+      }
       on_event(event)
+    }
+    if self.closed {
+      break
     }
     on_tick()
     @async.sleep(10)
   }
+}
+
+///|
+fn Browser::finish_run(self : Browser) -> Unit {
+  self.running = false
+  self.close()
+}
+
+///|
+/// Host notification for a network change even when address/index are unchanged.
+/// Stop this generation; reopen and restore subscriptions under a fresh scope.
+pub fn Browser::notify_network_changed(self : Browser) -> Unit {
+  self.close()
 }
 
 ///|

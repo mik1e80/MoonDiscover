@@ -4,6 +4,7 @@ pub suberror TransportError {
   BrowserClosed
   InvalidArgument(String)
   InterfaceUnavailable
+  DriverBusy
 }
 
 ///|

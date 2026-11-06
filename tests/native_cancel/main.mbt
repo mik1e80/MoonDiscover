@@ -69,6 +69,50 @@ async fn main {
   guard code == "invalid_transport_argument" else {
     fail("unstable transport code")
   }
+  let driven = @native.Browser::open(ip)
+  let mut busy_checked = false
+  driven.run(100, _ => (), on_tick=() => {
+    assert_true(
+      try {
+        let _ = driven.poll(timeout_ms=0)
+        false
+      } catch {
+        @native.DriverBusy => true
+        _ => false
+      },
+    )
+    assert_true(
+      try {
+        driven.run(1, _ => ())
+        false
+      } catch {
+        @native.DriverBusy => true
+        _ => false
+      },
+    )
+    // A rejected nested run must not close the outer driver's socket.
+    assert_true(
+      try {
+        let _ = driven.browse(@dnssd.DnsName::parse("_http._tcp.local."))
+        false
+      } catch {
+        @native.DriverBusy => true
+        _ => false
+      },
+    )
+    busy_checked = true
+    driven.notify_network_changed()
+  })
+  assert_true(busy_checked)
+  assert_true(
+    try {
+      let _ = driven.poll(timeout_ms=0)
+      false
+    } catch {
+      @native.BrowserClosed => true
+      _ => false
+    },
+  )
   println(
     "{\"cancelled_run_closed\":true,\"reopened\":true,\"shared_browsers\":true,\"idempotent_close\":true,\"invalid_run_closed\":true,\"callback_error_closed\":true,\"typed_error_code\":true}",
   )
