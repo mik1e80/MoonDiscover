@@ -7,6 +7,8 @@ pub impl Show for EngineError with fn output(self, logger) {
         "invalid_service_type: expected a local DNS-SD type/instance"
       ResourceLimit(detail) => "resource_limit: " + detail
       UnknownSubscription => "unknown_subscription"
+      RateLimited => "ingress_rate_limited"
+      InvalidTime => "invalid_ingress_time"
     },
   )
 }

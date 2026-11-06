@@ -39,6 +39,14 @@ pub fn DnsName::to_presentation(Self) -> String
 pub fn DnsName::to_repr(Self) -> @debug.Repr
 pub fn DnsName::to_wire(Self) -> Bytes
 
+pub struct PacketBudget {
+  // private fields
+}
+pub fn PacketBudget::allow(Self, Int64) -> Bool raise InputError
+pub fn PacketBudget::available(Self, Int64) -> Bool raise InputError
+pub fn PacketBudget::dropped(Self) -> Int64
+pub fn PacketBudget::new(limit? : Int32) -> Self raise InputError
+
 pub struct TxtRecord {
   // private fields
 } derive(@debug.Debug)

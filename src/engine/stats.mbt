@@ -9,6 +9,7 @@ pub struct EngineStats {
   queued_questions : Int32
   queued_datagrams : Int32
   dropped_events : Int64
+  rate_dropped : Int64
 }
 
 ///|
@@ -22,5 +23,6 @@ pub fn Engine::stats(self : Engine) -> EngineStats {
     queued_questions: self.pending.length(),
     queued_datagrams: self.fragments.length(),
     dropped_events: self.lost,
+    rate_dropped: self.packet_budget.dropped(),
   }
 }

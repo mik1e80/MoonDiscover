@@ -166,8 +166,9 @@ pub fn RecordCache::ingest(
     revision: self.revision,
   }
   let removed = next.advance(now)
-  // Accept only complete mDNS success responses (QR, opcode=0, TC=0, rcode=0).
-  if message.id == 0 && (message.flags & 0xfa0f) == 0x8000 {
+  // RFC 6762 18.1/18.4/18.5: receive ignores ID, AA and TC (also RD/RA/Z/AD/CD).
+  // Structural truncation is still rejected by wire.decode before ingestion.
+  if (message.flags & 0xf80f) == 0x8000 {
     guard message.questions.length() <= 256 &&
       message.records.length() <= 256 - message.questions.length() &&
       next.revision < 9223372036854775807L else {

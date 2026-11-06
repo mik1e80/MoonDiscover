@@ -15,6 +15,8 @@ pub suberror EngineError {
   InvalidServiceType
   ResourceLimit(String)
   UnknownSubscription
+  RateLimited
+  InvalidTime
 }
 #deprecated
 pub fn EngineError::output(Self, &Logger) -> Unit
@@ -33,7 +35,7 @@ pub fn Engine::close(Self) -> Unit
 pub fn Engine::dropped_events(Self) -> Int64
 pub fn Engine::ingest(Self, Bytes, String, Int64) -> Unit raise
 pub fn Engine::ingest_message(Self, @wire.Message, String, Int64) -> Unit raise
-pub fn Engine::new(cache_capacity? : Int32, service_capacity? : Int32, event_capacity? : Int32, query_capacity? : Int32, seed? : UInt32) -> Self raise
+pub fn Engine::new(cache_capacity? : Int32, service_capacity? : Int32, event_capacity? : Int32, query_capacity? : Int32, seed? : UInt32, packet_limit? : Int32) -> Self raise
 pub fn Engine::next_deadline(Self) -> Int64?
 pub fn Engine::poll_event(Self) -> Event?
 pub fn Engine::poll_outbound(Self) -> Outbound?
@@ -50,6 +52,7 @@ pub struct EngineStats {
   queued_questions : Int32
   queued_datagrams : Int32
   dropped_events : Int64
+  rate_dropped : Int64
 }
 
 pub(all) enum Event {

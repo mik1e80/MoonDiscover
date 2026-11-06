@@ -4,6 +4,8 @@ pub suberror EngineError {
   InvalidServiceType
   ResourceLimit(String)
   UnknownSubscription
+  RateLimited
+  InvalidTime
 }
 
 ///|
@@ -64,6 +66,7 @@ pub struct Engine {
   priv query_capacity : Int32
   priv mut rng : UInt32
   priv srv_seed : UInt32
+  priv packet_budget : @model.PacketBudget
 }
 
 ///|
@@ -73,6 +76,7 @@ pub fn Engine::new(
   event_capacity~ : Int32 = 256,
   query_capacity~ : Int32 = 256,
   seed~ : UInt32 = 1U,
+  packet_limit~ : Int32 = 256,
 ) -> Engine raise {
   guard service_capacity > 0 &&
     service_capacity <= 4096 &&
@@ -101,6 +105,7 @@ pub fn Engine::new(
     query_capacity,
     rng: seed,
     srv_seed: seed,
+    packet_budget: @model.PacketBudget::new(limit=packet_limit),
   }
 }
 
@@ -540,8 +545,9 @@ pub fn Engine::ingest(
   now : Int64,
 ) -> Unit raise {
   guard !self.closed else { raise Closed }
+  self.admit_input(now)
   let message = @wire.decode(packet)
-  self.ingest_message(message, scope, now)
+  self.ingest_admitted(message, scope, now)
 }
 
 ///|
@@ -552,6 +558,17 @@ pub fn Engine::ingest_message(
   now : Int64,
 ) -> Unit raise {
   guard !self.closed else { raise Closed }
+  self.admit_input(now)
+  self.ingest_admitted(message, scope, now)
+}
+
+///|
+fn Engine::ingest_admitted(
+  self : Engine,
+  message : @wire.Message,
+  scope : String,
+  now : Int64,
+) -> Unit raise {
   let removed = self.cache.ingest(scope, message, now)
   self.discard_burst()
   self.now_ms = now
@@ -564,6 +581,13 @@ pub fn Engine::ingest_message(
     return
   }
   self.reconcile("response", removals=removed)
+}
+
+///|
+fn Engine::admit_input(self : Engine, now : Int64) -> Unit raise EngineError {
+  guard now >= self.now_ms else { raise InvalidTime }
+  let allowed = self.packet_budget.allow(now) catch { _ => raise InvalidTime }
+  guard allowed else { raise RateLimited }
 }
 
 ///|
