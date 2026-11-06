@@ -51,4 +51,17 @@ test "smoke: section assertions deduplicate and malformed records reject the who
     },
   )
   assert_eq(cache.records("link", record.name, 1)[0].expires_at, 120000L)
+  assert_true(
+    try {
+      let _ = cache.ingest(
+        "link",
+        { id: -1, flags: 0x8000, questions: [], records: [record], },
+        20,
+      )
+      false
+    } catch {
+      _ => true
+    },
+  )
+  assert_eq(cache.records("link", record.name, 1)[0].expires_at, 120000L)
 }

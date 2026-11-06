@@ -7,7 +7,11 @@ async fn main {
   let output = ".tools/minimizer-synthetic-output.hex"
   for path in [output, output + ".json"] { if @fs.exists(path) { @fs.remove(path) } }
   @fs.write_file(input, "707265666978425547737566666978")
-  let moon = @env.get_env_var("MOON_HOME").unwrap_or("") + "/bin/moon"
+  let moon_home = match @env.get_env_var("MOON_HOME") {
+    Some(value) => value
+    None => @env.get_env_var("HOME").unwrap_or("") + "/.moon"
+  }
+  let moon = moon_home + "/bin/moon"
   let executable = if @fs.exists(moon + ".exe") { moon + ".exe" } else { moon }
   let result = @shell.Cmd(executable, ["run", "scripts/minimize-fuzz.mbtx", "--", "_build/native/debug/build/tests/guard_probe/guard_probe.exe", input, output]).output(timeout_ms=20000)
   result.check()

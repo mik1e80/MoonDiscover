@@ -161,6 +161,12 @@ pub fn RecordCache::ingest(
   source~ : @model.PacketSource? = None,
 ) -> Array[Removal] raise CacheError {
   validate_time(self.now_ms, now)
+  guard message.id >= 0 &&
+    message.id <= 65535 &&
+    message.flags >= 0 &&
+    message.flags <= 65535 else {
+    raise InvalidRecord("message header outside unsigned 16-bit range")
+  }
   if source is Some(info) {
     guard info.source_port >= 0 &&
       info.source_port <= 65535 &&

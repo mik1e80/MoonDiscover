@@ -50,6 +50,10 @@ jobs:
           moon run scripts/guard-smoke.mbtx
       - name: Short transport lifetime fault and TTL metadata observations
         run: moon run scripts/native-local-smoke.mbtx
+      - name: Targeted security coverage observation
+        run: |
+          moon test src/wire/adversarial_test.mbt src/cache/section_test.mbt src/engine/rate_test.mbt src/engine/fairness_test.mbt src/engine/view_test.mbt --target js --enable-coverage
+          moon coverage report -f summary -o .tools/security-coverage.txt
       - name: Keep fuzz reproducer and summary
         if: always()
         uses: actions/upload-artifact@v4
@@ -61,6 +65,7 @@ jobs:
             .tools/native*-report.json
             .tools/live*-report.json
             .tools/minimizer-synthetic-output.hex.json
+            .tools/security-coverage.txt
           include-hidden-files: true
       - name: Native ingress policy boundary tests
         run: moon test src/native --target native --filter 'smoke:*'

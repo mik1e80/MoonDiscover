@@ -64,3 +64,29 @@ MOONBIT_FFI_EXPORT int md_ttl_send(int port, int ttl) {
   int result = TTL_SET(s, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl)) ? -1 : (int)sendto(s, bytes, 12, 0, (struct sockaddr *)&target, sizeof(target));
   TTL_CLOSE(s); return result;
 }
+
+/* Test-only route lookup, without sending an application datagram. */
+MOONBIT_FFI_EXPORT uint32_t md_ttl_interface(void) {
+#ifdef _WIN32
+  WSADATA data;
+  if (WSAStartup(MAKEWORD(2,2), &data)) return 0;
+  ttl_socket s = WSASocket(AF_INET, SOCK_DGRAM, IPPROTO_UDP, NULL, 0, WSA_FLAG_NO_HANDLE_INHERIT);
+  int size;
+#else
+  ttl_socket s = socket(AF_INET, SOCK_DGRAM, 0);
+  socklen_t size;
+#endif
+  uint32_t result = 0;
+  struct sockaddr_in address;
+  memset(&address, 0, sizeof(address)); address.sin_family = AF_INET;
+  address.sin_port = htons(5353); address.sin_addr.s_addr = htonl(0xe00000fbU);
+  if (s != TTL_INVALID && !connect(s, (struct sockaddr *)&address, sizeof(address))) {
+    size = sizeof(address);
+    if (!getsockname(s, (struct sockaddr *)&address, &size)) result = ntohl(address.sin_addr.s_addr);
+  }
+  if (s != TTL_INVALID) TTL_CLOSE(s);
+#ifdef _WIN32
+  WSACleanup();
+#endif
+  return result;
+}

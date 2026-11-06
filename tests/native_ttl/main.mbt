@@ -5,6 +5,9 @@ extern "C" fn open() -> Int64 = "md_ttl_open"
 extern "C" fn port(handle : Int64) -> Int32 = "md_ttl_port"
 
 ///|
+extern "C" fn route_interface() -> UInt32 = "md_ttl_interface"
+
+///|
 extern "C" fn send(port : Int32, ttl : Int32) -> Int32 = "md_ttl_send"
 
 ///|
@@ -22,6 +25,19 @@ extern "C" fn receive(
 
 ///|
 fn main raise {
+  let args = @env.args()
+  if args.length() == 2 && args[1] == "--interface" {
+    let ip = route_interface()
+    assert_true(ip != 0U)
+    println(
+      Json::object({
+        "interface_ipv4": Json(
+          "\{ip >> 24}.\{(ip >> 16) & 255U}.\{(ip >> 8) & 255U}.\{ip & 255U}",
+        ),
+      }).stringify(),
+    )
+    return
+  }
   let handle = open()
   assert_true(handle >= 0)
   defer close(handle)
