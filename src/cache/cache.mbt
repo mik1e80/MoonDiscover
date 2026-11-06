@@ -14,6 +14,7 @@ pub struct CachedRecord {
   received_sequence : Int64
   expires_at : Int64
   original_ttl_ms : Int64
+  source : @model.PacketSource?
 }
 
 ///|
@@ -32,6 +33,7 @@ struct Entry {
   expires_at : Int64
   original_ttl_ms : Int64
   reason : String
+  source : @model.PacketSource?
 }
 
 ///|
@@ -156,8 +158,20 @@ pub fn RecordCache::ingest(
   scope : String,
   message : @wire.Message,
   now : Int64,
+  source~ : @model.PacketSource? = None,
 ) -> Array[Removal] raise CacheError {
   validate_time(self.now_ms, now)
+  if source is Some(info) {
+    guard info.source_port >= 0 &&
+      info.source_port <= 65535 &&
+      info.interface_index >= 0 &&
+      (
+        info.ip_ttl is None ||
+        (info.ip_ttl is Some(ttl) && ttl >= 0 && ttl <= 255)
+      ) else {
+      raise InvalidRecord("invalid source metadata")
+    }
+  }
   guard scope.length() > 0 && scope.length() <= 256 else { raise InvalidScope }
   let next : RecordCache = {
     entries: self.entries.copy(),
@@ -232,6 +246,7 @@ pub fn RecordCache::ingest(
           expires_at: now + ttl,
           original_ttl_ms: ttl,
           reason: "ttl_expired",
+          source,
         }
         if index >= 0 {
           next.entries[index] = entry
@@ -268,6 +283,7 @@ pub fn RecordCache::records(
         received_sequence: e.received_sequence,
         expires_at: e.expires_at,
         original_ttl_ms: e.original_ttl_ms,
+        source: e.source,
       })
     } else {
       None

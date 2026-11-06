@@ -1,5 +1,11 @@
 ///|
-pub using @model {type DnsName, type TxtRecord, type TxtValue, type InputError}
+pub using @model {
+  type DnsName,
+  type TxtRecord,
+  type TxtValue,
+  type InputError,
+  type PacketSource,
+}
 
 ///|
 pub using @engine {
@@ -9,6 +15,10 @@ pub using @engine {
   type SrvCandidate,
   type EngineError,
   type EngineStats,
+  type EventEnvelope,
+  type StateView,
+  type RecordObservation,
+  type EndpointCandidate,
 }
 
 ///|

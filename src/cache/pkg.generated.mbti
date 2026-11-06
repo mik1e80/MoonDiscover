@@ -30,6 +30,7 @@ pub struct CachedRecord {
   received_sequence : Int64
   expires_at : Int64
   original_ttl_ms : Int64
+  source : @model.PacketSource?
 }
 
 type Entry
@@ -39,7 +40,7 @@ pub struct RecordCache {
 }
 pub fn RecordCache::advance(Self, Int64) -> Array[Removal] raise CacheError
 pub fn RecordCache::clear(Self) -> Unit
-pub fn RecordCache::ingest(Self, String, @wire.Message, Int64) -> Array[Removal] raise CacheError
+pub fn RecordCache::ingest(Self, String, @wire.Message, Int64, source? : @model.PacketSource?) -> Array[Removal] raise CacheError
 pub fn RecordCache::len(Self) -> Int32
 pub fn RecordCache::new(capacity? : Int32) -> Self raise CacheError
 pub fn RecordCache::next_deadline(Self) -> Int64?

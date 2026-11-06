@@ -10,6 +10,7 @@ pub struct EngineStats {
   queued_datagrams : Int32
   dropped_events : Int64
   rate_dropped : Int64
+  deferred_queries : Int32
 }
 
 ///|
@@ -24,5 +25,6 @@ pub fn Engine::stats(self : Engine) -> EngineStats {
     queued_datagrams: self.fragments.length(),
     dropped_events: self.lost,
     rate_dropped: self.packet_budget.dropped(),
+    deferred_queries: self.omitted_queries,
   }
 }

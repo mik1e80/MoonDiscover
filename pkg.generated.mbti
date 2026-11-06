@@ -24,6 +24,8 @@ pub fn snapshot_json(@engine.ServiceSnapshot) -> Json
 // Type aliases
 pub using @model {type DnsName}
 
+pub using @engine {type EndpointCandidate}
+
 pub using @engine {type Engine}
 
 pub using @engine {type EngineError}
@@ -32,15 +34,21 @@ pub using @engine {type EngineStats}
 
 pub using @engine {type Event}
 
+pub using @engine {type EventEnvelope}
+
 pub using @model {type InputError}
 
 pub using @wire {type Message}
+
+pub using @model {type PacketSource}
 
 pub using @wire {type Question}
 
 pub using @wire {type RData}
 
 pub using @wire {type Record}
+
+pub using @engine {type RecordObservation}
 
 pub using @replay {type Replay}
 
@@ -51,6 +59,8 @@ pub using @wire {type Section}
 pub using @engine {type ServiceSnapshot}
 
 pub using @engine {type SrvCandidate}
+
+pub using @engine {type StateView}
 
 pub using @model {type TxtRecord}
 

@@ -24,6 +24,8 @@ pub struct ServiceSnapshot {
   missing : Array[String]
   complete : Bool
   remaining_ttl_ms : Int64
+  observations : Array[RecordObservation]
+  observations_truncated : Bool
 }
 
 ///|
@@ -52,7 +54,7 @@ pub struct Engine {
   priv cache : @cache.RecordCache
   priv mut interests : Array[Subscription]
   priv mut services : Array[ServiceSnapshot]
-  priv events : Array[Event]
+  priv events : Array[EventEnvelope]
   priv event_capacity : Int32
   priv service_capacity : Int32
   priv mut next_id : Int32
@@ -67,6 +69,11 @@ pub struct Engine {
   priv mut rng : UInt32
   priv srv_seed : UInt32
   priv packet_budget : @model.PacketBudget
+  priv mut query_offset : Int32
+  priv mut query_rotate_at : Int64?
+  priv mut omitted_queries : Int32
+  priv mut event_epoch : Int64
+  priv mut event_sequence : Int64
 }
 
 ///|
@@ -106,6 +113,11 @@ pub fn Engine::new(
     rng: seed,
     srv_seed: seed,
     packet_budget: @model.PacketBudget::new(limit=packet_limit),
+    query_offset: 0,
+    query_rotate_at: None,
+    omitted_queries: 0,
+    event_epoch: 0,
+    event_sequence: 0,
   }
 }
 
@@ -116,6 +128,7 @@ fn clone_snapshot(s : ServiceSnapshot) -> ServiceSnapshot {
     addresses: s.addresses.copy(),
     missing: s.missing.copy(),
     srv_candidates: s.srv_candidates.map(clone_candidate),
+    observations: s.observations.copy(),
   }
 }
 
@@ -124,13 +137,14 @@ fn Engine::emit(self : Engine, event : Event) -> Unit {
   if self.events.length() >= self.event_capacity {
     self.lost += self.events.length().to_int64()
     self.events.clear()
-    self.events.push(
+    self.event_epoch += 1
+    self.queue_event(
       Diagnostic(
         "event_overflow", "queued events discarded; resync from snapshots()",
       ),
     )
   }
-  self.events.push(event)
+  self.queue_event(event)
 }
 
 ///|
@@ -321,6 +335,9 @@ fn Engine::build_snapshot(
     }
   }
   addresses.sort()
+  let (observations, observations_truncated) = self.observations(
+    sub, instance, srv_candidates,
+  )
   if addresses.is_empty() {
     missing.push("addresses")
   }
@@ -336,6 +353,8 @@ fn Engine::build_snapshot(
     missing,
     complete: missing.is_empty(),
     remaining_ttl_ms: (expiry - self.now_ms).max(0L),
+    observations,
+    observations_truncated,
   }
 }
 
@@ -543,11 +562,12 @@ pub fn Engine::ingest(
   packet : Bytes,
   scope : String,
   now : Int64,
+  source~ : @model.PacketSource? = None,
 ) -> Unit raise {
   guard !self.closed else { raise Closed }
   self.admit_input(now)
   let message = @wire.decode(packet)
-  self.ingest_admitted(message, scope, now)
+  self.ingest_admitted(message, scope, now, source~)
 }
 
 ///|
@@ -556,10 +576,11 @@ pub fn Engine::ingest_message(
   message : @wire.Message,
   scope : String,
   now : Int64,
+  source~ : @model.PacketSource? = None,
 ) -> Unit raise {
   guard !self.closed else { raise Closed }
   self.admit_input(now)
-  self.ingest_admitted(message, scope, now)
+  self.ingest_admitted(message, scope, now, source~)
 }
 
 ///|
@@ -568,10 +589,12 @@ fn Engine::ingest_admitted(
   message : @wire.Message,
   scope : String,
   now : Int64,
+  source~ : @model.PacketSource?,
 ) -> Unit raise {
-  let removed = self.cache.ingest(scope, message, now)
+  let removed = self.cache.ingest(scope, message, now, source~)
   self.discard_burst()
   self.now_ms = now
+  self.rotate_queries()
   if self.expire_resolvers() {
     self.reconcile(
       "response",
@@ -598,6 +621,7 @@ pub fn Engine::advance(self : Engine, now : Int64) -> Unit raise {
     self.discard_burst()
   }
   self.now_ms = now
+  self.rotate_queries()
   if self.expire_resolvers() {
     self.reconcile(
       "time",
@@ -648,11 +672,7 @@ pub fn Engine::snapshots(self : Engine) -> Array[ServiceSnapshot] {
 
 ///|
 pub fn Engine::poll_event(self : Engine) -> Event? {
-  if self.events.is_empty() {
-    None
-  } else {
-    Some(self.events.remove(0))
-  }
+  self.poll_envelope().map(envelope => envelope.event)
 }
 
 ///|
@@ -666,6 +686,10 @@ pub fn Engine::next_deadline(self : Engine) -> Int64? {
     return None
   }
   let mut result = self.cache.next_deadline()
+  if self.query_rotate_at is Some(time) &&
+    (result is None || (result is Some(old) && time < old)) {
+    result = Some(time)
+  }
   if !self.pending.is_empty() || !self.fragments.is_empty() {
     result = Some(self.now_ms)
   }

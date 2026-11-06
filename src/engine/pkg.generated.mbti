@@ -25,6 +25,14 @@ pub fn EngineError::to_string(Self) -> String
 pub impl Show for EngineError
 
 // Types and methods
+pub struct EndpointCandidate {
+  scope : String
+  target : @model.DnsName
+  port : Int32
+  address : Bytes
+  requires_ipv6_zone : Bool
+}
+
 pub struct Engine {
   // private fields
 }
@@ -33,14 +41,16 @@ pub fn Engine::browse(Self, @model.DnsName, String, Int64) -> Int32 raise
 pub fn Engine::cancel(Self, Int32, Int64) -> Unit raise
 pub fn Engine::close(Self) -> Unit
 pub fn Engine::dropped_events(Self) -> Int64
-pub fn Engine::ingest(Self, Bytes, String, Int64) -> Unit raise
-pub fn Engine::ingest_message(Self, @wire.Message, String, Int64) -> Unit raise
+pub fn Engine::ingest(Self, Bytes, String, Int64, source? : @model.PacketSource?) -> Unit raise
+pub fn Engine::ingest_message(Self, @wire.Message, String, Int64, source? : @model.PacketSource?) -> Unit raise
 pub fn Engine::new(cache_capacity? : Int32, service_capacity? : Int32, event_capacity? : Int32, query_capacity? : Int32, seed? : UInt32, packet_limit? : Int32) -> Self raise
 pub fn Engine::next_deadline(Self) -> Int64?
+pub fn Engine::poll_envelope(Self) -> EventEnvelope?
 pub fn Engine::poll_event(Self) -> Event?
 pub fn Engine::poll_outbound(Self) -> Outbound?
 pub fn Engine::resolve(Self, @model.DnsName, String, Int64, timeout_ms? : Int32) -> Int32 raise
 pub fn Engine::snapshots(Self) -> Array[ServiceSnapshot]
+pub fn Engine::state_view(Self) -> StateView
 pub fn Engine::stats(Self) -> EngineStats
 
 pub struct EngineStats {
@@ -53,6 +63,7 @@ pub struct EngineStats {
   queued_datagrams : Int32
   dropped_events : Int64
   rate_dropped : Int64
+  deferred_queries : Int32
 }
 
 pub(all) enum Event {
@@ -63,6 +74,12 @@ pub(all) enum Event {
   Removed(ServiceSnapshot, String)
   Diagnostic(String, String)
   ResolveTimedOut(Int32)
+}
+
+pub struct EventEnvelope {
+  epoch : Int64
+  sequence : Int64
+  event : Event
 }
 
 pub struct Outbound {
@@ -76,6 +93,13 @@ type QueryJob
 
 type QuestionSpec
 
+pub struct RecordObservation {
+  owner : @model.DnsName
+  rr_type : Int32
+  received_at : Int64
+  source : @model.PacketSource
+}
+
 pub struct ServiceSnapshot {
   scope : String
   service_type : @model.DnsName
@@ -88,7 +112,10 @@ pub struct ServiceSnapshot {
   missing : Array[String]
   complete : Bool
   remaining_ttl_ms : Int64
+  observations : Array[RecordObservation]
+  observations_truncated : Bool
 }
+pub fn ServiceSnapshot::endpoints(Self, (Bytes, Int32) -> Bool, ipv4_only? : Bool) -> Array[EndpointCandidate]
 
 pub struct SrvCandidate {
   priority : Int32
@@ -96,6 +123,12 @@ pub struct SrvCandidate {
   port : Int32
   target : @model.DnsName
   addresses : Array[Bytes]
+}
+
+pub struct StateView {
+  epoch : Int64
+  sequence : Int64
+  snapshots : Array[ServiceSnapshot]
 }
 
 type Subscription

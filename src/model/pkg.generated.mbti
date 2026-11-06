@@ -47,6 +47,16 @@ pub fn PacketBudget::available(Self, Int64) -> Bool raise InputError
 pub fn PacketBudget::dropped(Self) -> Int64
 pub fn PacketBudget::new(limit? : Int32) -> Self raise InputError
 
+pub(all) struct PacketSource {
+  source_ipv4 : UInt32
+  source_port : Int32
+  interface_index : Int32
+  destination_ipv4 : UInt32
+  ip_ttl : Int32?
+} derive(Eq)
+pub fn PacketSource::equal(Self, Self) -> Bool
+pub fn PacketSource::not_equal(Self, Self) -> Bool
+
 pub struct TxtRecord {
   // private fields
 } derive(@debug.Debug)

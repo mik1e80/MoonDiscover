@@ -60,17 +60,15 @@ fn Engine::refresh_deadline(
 
 ///|
 fn Engine::sync_queries(self : Engine) -> Unit {
-  let desired : Array[QuestionSpec] = []
-  let mut limited = false
+  let catalog : Array[QuestionSpec] = []
+  let seen : Map[(String, Bytes, Int32), Unit] = Map([])
   fn want(q : QuestionSpec) {
-    if desired.any(other => same_question(q, other)) {
+    let key = (q.scope, q.name.canonical_key(), q.rr_type)
+    if seen.contains(key) {
       return
     }
-    if desired.length() >= self.query_capacity {
-      limited = true
-      return
-    }
-    desired.push(q)
+    seen[key] = ()
+    catalog.push(q)
   }
   for sub in self.interests {
     if sub.instance is Some(instance) {
@@ -90,8 +88,26 @@ fn Engine::sync_queries(self : Engine) -> Unit {
       }
     }
   }
-  if limited {
+  let limited = catalog.length() > self.query_capacity
+  if limited && self.omitted_queries == 0 {
     self.emit(Diagnostic("query_limit", "additional questions omitted"))
+  }
+  self.omitted_queries = (catalog.length() - self.query_capacity).max(0)
+  let desired : Array[QuestionSpec] = []
+  if limited {
+    if self.query_rotate_at is None {
+      self.query_rotate_at = Some(self.now_ms + 1000L)
+    }
+    self.query_offset = self.query_offset % catalog.length()
+    for i in 0..<self.query_capacity {
+      desired.push(catalog[(self.query_offset + i) % catalog.length()])
+    }
+  } else {
+    self.query_offset = 0
+    self.query_rotate_at = None
+    for q in catalog {
+      desired.push(q)
+    }
   }
   let next : Array[QueryJob] = []
   for q in desired {
