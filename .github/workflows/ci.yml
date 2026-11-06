@@ -53,7 +53,7 @@ jobs:
       - name: Targeted security coverage observation
         run: |
           moon test src/wire/adversarial_test.mbt src/cache/section_test.mbt src/engine/rate_test.mbt src/engine/fairness_test.mbt src/engine/view_test.mbt --target js --enable-coverage
-          moon coverage report -f summary -o .tools/security-coverage.txt
+          moon run scripts/save-coverage.mbtx
       - name: Keep fuzz reproducer and summary
         if: always()
         uses: actions/upload-artifact@v4

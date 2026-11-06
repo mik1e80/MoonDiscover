@@ -1,0 +1,18 @@
+----
+import { "moonbitlang/async@0.22.5", "moonbitlang/async@0.22.5/fs", "moonbitlang/async@0.22.5/shell", "moonbitlang/core/env" }
+----
+async fn main {
+  let moon_home = match @env.get_env_var("MOON_HOME") {
+    Some(value) => value
+    None => @env.get_env_var("HOME").unwrap_or("") + "/.moon"
+  }
+  let program = moon_home + "/bin/moon"
+  let executable = if @fs.exists(program + ".exe") { program + ".exe" } else { program }
+  let result = @shell.Cmd(executable, ["coverage", "report", "-f", "summary"]).output(timeout_ms=20000, max_output_bytes=100000)
+  result.check()
+  let summary = if result.stdout().find("Total:") is Some(_) { result.stdout() } else { result.stderr() }
+  guard summary.find("Total:") is Some(_) else { fail("coverage summary missing") }
+  @fs.mkdir(".tools", allow_exist=true)
+  @fs.write_file(".tools/security-coverage.txt", summary)
+  println(summary)
+}
