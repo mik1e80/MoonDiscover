@@ -21,6 +21,7 @@ pub struct Browser {
   priv mut packet_rejected : Int64
   priv mut running : Bool
   priv packet_limit : Int32
+  priv mut clock_at : Int64
 }
 
 ///|
@@ -82,12 +83,17 @@ pub fn Browser::open(
     packet_rejected: 0,
     running: false,
     packet_limit,
+    clock_at: 0,
   }
 }
 
 ///|
 pub fn Browser::elapsed(self : Browser) -> Int64 {
-  monotonic_ms() - self.origin
+  let current = monotonic_ms()
+  if current >= self.origin {
+    self.clock_at = self.clock_at.max(current - self.origin)
+  }
+  self.clock_at
 }
 
 ///|
@@ -107,7 +113,7 @@ pub fn Browser::browse(
 ) -> Int32 raise {
   guard !self.closed else { raise BrowserClosed }
   guard !self.running else { raise DriverBusy }
-  let now = self.elapsed()
+  let now = self.checked_time()
   let id = self.engine.browse(service_type, self.scope, now)
   self.capture_frame(BrowseFrame(now, service_type))
   id
@@ -121,7 +127,7 @@ pub fn Browser::resolve(
 ) -> Int32 raise {
   guard !self.closed else { raise BrowserClosed }
   guard !self.running else { raise DriverBusy }
-  let now = self.elapsed()
+  let now = self.checked_time()
   let id = self.engine.resolve(instance, self.scope, now, timeout_ms~)
   self.capture_frame(ResolveFrame(now, instance, timeout_ms))
   id
@@ -131,7 +137,7 @@ pub fn Browser::resolve(
 pub fn Browser::cancel(self : Browser, id : Int32) -> Unit raise {
   guard !self.closed else { raise BrowserClosed }
   guard !self.running else { raise DriverBusy }
-  let now = self.elapsed()
+  let now = self.checked_time()
   self.engine.cancel(id, now)
   self.capture_frame(CancelFrame(now, id))
 }
@@ -181,7 +187,7 @@ fn Browser::poll_driven(
   guard timeout_ms >= 0 && timeout_ms <= 1000 else {
     raise InvalidArgument("poll timeout outside 0..1000ms")
   }
-  let now = self.elapsed()
+  let now = self.checked_time()
   if now - self.last_interface_check >= 1000L {
     guard interface_index(self.interface_ipv4) == self.interface_index else {
       raise InterfaceUnavailable
@@ -197,7 +203,7 @@ fn Browser::poll_driven(
     wait = wait.min((deadline - now).max(0L).min(50L).to_int())
   }
   for _ in 0..<64 {
-    if !self.receive_budget.global.available(self.elapsed()) {
+    if !self.receive_budget.global.available(self.checked_time()) {
       self.receive_pauses += 1
       break
     }
@@ -209,14 +215,14 @@ fn Browser::poll_driven(
       Some(packet) => {
         wait = 0
         self.received += 1
-        if !self.receive_budget.allow(packet.source_ipv4, self.elapsed()) {
+        if !self.receive_budget.allow(packet.source_ipv4, self.checked_time()) {
           continue
         }
         if !self.ingress_policy.accepts(packet, self.interface_index) {
           self.policy_dropped += 1
           continue
         }
-        let received_at = self.elapsed()
+        let received_at = self.checked_time()
         self.capture_frame(PacketFrame(received_at, packet))
         self.engine.ingest(
           packet.bytes,
@@ -242,7 +248,7 @@ fn Browser::poll_driven(
       }
     }
   }
-  let after_receive = self.elapsed()
+  let after_receive = self.checked_time()
   self.engine.advance(after_receive)
   self.capture_frame(AdvanceFrame(after_receive))
   self.send_pending()
@@ -267,8 +273,8 @@ pub async fn Browser::run(
   guard duration_ms > 0 && duration_ms <= 86400000 else {
     raise InvalidArgument("duration outside 1..86400000ms")
   }
-  let deadline = self.elapsed() + duration_ms.to_int64()
-  while !self.closed && self.elapsed() < deadline {
+  let deadline = self.checked_time() + duration_ms.to_int64()
+  while !self.closed && self.checked_time() < deadline {
     for event in self.poll_driven(timeout_ms=0) {
       if self.closed {
         break
@@ -301,7 +307,7 @@ pub fn Browser::close(self : Browser) -> Unit {
   if self.closed {
     return
   }
-  let now = self.elapsed()
+  let now = self.checked_time() catch { _ => self.clock_at }
   self.engine.advance(now) catch {
     _ => ()
   }

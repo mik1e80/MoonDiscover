@@ -9,6 +9,9 @@ async fn main {
   let normal = @shell.Cmd(guard_bin, [cli, "fixtures/replay-basic.jsonl", "3000", "256", "2"]).output(timeout_ms=5000)
   normal.check()
   assert_true(@json.parse(normal.stdout()) is { "passed": True, .. })
+  @fs.write_file(".tools/guard unicode 空格.jsonl", @fs.read_file("fixtures/replay-basic.jsonl"))
+  let unicode = @shell.Cmd(guard_bin, [cli, ".tools/guard unicode 空格.jsonl", "3000", "256", "2"]).output(timeout_ms=5000)
+  unicode.check()
   let reports : Array[Json] = []
   for mode in ["stall", "memory", "cpu"] {
     @fs.write_file(".tools/guard-input.txt", mode)

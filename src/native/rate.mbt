@@ -20,7 +20,9 @@ fn ReceiveBudget::new(
   source_limit : Int32,
   capacity : Int32,
 ) -> ReceiveBudget raise {
-  guard source_limit >= 0 &&
+  guard packet_limit >= 0 &&
+    packet_limit <= 65536 &&
+    source_limit >= 0 &&
     source_limit <= 65536 &&
     capacity > 0 &&
     capacity <= 256 else {

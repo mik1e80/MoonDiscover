@@ -1,5 +1,14 @@
 ///|
 test "smoke: source quotas remain bounded under spoofed IP churn" {
+  assert_true(
+    try {
+      let _ = ReceiveBudget::new(-1, 64, 128)
+      false
+    } catch {
+      InvalidArgument(_) => true
+      _ => false
+    },
+  )
   let budget = ReceiveBudget::new(100, 2, 2)
   assert_true(budget.allow(1U, 0))
   assert_true(budget.allow(1U, 0))
