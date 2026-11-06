@@ -1,0 +1,31 @@
+----
+import { "moonbitlang/async@0.22.5", "moonbitlang/async@0.22.5/fs", "moonbitlang/async@0.22.5/shell", "moonbitlang/core/json" }
+----
+async fn main {
+  let guard_bin = "_build/native/debug/build/cmd/replay_guard/replay_guard.exe"
+  let cli = "_build/native/debug/build/cmd/moondiscover/moondiscover.exe"
+  let probe = "_build/native/debug/build/tests/guard_probe/guard_probe.exe"
+  @fs.mkdir(".tools", allow_exist=true)
+  let normal = @shell.Cmd(guard_bin, [cli, "fixtures/replay-basic.jsonl", "3000", "256", "2"]).output(timeout_ms=5000)
+  normal.check()
+  assert_true(@json.parse(normal.stdout()) is { "passed": True, .. })
+  let reports : Array[Json] = []
+  for mode in ["stall", "memory", "cpu"] {
+    @fs.write_file(".tools/guard-input.txt", mode)
+    if @fs.exists(".tools/guard-probe-started") { @fs.remove(".tools/guard-probe-started") }
+    let wall = if mode == "stall" { "250" } else { "3000" }
+    let output = @shell.Cmd(guard_bin, [probe, ".tools/guard-input.txt", wall, "128", "1"]).output(timeout_ms=5500)
+    assert_true(output.exit_code() != 0)
+    assert_true(@fs.exists(".tools/guard-probe-started"))
+    let json = @json.parse(output.stdout())
+    @fs.write_file(".tools/replay-guard-" + mode + ".json", json.stringify(indent=2))
+    assert_true(json is { "passed": False, .. })
+    if mode == "stall" { assert_true(json is { "timed_out": True, "child_exit": 124, .. }) }
+    else if mode == "memory" { assert_true(json is { "timed_out": False, .. }) }
+    else { assert_true(json is { "cpu_limited": True, "timed_out": False, .. }) }
+    reports.push(Json::object({ "mode": Json(mode), "result": json }))
+  }
+  let report = Json::object({ "passed": Json(true), "normal_replay": @json.parse(normal.stdout()), "synthetic_resource_cases": Json(reports), "limits": Json("synthetic child failures verify process budgets, not parser vulnerabilities; output is discarded") })
+  @fs.write_file(".tools/replay-guard-report.json", report.stringify(indent=2))
+  println(report.stringify())
+}
