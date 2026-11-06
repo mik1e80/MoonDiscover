@@ -35,9 +35,28 @@ fn ingress_checks(ip : UInt32) -> Json raise {
   defer yes.close()
   let no = @native.Browser::open(ip, ingress_policy=denied, record=true)
   defer no.close()
+  let limited = @native.Browser::open(ip, packet_limit=4, source_limit=0)
+  defer limited.close()
+  let source_limited = @native.Browser::open(
+    ip,
+    packet_limit=64,
+    source_limit=1,
+  )
+  defer source_limited.close()
+  // Overflow capture without changing network settings or needing a long run.
+  for _ in 0..<140 {
+    let id = yes.browse(@dnssd.DnsName::parse("_unused._tcp.local."))
+    yes.cancel(id)
+  }
+  guard yes.dropped_captures() > 0L else {
+    fail("capture fixture did not overflow")
+  }
   let _ = yes.browse(service)
   let _ = no.browse(service)
   sender.send(bytes)
+  for _ in 0..<16 {
+    sender.send(bytes)
+  }
   let mut ttl : Int32? = None
   let end = @native.monotonic_ms() + 1500L
   while @native.monotonic_ms() < end {
@@ -47,6 +66,8 @@ fn ingress_checks(ip : UInt32) -> Json raise {
     }
     let _ = yes.poll(timeout_ms=0)
     let _ = no.poll(timeout_ms=0)
+    let _ = limited.poll(timeout_ms=0)
+    let _ = source_limited.poll(timeout_ms=0)
     if yes.snapshots().length() == 1 && ttl is Some(_) {
       break
     }
@@ -71,11 +92,25 @@ fn ingress_checks(ip : UInt32) -> Json raise {
     }
   }
   guard accepted_capture else { fail("missing accepted packet metadata") }
+  guard limited.stats().receive_pauses > 0L &&
+    source_limited.stats().source_rate_dropped > 0L else {
+    fail("live ingress rate protection was not exercised")
+  }
+  guard limited.stats().received <= 4L + limited.elapsed() * 4L / 1000L else {
+    fail("live token bucket exceeded its bound")
+  }
   Json::object({
     "passed": Json(true),
     "received_ip_ttl": Json(255),
     "source_allowlist_accepted": Json(true),
     "source_denied_before_cache_and_capture": Json(true),
     "distinct_browser_scopes": Json(true),
+    "capture_overflow_did_not_stop_browse": Json(true),
+    "global_rate_receive_pauses": Json(
+      limited.stats().receive_pauses.to_double(),
+    ),
+    "source_rate_dropped": Json(
+      source_limited.stats().source_rate_dropped.to_double(),
+    ),
   })
 }
