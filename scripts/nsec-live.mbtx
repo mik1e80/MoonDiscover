@@ -1,0 +1,22 @@
+----
+import { "moonbitlang/async@0.22.5", "moonbitlang/async@0.22.5/fs", "moonbitlang/async@0.22.5/shell", "moonbitlang/core/env", "moonbitlang/core/json" }
+----
+async fn command(program : String, args : Array[String]) -> String {
+  let result = @shell.Cmd(program, args).output(timeout_ms=30000, max_output_bytes=30000)
+  result.check()
+  result.stdout()
+}
+async fn main {
+  let args = @env.args()
+  guard args.length() == 3 else { fail("usage: nsec-live.mbtx <python-with-fixed-zeroconf> <interface-ipv4>") }
+  @fs.mkdir(".tools", allow_exist=true)
+  let _ = command(args[1], ["tests/interop/live_smoke.py", "--interface", args[2], "--output", ".tools/nsec-live-publisher.json"])
+  let report = @json.parse(@fs.read_file(".tools/nsec-live-publisher.json").text())
+  guard report is {"trace_file": String(trace), "trace_sha256": String(hash), "source_commit": String(sha), ..} else { fail("publisher trace metadata missing") }
+  let result = @json.parse(command("_build/native/debug/build/tests/nsec_probe/nsec_probe.exe", [trace]))
+  let summary = Json::object({"publisher": "python-zeroconf 0.148.0", "source_commit": Json(sha),
+    "trace_sha256": Json(hash), "analysis": result,
+    "limits": "same-host actual IPv4 multicast capture; negative evidence checked in deterministic replay; not physical-time publisher recovery"})
+  @fs.write_file(".tools/nsec-live-report.json", summary.stringify(indent=2))
+  println(summary.stringify())
+}

@@ -17,7 +17,7 @@
 3. 接口失效后关闭并重建订阅有隔离环境证据；资源循环记录实际时长、逻辑计数和进程内存。
 4. README、支持矩阵、API 与演示一致；相关轻量 CI 成功；发布新版本并从 Mooncakes 独立安装验证。
 
-**功能边界。** 本期面向指定接口的 IPv4 QM 服务浏览与解析；不承诺 IPv6 组播、服务发布、NSEC、跨子网、自动接口迁移或所有设备兼容。第二物理设备和 Bonjour 验证另列待办。
+**功能边界（2026-11-18 整改）。** 本期面向指定接口的 IPv4 QM 查询端与 DNS-SD 浏览解析，NSEC 接收、负缓存、查询抑制与恢复为必要目标，不再排除；当前实现与验收分别见 negative-response.md。不承诺 IPv6 组播、服务发布、DNSSEC 验证、跨子网、自动接口迁移或所有设备兼容。第二物理设备和 Bonjour 验证另列待办。
 
 **来源与文档。** 项目为原创实现；RFC 为协议参考，Avahi / python-zeroconf 为独立测试对端。来源与许可见 `THIRD_PARTY_NOTICES`、`fixtures/README.md`；贡献边界见 `docs/november-baseline.md`，运行入口和证据见 README。
 

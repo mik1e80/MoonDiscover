@@ -1,0 +1,13 @@
+import {
+  "mik1e80/dnssd/src/wire",
+  "mik1e80/dnssd/src/model",
+  "mik1e80/dnssd/src/replay",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/async/fs",
+  "moonbitlang/async",
+}
+
+supported_targets = "native"
+
+pkgtype(kind: "executable")

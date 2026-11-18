@@ -13,6 +13,8 @@ on:
       - tests/protocol_live/**
       - tests/protocol_probe/**
       - scripts/protocol-live.mbtx
+      - scripts/nsec-live.mbtx
+      - tests/nsec_probe/**
       - fixtures/**
       - moon.mod
       - moon.pkg
@@ -42,11 +44,17 @@ jobs:
       - name: Build only live experiment entry points
         run: |
           moon update
-          moon build cmd/moondiscover examples/http_connect tests/native_cancel tests/protocol_live --target native
+          moon build cmd/moondiscover examples/http_connect tests/native_cancel tests/protocol_live tests/nsec_probe tests/native_ttl --target native
       - name: Observe actual IPv4 multicast HTTP update goodbye and replay
         run: /usr/bin/python3 tests/interop/avahi_smoke.py --output .tools/avahi-linux.json
       - name: Independently verify Known-Answer UDP and Avahi subtype publication
         run: moon run scripts/protocol-live.mbtx -- avahi
+      - name: Verify independent zeroconf NSEC through actual UDP and replay
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install -r tests/interop/requirements.txt
+          ip=$(_build/native/debug/build/tests/native_ttl/native_ttl.exe --interface | python3 -c 'import sys,json; print(json.load(sys.stdin)["interface_ipv4"])')
+          moon run scripts/nsec-live.mbtx -- .venv/bin/python "$ip"
       - name: Remove and restore an address in an isolated network namespace
         run: sudo --preserve-env=HOME,PATH,GITHUB_SERVER_URL,GITHUB_REPOSITORY,GITHUB_RUN_ID unshare --net "$HOME/.moon/bin/moon" run scripts/protocol-live.mbtx -- interface
       - name: Retain controlled report
@@ -57,6 +65,7 @@ jobs:
           path: |
             .tools/avahi-linux.json
             .tools/protocol-live-*.json
+            .tools/nsec-live-*.json
             .tools/interface-probe-*.log
             .tools/protocol-*.log
           include-hidden-files: true
