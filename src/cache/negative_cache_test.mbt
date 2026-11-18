@@ -122,3 +122,23 @@ test "smoke: multiple NSEC names class isolation flush rescue and atomic dual li
   assert_true(cache.records("link", third, 1).is_empty())
   assert_eq(cache.negative_count(), 2)
 }
+
+///|
+test "smoke: repeated negative cache update expiry cycles remain bounded" {
+  let cache = @cache.RecordCache::new(capacity=64)
+  for round in 0..<8 {
+    let now = round.to_int64() * 3000L
+    let records : Array[@wire.Record] = []
+    for i in 0..<64 {
+      records.push(
+        nsec_record(@model.DnsName::parse("host\{i}.local."), b"\x40", 2U),
+      )
+    }
+    let _ = cache.ingest("link", response(records), now)
+    let _ = cache.ingest("link", response(records), now + 1L)
+    assert_eq(cache.negative_count(), 64)
+    assert_eq(cache.len(), 0)
+    let _ = cache.advance(now + 2001L)
+    assert_eq(cache.negative_count(), 0)
+  }
+}

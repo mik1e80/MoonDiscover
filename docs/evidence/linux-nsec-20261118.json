@@ -1,0 +1,15 @@
+{
+  "source": "GitHub Actions job 134617859007 stdout, 2026-11-18T06:16:05.2649328Z",
+  "run_url": "https://github.com/mik1e80/MoonDiscover/actions/runs/44249939017",
+  "publisher": "python-zeroconf 0.148.0",
+  "source_commit": "1f604514a2e1f4040a94251caf223469af92d59c",
+  "trace_sha256": "91b891c53e4c1fd4539f87b977de44d0eaedc5838f1abe99a23dd227d1629582",
+  "analysis": {
+    "passed": true,
+    "nsec_records": 9,
+    "negative_observations": 6,
+    "trace": ".tools/capture-moondiscover-1803746110fd.jsonl",
+    "limits": "independent publisher trace received by Native; reanalysis uses Engine Replay, not a second decoder"
+  },
+  "limits": "same-host actual IPv4 multicast capture; negative evidence checked in deterministic replay; not physical-time publisher recovery"
+}

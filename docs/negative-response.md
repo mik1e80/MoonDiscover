@@ -14,6 +14,8 @@ Engine 在收包和到期时重建问题集合，取消有效否定类型的待�
 
 ## 八类验收案例
 
+Linux 新独立发布者专项已通过：[CI 44249939017](https://github.com/mik1e80/MoonDiscover/actions/runs/44249939017)，基线 1f60451，见[日志摘要](evidence/linux-nsec-20261118.json)。两平台实际收包与 Replay 证据相符，但下表中的全部场景仍主要用确定性核心测试验收。
+
 | 场景 | 可执行证据与预期 |
 | --- | --- |
 | A 有、AAAA 无 | engine/negative_response_test：完整快照，AAAA 查询被抑制，A 保留 |
@@ -25,6 +27,6 @@ Engine 在收包和到期时重建问题集合，取消有效否定类型的待�
 | 多名称/类型/范围与容量 | cache/negative_cache_test：隔离、原子容量失败；后续专项扩展见测试源码 |
 | cache-flush 与救回 | 正向优先、宽限内仍保留正记录；见 cache 专项与既有 flush 回归 |
 
-独立来源：现有 `fixtures/zeroconf-0.148.0-response.hex` 是独立 zeroconf 的实际抓包，SHA 和来源不变，现已检查 NSEC 位图。该报文的 owner 是服务实例，位图包含 AAAA；不能将它谎称为 host 的 IPv4-only 实验。`tests/protocol_live/nsec.mbt` 另向独立 Avahi 发布的唯一 IPv4 名称查询 AAAA，要求实际 UDP NSEC，报告在 `.tools/protocol-live-nsec.json`；脚本失败不能标为通过。
+独立来源：现有 `fixtures/zeroconf-0.148.0-response.hex` 是独立 zeroconf 的实际抓包，SHA 和来源不变，现已检查 NSEC 位图。该报文的 owner 是服务实例，位图包含 AAAA；不能将它谎称为 host 的 IPv4-only 实验。新增 `tests/nsec_probe` 检查独立发布者经 Native 收到的 trace，要求存在 NSEC 且实际形成否定状态；脚本失败不能标为通过。2026-11-18 本机独立 zeroconf 0.148.0 实际组播通过八项发现/回放检查，抓包含 9 条 NSEC、6 次有效负证据观测，见 [Windows 报告](evidence/windows-nsec-20261118.json)和[原实验报告](evidence/windows-live-20261118.json)。负状态在同一录制的 Replay 内复核，不是第二个独立解析器。
 
-轻量命令：`moon test src/wire src/cache src/engine src/replay --target js --filter 'smoke:*'`。Linux 使用现有 `moon run scripts/protocol-live.mbtx -- avahi`。Windows 同类独立发布者 NSEC 专项、第二物理设备、物理时间到期后发布者变更、长时间压力尚无新证据。部分验收未满足时不声称八类完整实网互操作或完整查询端 RFC 合规，也不发布稳定 0.3.0。
+轻量命令：`moon test src/wire src/cache src/engine src/replay --target js --filter 'smoke:*'`。Linux Avahi 常规专项仍为 `moon run scripts/protocol-live.mbtx -- avahi`；NSEC 改用 `moon run scripts/nsec-live.mbtx -- <fixed-zeroconf-python> <interface-ipv4>`，以独立 zeroconf 实际 UDP 和强制 trace 断言验收。首次 Avahi 地址发布实验没收到预期 NSEC（CI 44249456403），没有放宽为成功；已更换发布者并保留普通 Avahi 用例。第二物理设备、物理时间到期后发布者变更、长时间压力尚无新证据。部分验收未满足时不声称八类完整实网互操作或完整查询端 RFC 合规，也不发布稳定 0.3.0。

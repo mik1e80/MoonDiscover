@@ -29,3 +29,30 @@ test "smoke: restricted NSEC bitmap roundtrip and malformed record isolation" {
   assert_true(decoded.records[0].data is @wire.Unknown(_))
   assert_true(decoded.records[1].data is @wire.A(_))
 }
+
+///|
+test "smoke: NSEC unknown next name and unsupported bitmap variants isolate records" {
+  let host = @model.DnsName::parse("host.local.")
+  let next = @model.DnsName::parse("other.local.")
+  let record : @wire.Record = {
+    name: host,
+    rr_type: 47,
+    rr_class: 1,
+    cache_flush: true,
+    ttl: 120U,
+    data: @wire.Nsec(next, b"\x40\x00"),
+    section: @wire.Answer,
+  }
+  let bytes = @wire.query_with_answers(host, 47, [record])
+  assert_true(
+    @wire.decode(bytes).records[0].data is @wire.Nsec(n, _) && n.same_name(next),
+  )
+  for (offset, byte) in [(4, b'\x01'), (3, b'\x00'), (3, b'\x21')] {
+    let raw = bytes.to_array()
+    raw[raw.length() - offset] = byte
+    assert_true(
+      @wire.decode(Bytes::makei(raw.length(), i => raw[i])).records[0].data
+      is @wire.Unknown(_),
+    )
+  }
+}
