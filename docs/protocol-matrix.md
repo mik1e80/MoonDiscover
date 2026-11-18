@@ -25,7 +25,8 @@
 | 订阅与取消 | Engine 与 Native cancel 实验 | 重复订阅共享状态；取消清理关联待发查询；异步退出释放 socket |
 | 网络接纳与发送 | Native、Windows zeroconf、Linux Avahi 与本轮 ingress 报告 | 显式 IPv4 接口，源5353/目标组播/接口匹配；发送 TTL=255；来源 CIDR/严格 TTL/令牌桶。两平台生产接收函数的单播回环 TTL 255/254/1 已测；Windows mDNS 组播实收仍 Untested；Browser 单播排除 |
 | 确定性回放 | `src/replay`、CLI 冒烟、实网录制 | 严格 JSON、时间与种子恢复、同输入同事件/待发报文；网络 I/O 在核心之外 |
-| NSEC、发布者 | 无 | 未实现负缓存、发布/探测/重命名；未知 RR 仍作 opaque bytes |
+| NSEC 查询端 | 0.3.0-dev 新增 | 受限位图、独立负缓存、查询抑制与 TTL/正向恢复；不等于 DNSSEC，详见 negative-response.md |
+| 发布者 | 无 | 未实现发布/探测/重命名，属于不同协议角色 |
 
 工程上限为单包 9000 字节、问题与 RR 合计 256、单名称解码 256 步。这些是实现限制，不是 RFC 统一规定。资源容量和平台状态见 [范围文档](SCOPE.md)。
 

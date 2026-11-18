@@ -15,7 +15,7 @@
 | 层 | 当前实现 | 证据与边界 |
 | --- | --- | --- |
 | 模型与 wire | 原始标签字节、可逆名称文本、二进制 TXT、PTR/SRV/TXT/A/AAAA、未知 RR 有界跳过、QM 编码 | JS 轻量用例与独立 zeroconf 报文；不是完整 DNS codec |
-| 缓存 | 范围隔离、重复刷新、TTL、goodbye、cache-flush 宽限、容量失败原子性 | 注入时间的确定性用例；不解释 NSEC |
+| 缓存 | 范围隔离、重复刷新、TTL、goodbye、cache-flush 宽限、容量失败原子性；NSEC 独立负缓存 | 0.3.0-dev 新增，按名称/类型/scope/IN 隔离，详见 negative-response.md |
 | 聚合与事件 | PTR→SRV 候选/TXT/地址；部分/完整快照；生命周期事件 | SRV 按优先级及确定性加权顺序提供候选；TXT 冲突仍保守处理 |
 | 查询与解析 | QM 抖动与退避、依赖查询、TTL 刷新、有界多包 Known-Answer、子类型；指定实例解析、超时、取消 | 已有 Linux 实际 UDP+独立解析器、Avahi 子类型专项；不是所有 responder 抑制/等待行为的证明 |
 | 核心后端 | 系统无关的 Engine 与 Replay | JS 冒烟通过；部分引擎用例在 Wasm/Native 通过，未全量运行所有后端 |
@@ -41,7 +41,8 @@ Supported = 所列子项已实现且有对应验证；Partial = 有限行为或�
 | 三目标变异、组合容量与 Replay 总量/进程预算 | Supported（所列测试范围） | Wire/Cache/Engine、有界最小化、有限覆盖率观察、独立进程限制；非覆盖引导 fuzz 或安全审计 |
 | 高频输入、压力查询轮换与版本化视图 | Supported（稳定集合） | 实时全局/来源/核心令牌桶；每秒轮换容量窗口；异步旧事件按 epoch/sequence 丢弃。任意持续变化无无条件公平延迟保证 |
 | 第二物理设备、Bonjour、长时间实网压力 | Untested | 不用同机/同 VM/核心资源循环替代 |
-| IPv6 组播、发布者、NSEC、跨子网反射 | Unsupported | 无相关实现声明 |
+| 受限 NSEC 查询端处理 | Partial（0.3.0-dev 新增） | 解码、负缓存与调度已实现；专项验收及外部实网证据见 negative-response.md，不再排除必要能力 |
+| IPv6 组播、发布者、跨子网反射 | Unsupported | 不属于本期查询端角色 |
 
 安全、Scope/事件/退化规则、解析和 RFC 追踪分别见[安全模型](security-model.md)、[行为契约](behavior-contract.md)、[解析契约](dnssd-resolution-contract.md)、[RFC 对照](rfc-conformance.md)。
 
@@ -66,7 +67,7 @@ Native Browser 仅接纳源端口 5353、目标组播地址 `224.0.0.251`、所�
 
 ## 暂未实现或未验证
 
-未实现发布者、自动重命名、IPv6 组播、跨子网/反射器、后台守护进程、自动枚举所有类型、NSEC 负缓存、接口自动切换。没有 Bonjour、第二设备或长时间实网运行证据。
+未实现发布者、自动重命名、IPv6 组播、跨子网/反射器、后台守护进程、自动枚举所有类型、接口自动切换。没有 Bonjour、第二设备或长时间实网运行证据。NSEC 是 0.3.0 查询端必要整改项，当前实现与验收分别记录，不以范围排除代替完成。
 
 当前 DNS-SD 缓存把 PTR 当作共享成员关系处理并忽略其 flush 位；不提供反向 PTR 唯一 RRSet 的刷新语义。多包 Known-Answer 不解决同一主机上多个独立 mDNS 实现之间的协调问题；一般 Avahi 闭环也不证明该扩展的完整互操作性。
 

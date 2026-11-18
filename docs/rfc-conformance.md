@@ -20,4 +20,16 @@
 | [RFC 8553 §3.1](https://www.rfc-editor.org/rfc/rfc8553.html#section-3.1)：SRV `_Proto` 下划线注册模板 | Partial；engine/engine.mbt 的类型校验、subtype_test | 该 RFC 更新下划线命名与 IANA 注册说明，并非设备冲突处理协议；本库限 `_tcp`/`_udp`，不实现注册表查询，也不替应用注册新名称 |
 | [RFC 6763 §15](https://www.rfc-editor.org/rfc/rfc6763.html#section-15)：安全考虑 | Partial；[安全模型](security-model.md) | 发现不等于认证；来源策略不约束广告端点，不防同链路伪造；应用认证是独立责任 |
 
-工程限制（9000 字节、256 个问题/RR、缓存/事件/回放总量）属于实现预算，不是 RFC 对所有实现统一规定。DNS TCP、通用单播 DNS、NSEC 负缓存、发布者和跨子网反射不在当前支持范围。没有通过所有平台、所有 RFC 条款、第二物理设备或 Bonjour 的声明。
+工程限制（9000 字节、256 个问题/RR、缓存/事件/回放总量）属于实现预算，不是 RFC 对所有实现统一规定。DNS TCP、通用单播 DNS、发布者和跨子网反射不在当前支持范围。没有通过所有平台、所有 RFC 条款、第二物理设备或 Bonjour 的声明。
+
+## 0.3.0-dev 整改增量（2026-11-18）
+
+本节更新上面的历史 0.2.1 对照，NSEC 不再是排除项。最终目标是明确的 IPv4 QM mDNS 查询端及 DNS-SD 浏览/解析行为；没有将未验证的角色级符合性标为完成。
+
+| 条款 | 实现与验收 | 状态 |
+| --- | --- | --- |
+| RFC 6762 §6.1 / RFC 4034 §4.1 | wire/nsec/decode、cache/negative_cache、engine/query；窗口 0、1–32 字节、忽略不同 next name、无 NSEC 自身位；异常单条忽略 | 实现已接入；专项测试见 negative-response.md |
+| RFC 6762 §6.1、§10 | 否定 TTL、作用域、正向优先、到期恢复、共享 PTR 不整体否定，容量原子接纳 | 本轮专项回归；不是 DNSSEC 认证 |
+| RFC 6763 §12 | Answer/Authority/Additional NSEC 同样处理，正常服务记录继续聚合 | 本轮 Additional 回归；缺失继续查询 |
+| RFC 6762 §5.2、§7.1–7.2 | 原抖动/退避/KA 回归保留；仅取消被否定的问题，不影响 A/其他类型和共享 PTR | 有界实现；多 responder 等待/抑制完整实测仍待完成 |
+| RFC 6762 §18.1、§18.5 | 保留忽略接收 ID/TC，真实结构截断仍拒绝，响应 Question 不作缓存 | 顾问概述与原文不同时以原文为准 |

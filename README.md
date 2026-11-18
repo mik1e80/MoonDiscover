@@ -2,7 +2,7 @@
 
 **用 MoonBit 发现局域网服务，获取动态地址、端口和属性，并持续跟踪服务变化。**
 
-MoonDiscover 是 mDNS / DNS-SD 服务浏览与解析库，模块名 `mik1e80/dnssd`，采用 [Apache-2.0](LICENSE) 许可。应用只需知道约定的服务类型，例如 `_http._tcp.local.`，就可以查询实例、目标主机、端口、TXT 属性和 IP 地址，减少手工填写与写死端点的需要。
+MoonDiscover 是面向 MoonBit 应用开发者的 IPv4 mDNS 查询端与 DNS-SD 服务浏览、解析库，模块名 `mik1e80/dnssd`，采用 [Apache-2.0](LICENSE) 许可。应用只需知道约定的服务类型，例如 `_http._tcp.local.`，就可以查询实例、目标主机、端口、TXT 属性和 IP 地址，减少手工填写与写死端点的需要。
 
 项目包含纯 MoonBit 协议核心、Native IPv4 组播适配层、命令行工具，以及录制和离线回放功能。**当前适合在明确支持范围内接入服务发现；0.2.0 聚焦已经说明的 IPv4 浏览与解析范围，不宣称完整 RFC 或所有平台支持。**
 
@@ -51,7 +51,7 @@ flowchart LR
 
 ## 版本选择
 
-状态更新：**2026-11-06**。`0.2.0` 已发布至 Mooncakes。main 为 **0.2.1-dev（未发布）**，包含后续来源/TTL、资源保护与恢复改进，安装 0.2.0 不包含这些改进。下面比较已发布版本；开发改进见 [CHANGELOG](CHANGELOG.md)和[本轮验证](docs/security-review-20261106.md)。[0.2.0 发布与独立安装验证](docs/release-0.2.0.md)。
+状态更新：**2026-11-18**。`0.2.0` 已发布至 Mooncakes。main 为 **0.3.0-dev（未发布）**，新增 NSEC 查询端整改，并包含此前来源/TTL、资源保护与恢复改进；安装 0.2.0 不包含这些改进。下面比较已发布版本；开发改进见 [CHANGELOG](CHANGELOG.md)、[NSEC 契约](docs/negative-response.md)及[此前验证](docs/security-review-20261106.md)。[0.2.0 发布与独立安装验证](docs/release-0.2.0.md)。
 
 2026-11-06 又补充了[高频输入保护](docs/resource-protection.md)、查询轮换、版本化视图、广告端点筛选、来源观察、[独立进程回放预算](docs/replay-isolation.md)及三类状态变异测试。最新证据和未完成验证见[第四轮落实记录](docs/security-review-20261106.md)；这些能力仍未发布到 Mooncakes。
 
@@ -340,7 +340,19 @@ python -m http.server 8000 --bind 127.0.0.1 --directory .tools/browser-replay
 | 接口变化 | 接口失效或地址/索引变化报错，不自动迁移到新接口 |
 | 异步实现 | 短周期协作轮询，尚未接入系统原生异步 fd 事件源 |
 
-当前没有服务发布者、探测/重命名、完整普通 DNS 递归解析器、QU/单播接收、NSEC 负缓存、IPv6 组播、自动接口切换、跨子网发现/反射器、后台守护进程或自动枚举所有类型。codec 能处理一种 RR，不代表相关完整协议功能已实现。
+当前没有服务发布者、探测/重命名、完整普通 DNS 递归解析器、QU/单播接收、IPv6 组播、自动接口切换、跨子网发现/反射器、后台守护进程或自动枚举所有类型。codec 能处理一种 RR，不代表相关完整协议功能已实现。
+
+### 查询端协议职责与否定响应
+
+main 自 2026-11-17 为 **0.3.0-dev（未发布）**；上文 0.2.0/0.2.1 的描述属于先前版本。面向本地开发工具、桌面设备面板及约定类型的服务连接应用，核心职责包括 IPv4 QM 查询/重传、Known-Answer 与有界分包、PTR/SRV/TXT/A/AAAA 聚合、子类型、TTL/goodbye/cache-flush、生命周期事件，以及 NSEC 否定响应的接收、负缓存、查询抑制和过期恢复。Native 接口实际收发，CLI 为操作入口，JS 示例仅离线回放。
+
+NSEC 是必要的查询端能力，已经纳入本轮代码整改与最终验收，不再作为可选扩展排除。受限 NSEC 使用窗口 0、1–32 字节位图；Next Domain Name 不同时仍处理位图；扩展或畸形 NSEC 单条忽略，不拖累同包正常 RR。否定证据按 scope/name/IN/type 隔离、受容量及 TTL 限制；正向记录优先；共享 DNS-SD PTR 不受否定抑制。只有 A、没有 AAAA 仍可解析完整；SRV/TXT 或所有地址缺失仍不完整。未响应不是否定证据，发现完整不等于可连接或已认证。调用方可用 `Engine.is_negative(scope, name, type)` 或 `Browser.is_negative(name, type)` 区分 Unknown 与 Negative，详见[否定响应案例](docs/negative-response.md)。
+
+协议依据为 RFC 1035（DNS 字段/压缩）、2782（SRV）、6762（mDNS 查询与缓存）、6763（DNS-SD），及 RFC 4034 §4.1 的 NSEC 格式。以[逐条符合性矩阵](docs/rfc-conformance.md)为准；接收 ID/AA/TC 忽略规则依 RFC 6762 §18，不因顾问概述而额外拒绝结构完整响应。项目不提供 DNSSEC 签名验证、NSEC3，也没有 IETF 认证；必要查询端行为仍须逐条验收，不能由一个功能测试推断整份 RFC 合规。
+
+### 许可证与使用责任
+
+源码采用完整 [Apache License 2.0](LICENSE)，允许按许可使用、修改和分发；再分发须保留许可及适用声明、标明修改，并遵守许可中的专利、商标及免责条款。本项目不另加禁止商业用途等冲突限制。运行依赖 `moonbitlang/async@0.22.5` 的安装 LICENSE 为 Apache-2.0；工具链/core 单独分发并保留自身声明。Avahi、python-zeroconf 仅为独立测试进程，不作为运行时链接或捆绑代码。协议参考不等于复制第三方实现；当前未提取 RFC Code Components，今后提取须附 RFC 要求的 Simplified BSD 文本。来源、依赖和再分发核对见 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) 与[许可说明](docs/license-compliance.md)。这些说明不承诺未经审查的未来依赖没有许可冲突。
 
 ### 数据与资源上限
 
