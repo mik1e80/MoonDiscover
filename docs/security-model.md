@@ -1,6 +1,6 @@
 # 安全模型
 
-状态日期：2026-11-06。本文约束当前 main / 0.2.1-dev（未发布）；已发布 0.2.0 的归档不随 main 修改。最新证据见[第四轮落实记录](security-review-20261106.md)，其余契约见[支持范围](SCOPE.md)、[行为契约](behavior-contract.md)和 [RFC 对照](rfc-conformance.md)。
+状态日期：2026-11-18。本文约束当前 main / 0.3.0-dev（未发布）；已发布 0.2.0 的归档不随 main 修改。NSEC 使用相同 ingress 和资源边界，负证据未认证且不能证明服务不存在；最新证据见[整改记录](rectification-20261118.md)，此前安全证据见[第四轮落实记录](security-review-20261106.md)，其余契约见[支持范围](SCOPE.md)、[行为契约](behavior-contract.md)和 [RFC 对照](rfc-conformance.md)。
 
 ## 信任边界
 

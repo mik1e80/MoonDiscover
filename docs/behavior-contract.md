@@ -2,7 +2,7 @@
 
 2026-11-18 增量：当前 main 为 0.3.0-dev，新增 `is_negative` 与 NSEC 调度；此前条款继续适用。否定证据不会降低 complete 的 TXT/SRV/地址要求，不代表 Removed 或身份认证；见 [否定响应](negative-response.md)。
 
-状态：2026-11-06，main / 0.2.1-dev（未发布）。0.2.0 归档不包含本轮来源、预算、版本化事件和恢复 API；最新验证见[第四轮记录](security-review-20261106.md)。服务完整性的具体条件见[解析契约](dnssd-resolution-contract.md)，不可信输入见[安全模型](security-model.md)。
+基础行为证据：2026-11-06 的 0.2.1-dev 阶段；当前 main 已为 0.3.0-dev，新增行为见上方增量与[整改记录](rectification-20261118.md)。0.2.0 归档不包含后续来源、预算、版本化事件和恢复 API；历史验证见[第四轮记录](security-review-20261106.md)。服务完整性的具体条件见[解析契约](dnssd-resolution-contract.md)，不可信输入见[安全模型](security-model.md)。
 
 ## 分层与调用顺序
 

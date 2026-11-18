@@ -1,6 +1,6 @@
 # 当前协议矩阵
 
-参考：[RFC 6762](https://www.rfc-editor.org/rfc/rfc6762)、[RFC 6763](https://www.rfc-editor.org/rfc/rfc6763)、[RFC 8553](https://www.rfc-editor.org/rfc/rfc8553)。状态日期：2026-11-06。本表描述 main（0.2.1-dev，未发布）的代码和证据，不是完整规范符合性审计；与发布包差异及四种状态定义见[范围矩阵](SCOPE.md)，条款、偏差与对应测试见 [RFC 对照](rfc-conformance.md)。
+参考：[RFC 6762](https://www.rfc-editor.org/rfc/rfc6762)、[RFC 6763](https://www.rfc-editor.org/rfc/rfc6763)、[RFC 8553](https://www.rfc-editor.org/rfc/rfc8553)。状态日期：2026-11-18。本表描述 main（0.3.0-dev，未发布）的代码和分阶段证据，不是完整规范符合性审计；NSEC 增量见 [否定响应](negative-response.md)。与发布包差异及四种状态定义见[范围矩阵](SCOPE.md)，条款、偏差与对应测试见 [RFC 对照](rfc-conformance.md)。
 
 | 事项 | 实现与验证 | 状态与限制 |
 | --- | --- | --- |
