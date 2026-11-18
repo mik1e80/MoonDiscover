@@ -38,6 +38,7 @@ struct Entry {
 
 ///|
 pub struct RecordCache {
+  priv mut negatives : Array[NegativeEvidence]
   priv mut entries : Array[Entry]
   priv mut now_ms : Int64
   priv capacity : Int32
@@ -49,7 +50,7 @@ pub fn RecordCache::new(
   capacity~ : Int32 = 2048,
 ) -> RecordCache raise CacheError {
   guard capacity > 0 && capacity <= 16384 else { raise CapacityExceeded }
-  { entries: [], now_ms: 0, capacity, revision: 0, }
+  { entries: [], negatives: [], now_ms: 0, capacity, revision: 0, }
 }
 
 ///|
@@ -124,6 +125,7 @@ pub fn RecordCache::len(self : RecordCache) -> Int32 {
 ///|
 pub fn RecordCache::clear(self : RecordCache) -> Unit {
   self.entries = []
+  self.negatives = []
 }
 
 ///|
@@ -146,6 +148,7 @@ pub fn RecordCache::advance(
     }
   }
   self.entries = kept
+  self.negatives = self.negatives.filter(e => e.expires_at > now)
   self.now_ms = now
   removed
 }
@@ -180,6 +183,7 @@ pub fn RecordCache::ingest(
   }
   guard scope.length() > 0 && scope.length() <= 256 else { raise InvalidScope }
   let next : RecordCache = {
+    negatives: self.negatives.copy(),
     entries: self.entries.copy(),
     now_ms: self.now_ms,
     capacity: self.capacity,
@@ -265,7 +269,11 @@ pub fn RecordCache::ingest(
       }
     }
   }
+  if (message.flags & 0xf80f) == 0x8000 {
+    next.accept_negatives(scope, message.records, now)
+  }
   self.entries = next.entries
+  self.negatives = next.negatives
   self.now_ms = now
   self.revision = next.revision
   removed
@@ -300,6 +308,11 @@ pub fn RecordCache::records(
 ///|
 pub fn RecordCache::next_deadline(self : RecordCache) -> Int64? {
   let mut result : Int64? = None
+  for entry in self.negatives {
+    if result is None || (result is Some(time) && entry.expires_at < time) {
+      result = Some(entry.expires_at)
+    }
+  }
   for entry in self.entries {
     if result is None || (result is Some(time) && entry.expires_at < time) {
       result = Some(entry.expires_at)

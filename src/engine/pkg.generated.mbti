@@ -43,6 +43,7 @@ pub fn Engine::close(Self) -> Unit
 pub fn Engine::dropped_events(Self) -> Int64
 pub fn Engine::ingest(Self, Bytes, String, Int64, source? : @model.PacketSource?) -> Unit raise
 pub fn Engine::ingest_message(Self, @wire.Message, String, Int64, source? : @model.PacketSource?) -> Unit raise
+pub fn Engine::is_negative(Self, String, @model.DnsName, Int32) -> Bool
 pub fn Engine::new(cache_capacity? : Int32, service_capacity? : Int32, event_capacity? : Int32, query_capacity? : Int32, seed? : UInt32, packet_limit? : Int32) -> Self raise
 pub fn Engine::next_deadline(Self) -> Int64?
 pub fn Engine::poll_envelope(Self) -> EventEnvelope?

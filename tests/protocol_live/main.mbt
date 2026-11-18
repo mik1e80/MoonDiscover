@@ -12,6 +12,7 @@ async fn main {
   let report = match args[1] {
     "packets" => packet_checks(ip)
     "ingress" => ingress_checks(ip)
+    "nsec" => nsec_checks(ip)
     "subtypes" => subtype_checks(ip)
     "interface" => {
       guard args.length() == 4 else { fail("interface marker required") }

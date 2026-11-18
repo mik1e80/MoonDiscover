@@ -592,6 +592,11 @@ fn Engine::ingest_admitted(
   source~ : @model.PacketSource?,
 ) -> Unit raise {
   let removed = self.cache.ingest(scope, message, now, source~)
+  if message.records.any(r => r.rr_type == 47 && r.data is @wire.Unknown(_)) {
+    self.emit(
+      Diagnostic("nsec_ignored", "unsupported or malformed NSEC RDATA ignored"),
+    )
+  }
   self.discard_burst()
   self.now_ms = now
   self.rotate_queries()
@@ -616,6 +621,7 @@ fn Engine::admit_input(self : Engine, now : Int64) -> Unit raise EngineError {
 ///|
 pub fn Engine::advance(self : Engine, now : Int64) -> Unit raise {
   guard !self.closed else { raise Closed }
+  let negative_count = self.cache.negative_count()
   let removed = self.cache.advance(now)
   if now != self.now_ms {
     self.discard_burst()
@@ -631,6 +637,9 @@ pub fn Engine::advance(self : Engine, now : Int64) -> Unit raise {
     return
   }
   if removed.is_empty() {
+    if self.cache.negative_count() != negative_count {
+      self.sync_queries()
+    }
     self.schedule_queries()
     return
   }

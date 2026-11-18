@@ -10,6 +10,7 @@ pub(all) enum RData {
   Ptr(@model.DnsName)
   Srv(Int32, Int32, Int32, @model.DnsName)
   Txt(@model.TxtRecord)
+  Nsec(@model.DnsName, Bytes)
   Unknown(Bytes)
 }
 
@@ -147,6 +148,26 @@ fn rdata(
       }
       Txt(txt)
     }
+    47 =>
+      // Unsupported NSEC RDATA must not invalidate the other response RRs.
+      try {
+        let (name, next) = decode_name(data, at)
+        guard next + 2 <= end else { raise Malformed("short NSEC bitmap") }
+        let length = data[next + 1].to_int()
+        guard data[next] == 0 &&
+          length >= 1 &&
+          length <= 32 &&
+          next + 2 + length == end else {
+          raise Malformed("unsupported NSEC bitmap")
+        }
+        let bitmap = data[next + 2:end].to_owned()
+        guard !nsec_contains(bitmap, 47) else {
+          raise Malformed("NSEC self bit")
+        }
+        Nsec(name, bitmap)
+      } catch {
+        _ => Unknown(data[at:end].to_owned())
+      }
     _ => Unknown(data[at:end].to_owned())
   }
 }

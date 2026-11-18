@@ -35,13 +35,17 @@ pub struct CachedRecord {
 
 type Entry
 
+type NegativeEvidence
+
 pub struct RecordCache {
   // private fields
 }
 pub fn RecordCache::advance(Self, Int64) -> Array[Removal] raise CacheError
 pub fn RecordCache::clear(Self) -> Unit
 pub fn RecordCache::ingest(Self, String, @wire.Message, Int64, source? : @model.PacketSource?) -> Array[Removal] raise CacheError
+pub fn RecordCache::is_negative(Self, String, @model.DnsName, Int32) -> Bool
 pub fn RecordCache::len(Self) -> Int32
+pub fn RecordCache::negative_count(Self) -> Int32
 pub fn RecordCache::new(capacity? : Int32) -> Self raise CacheError
 pub fn RecordCache::next_deadline(Self) -> Int64?
 pub fn RecordCache::records(Self, String, @model.DnsName, Int32) -> Array[CachedRecord]

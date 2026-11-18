@@ -37,7 +37,11 @@ test "smoke: independent zeroconf packet resolves wire fields including binary T
         assert_eq(value, b"\x0a\x0c\xb3\x17")
         address = true
       }
-      @wire.Unknown(_) => unknown = true
+      @wire.Nsec(_, bitmap) => {
+        assert_false(@wire.nsec_contains(bitmap, 33))
+        assert_true(@wire.nsec_contains(bitmap, 28))
+        unknown = true
+      }
       _ => ()
     }
   }

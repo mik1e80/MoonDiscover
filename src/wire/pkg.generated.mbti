@@ -10,6 +10,8 @@ pub fn decode(Bytes) -> Message raise WireError
 
 pub fn decode_name(Bytes, Int32) -> (@model.DnsName, Int32) raise WireError
 
+pub fn nsec_contains(Bytes, Int32) -> Bool
+
 pub fn qm_query(@model.DnsName, Int32) -> Bytes raise WireError
 
 pub fn query_packets(@model.DnsName, Int32, Array[Record], max_size? : Int32, max_packets? : Int32) -> Array[Bytes] raise WireError
@@ -47,6 +49,7 @@ pub(all) enum RData {
   Ptr(@model.DnsName)
   Srv(Int32, Int32, Int32, @model.DnsName)
   Txt(@model.TxtRecord)
+  Nsec(@model.DnsName, Bytes)
   Unknown(Bytes)
 }
 

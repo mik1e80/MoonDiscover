@@ -63,6 +63,9 @@ fn Engine::sync_queries(self : Engine) -> Unit {
   let catalog : Array[QuestionSpec] = []
   let seen : Map[(String, Bytes, Int32), Unit] = Map([])
   fn want(q : QuestionSpec) {
+    if self.cache.is_negative(q.scope, q.name, q.rr_type) {
+      return
+    }
     let key = (q.scope, q.name.canonical_key(), q.rr_type)
     if seen.contains(key) {
       return

@@ -93,6 +93,18 @@ async fn main {
     raw[2] = b'\x84'
     Bytes::makei(raw.length(), i => raw[i])
   })
+  let nsec : @wire.Record = {
+    name: host,
+    rr_type: 47,
+    rr_class: 1,
+    cache_flush: true,
+    ttl: 120U,
+    data: @wire.Nsec(host, b"\x40"),
+    section: @wire.Answer,
+  }
+  let raw = @wire.query_with_answers(host, 47, [nsec]).to_array()
+  raw[2] = b'\x84'
+  corpus.push(Bytes::makei(raw.length(), i => raw[i]))
   let mut rejected = 0
   for i in 0..<count {
     let source = corpus[random(corpus.length())]

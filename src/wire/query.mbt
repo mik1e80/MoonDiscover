@@ -28,6 +28,18 @@ fn payload(record : Record) -> Bytes raise WireError {
     }
     (12, Ptr(name)) => name.to_wire()
     (16, Txt(txt)) => txt.to_wire()
+    (47, Nsec(name, bitmap)) => {
+      guard bitmap.length() >= 1 &&
+        bitmap.length() <= 32 &&
+        !nsec_contains(bitmap, 47) else {
+        raise Malformed("invalid restricted NSEC")
+      }
+      let out = name.to_wire().to_array()
+      out.push(0)
+      out.push(bitmap.length().to_byte())
+      append(out, bitmap)
+      Bytes::makei(out.length(), i => out[i])
+    }
     (33, Srv(priority, weight, port, target)) => {
       guard priority >= 0 &&
         priority <= 65535 &&
