@@ -1,5 +1,12 @@
 # 变更记录
 
+## 0.3.0-dev — 未发布，2026-11-18
+
+- 按报名驳回意见将受限 mDNS NSEC 纳入必要查询端目标，增加 Type 47 位图解码/编码、畸形 NSEC 单条忽略和不同 next-name 兼容。
+- 独立有界负证据缓存、正向优先、类型/名称/IN/scope 隔离；负 TTL 到期恢复查询，不整体否定共享 PTR；公开 Engine/Browser.is_negative。
+- 新增负响应、容量原子性、Additional、cache-flush 救回、Replay 和独立 zeroconf 抓包回归，扩充 NSEC fuzz 语料；Avahi 实际 UDP 专项入口。
+- README 明确对象、协议角色、必要功能、完整性与认证边界和 Apache-2.0/依赖/RFC 引用责任；稳定 0.3.0 仍需完成专项实网与新包独立消费验收。
+
 ## 0.2.1-dev — 未发布，2026-11-05
 
 2026-11-06 的第四轮加固：
