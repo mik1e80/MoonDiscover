@@ -13,4 +13,6 @@
 
 真实时间复现：构建 tests/protocol_live 与 tests/native_ttl 的 Native 目标，用 native_ttl --interface 获取活动 IPv4，再运行 protocol_live nsec-expiry <IPv4>。此实验同机运行，使用生产 Browser、受控发布输入和独立出站解析器。源码消费和本地开发归档只覆盖当前候选源码。
 
+Linux 实验运行 [44730748989](https://github.com/mik1e80/MoonDiscover/actions/runs/44730748989) 在约 1107ms 恢复 AAAA 并通过正向接纳验证。普通 Avahi goodbye 通过。独立 zeroconf 实验同样收到了 NSEC，但未在观察窗得到 goodbye 移除事件。NSEC 专项按真实收包、解码一致和 Replay 验收，报告继续保留 zeroconf goodbye 的实际结果。常规完整场景仍要求原有的 goodbye 断言。
+
 剩余验证包括 RFC 6762 §7.3 跨查询器抑制、多独立响应器的续包等待与互操作、第二物理设备和长时间实网，以及发布标签、归档散列与 Mooncakes 独立安装闭环。发布条件满足后才标记稳定版。

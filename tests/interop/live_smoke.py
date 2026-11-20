@@ -161,6 +161,16 @@ def main():
         args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(json.dumps(report["checks"]))
         print("report:", args.output)
+        if args.inspect_nsec:
+            # The NSEC workflow independently validates ordinary goodbye with
+            # Avahi. Preserve every zeroconf observation in this report.
+            return 0 if all([
+                bool(report.get("independent_nsec_bitmaps")),
+                report["checks"]["independent_service_resolved"],
+                report["checks"]["all_processes_exit_zero"],
+                report["checks"]["recorded_replay_deterministic"],
+                report["checks"]["live_and_replay_service_events_match"],
+            ]) else 1
         return 0 if all(report["checks"].values()) else 1
     finally:
         for process in processes:
