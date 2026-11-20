@@ -20,4 +20,4 @@ if __name__ == "__main__":
                             other_ttl=4500)
             )
         Path(ready).touch(exist_ok=False)
-        time.sleep(35)
+        time.sleep(90)

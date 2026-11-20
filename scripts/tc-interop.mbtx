@@ -10,7 +10,7 @@ import {
 ----
 
 async fn command(program : String, args : Array[String]) -> String {
-  let result = @shell.Cmd(program, args).output(timeout_ms=25000)
+  let result = @shell.Cmd(program, args).output(timeout_ms=65000)
   guard result.exit_code() == 0 else {
     fail(program + " failed: " + result.stderr() + "\n" + result.stdout())
   }
@@ -19,7 +19,7 @@ async fn command(program : String, args : Array[String]) -> String {
 
 async fn main {
   let args = @env.args()
-  guard args.length() == 2 else { fail("usage: tc-interop.mbtx <zeroconf-python>") }
+  guard args.length() == 3 else { fail("usage: tc-interop.mbtx <zeroconf-python> <second-source-IPv4>") }
   @fs.mkdir(".tools", allow_exist=true)
   let route = @json.parse(command("ip", ["-j", "-4", "route", "get", "224.0.0.251"]))
   guard route is [{ "prefsrc": String(ip), .. }, ..] else { fail("no active IPv4 route") }
@@ -42,7 +42,7 @@ async fn main {
     }
     guard @fs.exists(marker) else { fail("zeroconf did not finish registration") }
     @async.sleep(2300)
-    let sample = command("_build/native/debug/build/tests/tc_interop/tc_interop.exe", [ip])
+    let sample = command("_build/native/debug/build/tests/tc_interop/tc_interop.exe", [ip, args[2]])
     guard a.try_wait() is None && b.try_wait() is None && z.try_wait() is None else { fail("publisher exited during the probe") }
     @json.parse(sample)
   })

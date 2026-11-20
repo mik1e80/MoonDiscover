@@ -69,11 +69,18 @@ fn observation(
 ///|
 async fn main {
   let args = @env.args()
-  guard args.length() == 2 else { fail("usage: tc_interop <IPv4>") }
+  guard args.length() == 3 else {
+    fail("usage: tc_interop <IPv4> <second-source-IPv4>")
+  }
   let addr = @socket.Addr::parse(args[1] + ":0")
-  guard !addr.is_ipv6() else { fail("IPv4 required") }
+  let second = @socket.Addr::parse(args[2] + ":0")
+  guard !addr.is_ipv6() && !second.is_ipv6() && addr.ip() != second.ip() else {
+    fail("two distinct IPv4 addresses required")
+  }
   let socket = @native.MulticastSocket::open(addr.ip())
   defer socket.close()
+  let waiter = @native.MulticastSocket::open(second.ip())
+  defer waiter.close()
   let service = @model.DnsName::parse("_md-tcproof._tcp.local.")
   let names = ["av-known", "av-unknown", "zc-known", "zc-unknown"].map(label => {
     @model.DnsName::parse(label + "." + service.to_presentation())
@@ -92,12 +99,22 @@ async fn main {
   let single = @wire.query_with_answers(service, 12, known_answers)
   let arms : Array[Json] = []
   let mut baseline = false
-  for mode in ["plain", "single", "immediate_tail", "delayed_tail", "head_only"] {
+  let modes = [
+    "plain", "single", "immediate_tail", "delayed_tail", "head_only", "head_only",
+    "head_only", "head_only", "head_only", "solo_tail", "two_queriers", "solo_tail",
+    "two_queriers", "solo_tail", "two_queriers",
+  ]
+  for trial, mode in modes {
     if mode != "plain" {
       @async.sleep(2100)
     }
     for _ in 0..<128 {
       if socket.receive(timeout_ms=0) is None {
+        break
+      }
+    }
+    for _ in 0..<128 {
+      if waiter.receive(timeout_ms=0) is None {
         break
       }
     }
@@ -114,45 +131,89 @@ async fn main {
       _ => socket.send(head)
     }
     let seen : Map[Bytes, Int64] = Map([])
+    let waiter_seen : Map[Bytes, Int64] = Map([])
+    let mut waiter_at : Int64? = None
+    let mut waiter_qm_observed = false
+    let mut primary_head_observed = false
+    let mut primary_tail_observed = false
     while @native.monotonic_ms() - t0 < 1050L {
       let elapsed = @native.monotonic_ms() - t0
       if mode == "delayed_tail" && tail_at is None && elapsed >= 250L {
         socket.send(tail)
         tail_at = Some(@native.monotonic_ms() - t0)
       }
+      if (mode == "two_queriers" || mode == "solo_tail") &&
+        tail_at is None &&
+        elapsed >= 30L {
+        if mode == "two_queriers" {
+          waiter.send(plain)
+          waiter_at = Some(@native.monotonic_ms() - t0)
+        }
+        socket.send(tail)
+        tail_at = Some(@native.monotonic_ms() - t0)
+      }
+      if mode == "two_queriers" {
+        for _ in 0..<16 {
+          guard waiter.receive(timeout_ms=0) is Some(packet) else { break }
+          record_answers(
+            packet,
+            @native.monotonic_ms() - t0,
+            service,
+            names,
+            waiter_seen,
+          )
+        }
+      }
       if socket.receive(timeout_ms=5) is Some(packet) {
         let received_at = @native.monotonic_ms() - t0
-        if packet.source_port != 5353 || packet.destination_ipv4 != 0xe00000fbU {
-          continue
+        if packet.source_ipv4 == second.ip() &&
+          packet.bytes == plain &&
+          primary_head_observed {
+          waiter_qm_observed = true
         }
-        let message = @wire.decode(packet.bytes) catch { _ => continue }
-        if (message.flags & 0xf80f) != 0x8000 {
-          continue
+        if packet.source_ipv4 == addr.ip() && packet.bytes == head {
+          primary_head_observed = true
         }
-        for record in message.records {
-          if record.section is @wire.Answer &&
-            record.rr_class == 1 &&
-            record.ttl > 0 &&
-            record.name.same_name(service) &&
-            record.data is @wire.Ptr(target) &&
-            names.any(n => n.same_name(target)) {
-            let key = target.canonical_key()
-            if !seen.contains(key) {
-              seen[key] = received_at
-            }
-          }
+        if packet.source_ipv4 == addr.ip() &&
+          packet.bytes == tail &&
+          waiter_qm_observed {
+          primary_tail_observed = true
         }
+        record_answers(packet, received_at, service, names, seen)
       }
     }
     if mode == "plain" {
       baseline = seen.length() == names.length()
     }
+    if mode == "two_queriers" {
+      guard primary_head_observed && waiter_qm_observed && primary_tail_observed else {
+        fail(
+          "could not verify distinct querier datagrams and the TC burst on the link",
+        )
+      }
+    }
     arms.push(
       Json::object({
         "mode": Json(mode),
+        "trial": Json(trial + 1),
         "tail_sent_ms": nullable_ms(tail_at),
         "avahi": observation(seen, names[0], names[1], tail_at),
         "zeroconf": observation(seen, names[2], names[3], tail_at),
+        "second_query_ms": nullable_ms(waiter_at),
+        "distinct_querier_udp_verified": Json(
+          mode == "two_queriers" &&
+          waiter_qm_observed &&
+          primary_head_observed &&
+          primary_tail_observed,
+        ),
+        "second_querier_received": if mode == "two_queriers" {
+          Json::object({
+            "avahi": observation(waiter_seen, names[0], names[1], tail_at),
+            "zeroconf": observation(waiter_seen, names[2], names[3], tail_at),
+          })
+        } else {
+          Json::null()
+        },
       }),
     )
   }
@@ -160,11 +221,39 @@ async fn main {
     "baseline_both_responders": Json(baseline),
     "arms": Json::array(arms),
     "scope": Json(
-      "same Linux runner; two responder processes and implementations; results attributed by exclusively registered PTR targets",
+      "same Linux runner; two responder implementations; two querier source IPv4 addresses on the same interface",
     ),
   })
   println(report.stringify())
   guard baseline else {
     fail("plain query did not observe all four independent registrations")
+  }
+}
+
+///|
+fn record_answers(
+  packet : @native.Datagram,
+  received_at : Int64,
+  service : @model.DnsName,
+  names : Array[@model.DnsName],
+  seen : Map[Bytes, Int64],
+) -> Unit {
+  guard packet.source_port == 5353 && packet.destination_ipv4 == 0xe00000fbU else {
+    return
+  }
+  let message = @wire.decode(packet.bytes) catch { _ => return }
+  guard (message.flags & 0xf80f) == 0x8000 else { return }
+  for record in message.records {
+    if record.section is @wire.Answer &&
+      record.rr_class == 1 &&
+      record.ttl > 0 &&
+      record.name.same_name(service) &&
+      record.data is @wire.Ptr(target) &&
+      names.any(n => n.same_name(target)) {
+      let key = target.canonical_key()
+      if !seen.contains(key) {
+        seen[key] = received_at
+      }
+    }
   }
 }

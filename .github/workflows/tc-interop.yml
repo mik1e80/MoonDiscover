@@ -34,10 +34,14 @@ jobs:
           python3 -m venv .venv
           .venv/bin/pip install -r tests/interop/requirements.txt
       - name: Build and run the focused multicast probe
+        shell: bash
         run: |
           moon update
           moon build tests/tc_interop --target native
-          moon run scripts/tc-interop.mbtx -- .venv/bin/python
+          dev=$(ip -j -4 route get 224.0.0.251 | python3 -c 'import json,sys; print(json.load(sys.stdin)[0]["dev"])')
+          sudo ip addr add 192.0.2.242/32 dev "$dev"
+          trap 'sudo ip addr del 192.0.2.242/32 dev "$dev"' EXIT
+          moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242
       - name: Retain observations and publisher logs
         if: always()
         uses: actions/upload-artifact@v4
