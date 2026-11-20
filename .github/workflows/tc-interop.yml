@@ -1,0 +1,49 @@
+name: Two responder TC interoperability
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/tc-interop.yml
+      - scripts/tc-interop.mbtx
+      - tests/tc_interop/**
+      - tests/interop/tc_publisher.py
+      - tests/interop/requirements.txt
+      - tests/protocol_probe/**
+      - src/wire/**
+      - src/native/**
+      - moon.mod
+      - toolchain.json
+permissions:
+  contents: read
+jobs:
+  tc-interop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install pinned toolchain and responders
+        shell: bash
+        run: |
+          version=$(python3 -c 'import json; print(json.load(open("toolchain.json"))["release"])')
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- "$version"
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+          sudo apt-get update -qq
+          sudo apt-get install -y avahi-daemon avahi-utils iproute2
+          sudo systemctl start dbus avahi-daemon
+          python3 -m venv .venv
+          .venv/bin/pip install -r tests/interop/requirements.txt
+      - name: Build and run the focused multicast probe
+        run: |
+          moon update
+          moon build tests/tc_interop --target native
+          moon run scripts/tc-interop.mbtx -- .venv/bin/python
+      - name: Retain observations and publisher logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: two-responder-tc-evidence
+          path: |
+            .tools/tc-interop.json
+            .tools/tc-*.log
+          include-hidden-files: true

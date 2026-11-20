@@ -1,0 +1,57 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/process",
+  "moonbitlang/async@0.22.5/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+----
+
+async fn command(program : String, args : Array[String]) -> String {
+  let result = @shell.Cmd(program, args).output(timeout_ms=25000)
+  guard result.exit_code() == 0 else {
+    fail(program + " failed: " + result.stderr() + "\n" + result.stdout())
+  }
+  result.stdout().trim().to_owned()
+}
+
+async fn main {
+  let args = @env.args()
+  guard args.length() == 2 else { fail("usage: tc-interop.mbtx <zeroconf-python>") }
+  @fs.mkdir(".tools", allow_exist=true)
+  let route = @json.parse(command("ip", ["-j", "-4", "route", "get", "224.0.0.251"]))
+  guard route is [{ "prefsrc": String(ip), .. }, ..] else { fail("no active IPv4 route") }
+  let marker = ".tools/tc-publisher-ready"
+  if @fs.exists(marker) { @fs.remove(marker) }
+  let result = @async.with_task_group(group => {
+    let a_log = @process.redirect_to_file(".tools/tc-av-known.log")
+    let b_log = @process.redirect_to_file(".tools/tc-av-unknown.log")
+    let z_log = @process.redirect_to_file(".tools/tc-zeroconf.log")
+    let a = @process.spawn(group, "avahi-publish-service", ["av-known", "_md-tcproof._tcp", "18421"], stdout=a_log, stderr=a_log, no_wait=true)
+    defer a.cancel()
+    let b = @process.spawn(group, "avahi-publish-service", ["av-unknown", "_md-tcproof._tcp", "18422"], stdout=b_log, stderr=b_log, no_wait=true)
+    defer b.cancel()
+    let z = @process.spawn(group, args[1], ["tests/interop/tc_publisher.py", ip, marker], stdout=z_log, stderr=z_log, no_wait=true)
+    defer z.cancel()
+    for _ in 0..<300 {
+      guard a.try_wait() is None && b.try_wait() is None && z.try_wait() is None else { fail("publisher exited before the probe") }
+      if @fs.exists(marker) { break }
+      @async.sleep(20)
+    }
+    guard @fs.exists(marker) else { fail("zeroconf did not finish registration") }
+    @async.sleep(2300)
+    let sample = command("_build/native/debug/build/tests/tc_interop/tc_interop.exe", [ip])
+    guard a.try_wait() is None && b.try_wait() is None && z.try_wait() is None else { fail("publisher exited during the probe") }
+    @json.parse(sample)
+  })
+  let report = Json::object({
+    "source_commit": Json(command("git", ["rev-parse", "HEAD"])),
+    "avahi_version": Json(command("avahi-daemon", ["--version"])),
+    "zeroconf_version": Json(command(args[1], ["-c", "from importlib.metadata import version; print(version('zeroconf'))"])),
+    "result": result,
+  })
+  @fs.write_file(".tools/tc-interop.json", report.stringify(indent=2) + "\n")
+  println(report.stringify())
+}
