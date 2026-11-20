@@ -47,3 +47,4 @@ During query pressure, query_limit is coalesced on entry and deferred work rotat
 - Keep normal service events, recoverable diagnostics, and raised transport errors as separate application paths.
 
 See [service and event model](model.md) for lifecycle semantics and [public Engine interface](../src/engine/pkg.generated.mbti) for the current development API.
+受限 NSEC 的位图或 RDATA 不受支持时，引擎可输出 `nsec_ignored`。同包有效普通记录继续处理。此诊断表示单条证据未采纳，不能推断服务状态。

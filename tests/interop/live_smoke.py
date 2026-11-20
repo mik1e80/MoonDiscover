@@ -14,6 +14,8 @@ import uuid
 from pathlib import Path
 
 from zeroconf import IPVersion, ServiceInfo, Zeroconf
+from zeroconf._dns import DNSNsec
+from zeroconf._protocol.incoming import DNSIncoming
 
 ROOT = Path(__file__).resolve().parents[2]
 BUILD = ROOT / "_build/native/debug/build"
@@ -29,6 +31,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--interface", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--inspect-nsec", action="store_true")
     args = parser.parse_args()
     token = "moondiscover-" + uuid.uuid4().hex[:12]
     requests = []
@@ -147,6 +150,14 @@ def main():
             "limits": ["same Windows host using an independent zeroconf process", "IPv4 QM multicast adapter; unicast intentionally excluded", "no second-device or Linux live-network evidence"],
         }
         args.output.parent.mkdir(parents=True, exist_ok=True)
+        if args.inspect_nsec and trace_path.exists():
+            report["independent_nsec_bitmaps"] = [
+                [record.ttl, *record.rdtypes]
+                for line in trace_path.read_text(encoding="utf-8").splitlines()
+                if (frame := json.loads(line)).get("kind") == "packet"
+                for record in DNSIncoming(bytes.fromhex(frame["packet_hex"])).answers()
+                if isinstance(record, DNSNsec)
+            ]
         args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(json.dumps(report["checks"]))
         print("report:", args.output)

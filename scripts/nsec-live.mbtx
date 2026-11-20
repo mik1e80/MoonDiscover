@@ -10,12 +10,13 @@ async fn main {
   let args = @env.args()
   guard args.length() == 3 else { fail("usage: nsec-live.mbtx <python-with-fixed-zeroconf> <interface-ipv4>") }
   @fs.mkdir(".tools", allow_exist=true)
-  let _ = command(args[1], ["tests/interop/live_smoke.py", "--interface", args[2], "--output", ".tools/nsec-live-publisher.json"])
+  let _ = command(args[1], ["tests/interop/live_smoke.py", "--interface", args[2], "--output", ".tools/nsec-live-publisher.json", "--inspect-nsec"])
   let report = @json.parse(@fs.read_file(".tools/nsec-live-publisher.json").text())
-  guard report is {"trace_file": String(trace), "trace_sha256": String(hash), "source_commit": String(sha), ..} else { fail("publisher trace metadata missing") }
+  guard report is {"trace_file": String(trace), "trace_sha256": String(hash), "source_commit": String(sha), "independent_nsec_bitmaps": Array(expected), ..} && !expected.is_empty() else { fail("independent NSEC decoder evidence missing") }
   let result = @json.parse(command("_build/native/debug/build/tests/nsec_probe/nsec_probe.exe", [trace]))
+  guard result is {"nsec_bitmaps": Array(actual), ..} && Json::array(actual).stringify() == Json::array(expected).stringify() else { fail("independent decoder disagrees on NSEC TTL or present types") }
   let summary = Json::object({"publisher": "python-zeroconf 0.148.0", "source_commit": Json(sha),
-    "trace_sha256": Json(hash), "analysis": result,
+    "trace_sha256": Json(hash), "analysis": result, "independent_bitmap_decoder_agreement": Json(true),
     "limits": "same-host actual IPv4 multicast capture; negative evidence checked in deterministic replay; not physical-time publisher recovery"})
   @fs.write_file(".tools/nsec-live-report.json", summary.stringify(indent=2))
   println(summary.stringify())

@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/linux-interop.yml
       - tests/interop/avahi_smoke.py
+      - tests/interop/live_smoke.py
       - src/**
       - cmd/**
       - examples/**

@@ -11,6 +11,7 @@ async fn main {
   )
   let mut records = 0
   let mut negatives = 0
+  let signatures : Array[Array[UInt32]] = []
   for line in trace.split("\n") {
     let line = line.trim().to_owned()
     if line.is_empty() {
@@ -29,6 +30,13 @@ async fn main {
       for record in message.records {
         if record.data is @wire.Nsec(_, bitmap) {
           records += 1
+          let signature = [record.ttl]
+          for rr_type in 0..<(bitmap.length() * 8) {
+            if @wire.nsec_contains(bitmap, rr_type) {
+              signature.push(rr_type.reinterpret_as_uint())
+            }
+          }
+          signatures.push(signature)
           for rr_type in [1, 16, 28, 33] {
             if !@wire.nsec_contains(bitmap, rr_type) &&
               replay.engine.is_negative(scope, record.name, rr_type) {
@@ -48,7 +56,8 @@ async fn main {
       "nsec_records": records,
       "negative_observations": negatives,
       "trace": args[1],
-      "limits": "independent publisher trace received by Native; reanalysis uses Engine Replay, not a second decoder",
+      "nsec_bitmaps": signatures,
+      "limits": "Engine Replay checks evidence; companion nsec-live script compares TTL and bitmap with the independent decoder",
     }).stringify(),
   )
 }
