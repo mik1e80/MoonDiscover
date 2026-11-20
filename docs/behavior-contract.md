@@ -1,6 +1,6 @@
 # Engine 与 Browser 行为契约
 
-2026-11-18 增量：当前 main 为 0.3.0-dev，新增 `is_negative` 与 NSEC 调度；此前条款继续适用。否定证据不会降低 complete 的 TXT/SRV/地址要求，不代表 Removed 或身份认证；见 [否定响应](negative-response.md)。
+2026-11-20 增量：当前 main 为 0.3.0-dev。有效 TXT 否定证据可提供空属性，证据到期时重新计算完整状态与待发查询。SRV 与地址仍由正向记录提供。事件边界见 [否定响应](negative-response.md)。
 
 基础行为证据：2026-11-06 的 0.2.1-dev 阶段；当前 main 已为 0.3.0-dev，新增行为见上方增量与[整改记录](rectification-20261118.md)。0.2.0 归档不包含后续来源、预算、版本化事件和恢复 API；历史验证见[第四轮记录](security-review-20261106.md)。服务完整性的具体条件见[解析契约](dnssd-resolution-contract.md)，不可信输入见[安全模型](security-model.md)。
 

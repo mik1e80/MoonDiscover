@@ -4,6 +4,8 @@
 
 2026-11-20 维护：减少 NSEC 矛盾检查的缓存扫描，保持 scope 隔离、原子接纳及正向优先。新增真实时间到期恢复、Avahi 两条 PTR 的 Known-Answer 对照和外部项目 NSEC API 检查。补齐协议差异、使用手册、维护路线与候选发布验证。
 
+- 按 RFC 6763 §6.1 将明确否定的 TXT 解释为空属性，并统一零长度与单空字符串的属性语义。负证据到期时重新计算快照，未知 TXT 仍继续查询。
+
 - 按报名驳回意见将受限 mDNS NSEC 纳入必要查询端目标，增加 Type 47 位图解码/编码、畸形 NSEC 单条忽略和不同 next-name 兼容。
 - 独立有界负证据缓存、正向优先、类型/名称/IN/scope 隔离；负 TTL 到期恢复查询，不整体否定共享 PTR；公开 Engine/Browser.is_negative。
 - 新增负响应、容量原子性、Additional、cache-flush 救回、Replay 和独立 zeroconf 抓包回归，扩充 NSEC fuzz 语料；Avahi 实际 UDP 专项入口。

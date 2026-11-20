@@ -36,6 +36,6 @@ Engine 和 Native transport 的诊断代码、触发条件及调用方处理建�
 
 ## 否定证据与模型验证
 
-对同一个 scope、名称、IN 类型，应用先判断是否有有效正向记录，再用 is_negative 查询有效的 NSEC 缺失证据。都没有时为 Unknown。已有正向记录与 NSEC 冲突时保留正向记录，并防止旧否定在正向 TTL 到期后复活。到期或网络代次重建会清除相应证据。服务完整度仍取决于正向 SRV、TXT 和地址记录。
+对同一个 scope、名称、IN 类型，应用先判断是否有有效正向记录，再用 is_negative 查询有效的 NSEC 缺失证据。都没有时为 Unknown。已有正向记录与 NSEC 冲突时保留正向记录，并防止旧否定在正向 TTL 到期后复活。到期或网络代次重建会清除相应证据。完整快照需要正向 SRV、地址及可用的 TXT 属性，明确否定 TXT 时属性按空处理。
 
 名称和 TXT 编码见 src/model 的 smoke 用例。NSEC 格式见 src/wire/nsec_test.mbt，状态隔离、容量原子性和正负顺序见 src/cache/negative_cache_test.mbt，查询恢复见 src/engine/negative_response_test.mbt，回放一致性见 src/replay/negative_test.mbt。Native 实验单独验证实际时钟和组播收发。

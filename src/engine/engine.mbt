@@ -312,11 +312,32 @@ fn Engine::build_snapshot(
     }
   }
   let txt_records = newest(self.cache.records(sub.scope, instance, 16))
-  if txt_records.length() != 1 {
-    missing.push(if txt_records.is_empty() { "txt" } else { "ambiguous_txt" })
+  if txt_records.is_empty() {
+    if self.cache.negative_expiry(sub.scope, instance, 16) is Some(deadline) {
+      // RFC 6763 §6.1: an explicit absent TXT implies no service attributes.
+      txt = Some(@model.TxtRecord::from_entries([b""]) catch { _ => panic() })
+      expiry = expiry.min(deadline)
+    } else {
+      missing.push("txt")
+    }
   } else if txt_records[0].record.data is @wire.Txt(value) {
-    txt = Some(value)
-    expiry = expiry.min(txt_records[0].expires_at)
+    let semantic = txt_semantic_wire(value)
+    let mut valid_until = txt_records[0].expires_at
+    let mut ambiguous = false
+    for entry in txt_records {
+      if entry.record.data is @wire.Txt(other) &&
+        txt_semantic_wire(other) == semantic {
+        valid_until = valid_until.max(entry.expires_at)
+      } else {
+        ambiguous = true
+      }
+    }
+    if ambiguous {
+      missing.push("ambiguous_txt")
+    } else {
+      txt = Some(value)
+      expiry = expiry.min(valid_until)
+    }
   }
   let addresses : Array[Bytes] = []
   if target is Some(host) {
@@ -370,9 +391,19 @@ fn same_content(a : ServiceSnapshot, b : ServiceSnapshot) -> Bool {
   a.target.map(t => t.canonical_key()) == b.target.map(t => t.canonical_key()) &&
   a.port == b.port &&
   same_candidates(a.srv_candidates, b.srv_candidates) &&
-  a.txt.map(t => t.to_wire()) == b.txt.map(t => t.to_wire()) &&
+  a.txt.map(txt_semantic_wire) == b.txt.map(txt_semantic_wire) &&
   a.addresses == b.addresses &&
   a.missing == b.missing
+}
+
+///|
+fn txt_semantic_wire(txt : @model.TxtRecord) -> Bytes {
+  let raw = txt.to_wire()
+  if raw.is_empty() {
+    b"\x00"
+  } else {
+    raw
+  }
 }
 
 ///|
@@ -638,7 +669,8 @@ pub fn Engine::advance(self : Engine, now : Int64) -> Unit raise {
   }
   if removed.is_empty() {
     if self.cache.negative_count() != negative_count {
-      self.sync_queries()
+      self.reconcile("time")
+      return
     }
     self.schedule_queries()
     return

@@ -4,7 +4,8 @@
 
 | 项目 | 当前可复现证据 |
 | --- | --- |
-| 模型、Wire、Cache、Engine、Replay | 78 项 JS smoke 通过。含跨报文正向优先、scope 隔离、负缓存到期及刷新、异常位图、Additional 和回放 |
+| 模型、Wire、Cache、Engine、Replay | 79 项定向 JS smoke。含跨报文正向优先、scope 隔离、明确否定 TXT 的空属性、负缓存到期及刷新、异常位图、Additional 和回放 |
+| Avahi Known-Answer | 两个服务由同一 daemon 发布。对照查询必须收齐两条 PTR，携带 Known-Answer 的查询必须收到另一条 PTR，并单独记录是否仍收到已知 PTR |
 | Native 实时 NSEC | Windows 同机实际组播，受控 Additional NSEC TTL 为 1 秒，约 1079ms 时观察到出站 AAAA 问题，然后返回 IPv6 地址并由 Browser 接纳。独立解析器检查出站问题 |
 | 独立发布者 | 11 月 18 日保存的 zeroconf NSEC 抓包证据仍有效。受控短 TTL 实验和独立发布者抓包分别验证不同路径 |
 | 外部 API | 单独目录的 MoonBit 工程通过源码映射运行 JS，验证 NSEC 存在和到期，Native 消费工程构建成功 |

@@ -22,16 +22,30 @@ pub fn RecordCache::is_negative(
   name : @model.DnsName,
   rr_type : Int32,
 ) -> Bool {
+  self.negative_expiry(scope, name, rr_type) is Some(_)
+}
+
+///|
+/// Expiry of effective IN negative evidence, if present.
+pub fn RecordCache::negative_expiry(
+  self : RecordCache,
+  scope : String,
+  name : @model.DnsName,
+  rr_type : Int32,
+) -> Int64? {
   if rr_type <= 0 || rr_type > 255 || rr_type == 12 || rr_type == 47 {
-    return false
+    return None
   }
-  self.negatives.any(e => {
-    e.scope == scope &&
-    e.name.same_name(name) &&
-    e.expires_at > self.now_ms &&
-    !e.contradicted.contains(rr_type) &&
-    !@wire.nsec_contains(e.bitmap, rr_type)
-  })
+  for e in self.negatives {
+    if e.scope == scope &&
+      e.name.same_name(name) &&
+      e.expires_at > self.now_ms &&
+      !e.contradicted.contains(rr_type) &&
+      !@wire.nsec_contains(e.bitmap, rr_type) {
+      return Some(e.expires_at)
+    }
+  }
+  None
 }
 
 ///|

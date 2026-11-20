@@ -10,7 +10,7 @@ Type 47 解码为 `RData.Nsec(next_name, bitmap)`；window=0、长度 1–32、�
 
 Engine 在收包和到期时重建问题集合，取消有效否定类型的待发查询和续包；其他类型、KA 和 PTR 仍继续。否定到期通过 cache.next_deadline 唤醒，引擎恢复正常查询抖动。关闭或重建网络代次清空全部负缓存。纯 Engine 的 scope 由调用方提供；Native 负证据通过普通 ingress 策略和收包限额，不能绕过来源检查。
 
-`Engine.is_negative(scope,name,type)` / `Browser.is_negative(name,type)` 仅表示有效 IN 证据；false 同时可能是 Positive 或 Unknown，结合正向快照/记录判断。快照 complete 不降低 TXT 要求：有 A、否定 AAAA 可完整；AAAA-only 可完整但默认 IPv4 endpoints 为空；两种地址都否定、SRV/TXT 缺失仍部分状态。NSEC 本身不是服务，不能生成假服务或宣布设备离线。
+`Engine.is_negative(scope,name,type)` / `Browser.is_negative(name,type)` 仅表示有效 IN 证据，false 结合正向快照区分 Positive 与 Unknown。已有 A 且 AAAA 被否定时可满足地址要求。AAAA-only 默认 IPv4 endpoints 为空。有效的 TXT 否定证据提供空属性，到期后恢复未知与查询。SRV 缺失或两种地址都缺失仍为部分状态。NSEC 只描述观测到的类型缺失。
 
 ## 八类验收案例
 

@@ -75,3 +75,48 @@ test "smoke: negative SRV and TXT keep resolution partial and shared PTR continu
   assert_eq(engine.poll_outbound().unwrap().rr_type, 12)
   assert_true(engine.poll_outbound() is None)
 }
+
+///|
+test "smoke: explicit TXT absence resolves as empty only while evidence is live" {
+  let records = fixture()
+  let instance = records[1].name
+  let engine = @engine.Engine::new()
+  let _ = engine.browse(records[0].name, "link", 0)
+  engine.ingest_message(
+    message([records[0], records[1], records[3]]),
+    "link",
+    0,
+  )
+  assert_false(engine.snapshots()[0].complete)
+  let absent : @wire.Record = {
+    ..records[2],
+    rr_type: 47,
+    ttl: 2U,
+    data: @wire.Nsec(instance, b"\x00\x00\x00\x00\x40"),
+  }
+  engine.ingest_message(message([absent]), "link", 100)
+  assert_true(engine.snapshots()[0].complete)
+  assert_eq(engine.snapshots()[0].txt.unwrap().to_wire(), b"\x00")
+  assert_eq(engine.snapshots()[0].remaining_ttl_ms, 2000L)
+  engine.advance(2100)
+  assert_false(engine.snapshots()[0].complete)
+  assert_true(engine.snapshots()[0].missing.contains("txt"))
+  while engine.poll_event() is Some(_) {
+    ()
+  }
+  engine.ingest_message(message([absent]), "link", 2200)
+  assert_true(engine.poll_event() is Some(@engine.Resolved(_)))
+  let empty = @model.TxtRecord::from_wire(b"")
+  let one_empty = @model.TxtRecord::from_wire(b"\x00")
+  engine.ingest_message(
+    message([
+      { ..records[2], data: @wire.Txt(empty), },
+      { ..records[2], data: @wire.Txt(one_empty), },
+    ]),
+    "link",
+    2300,
+  )
+  assert_true(engine.snapshots()[0].complete)
+  assert_false(engine.is_negative("link", instance, 16))
+  assert_true(engine.poll_event() is None)
+}

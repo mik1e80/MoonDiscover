@@ -334,7 +334,7 @@ python -m http.server 8000 --bind 127.0.0.1 --directory .tools/browser-replay
 | 真实传输 | 指定本机接口的 IPv4 QM 组播；UDP 5353、目标 `224.0.0.251` |
 | Native 接纳来源 | 源端口 5353、目标为上述组播地址、入站接口与所选接口一致 |
 | 地址记录 | 解码和聚合 A / AAAA；AAAA 不等于 IPv6 组播传输或已验证 IPv6 连接 |
-| 支持记录 | PTR、SRV、TXT、A、AAAA；未知 RR 有界保留/跳过，不自动成为业务能力 |
+| 支持记录 | PTR、SRV、TXT、A、AAAA。开发版另支持受限 NSEC。未知 RR 有界保留或跳过 |
 | 缓存 | scope 隔离、TTL、goodbye 一秒宽限、flush 近期分包保护；main 忽略 DNS-SD PTR 异常 flush 位 |
 | 冲突记录 | SRV 汇集同范围未过期 RRSet，按优先级与固定种子权重顺序公开候选；替换遵循 cache-flush 宽限。多个冲突 TXT 仍保持未完成 |
 | 接口变化 | 接口失效或地址/索引变化报错，不自动迁移到新接口 |
@@ -346,7 +346,7 @@ python -m http.server 8000 --bind 127.0.0.1 --directory .tools/browser-replay
 
 开发版 **0.3.0-dev** 面向本地开发工具、桌面设备面板及按约定类型查找服务的应用。核心职责包括 IPv4 QM 查询和重传、Known-Answer 与有界分包、PTR/SRV/TXT/A/AAAA 聚合、子类型、TTL/goodbye/cache-flush、生命周期事件，以及 NSEC 否定响应的接收、负缓存、查询抑制和过期恢复。Native 负责实际收发，CLI 提供操作入口，JS 示例提供离线回放。
 
-NSEC 是必要的查询端能力，已经纳入本轮代码整改与最终验收，不再作为可选扩展排除。受限 NSEC 使用窗口 0、1–32 字节位图；Next Domain Name 不同时仍处理位图；扩展或畸形 NSEC 单条忽略，不拖累同包正常 RR。否定证据按 scope/name/IN/type 隔离、受容量及 TTL 限制；正向记录优先；共享 DNS-SD PTR 不受否定抑制。只有 A、没有 AAAA 仍可解析完整；SRV/TXT 或所有地址缺失仍不完整。未响应不是否定证据，发现完整不等于可连接或已认证。调用方可用 `Engine.is_negative(scope, name, type)` 或 `Browser.is_negative(name, type)` 区分 Unknown 与 Negative，详见[否定响应案例](docs/negative-response.md)。
+受限 NSEC 使用窗口 0、1–32 字节位图，接受不同的 Next Domain Name，单条忽略扩展或畸形记录。负证据按 scope/name/IN/type 隔离并受 TTL 和容量限制，正向记录优先，共享 PTR 继续查询。只有 A 仍可满足地址要求。明确否定 TXT 按空属性处理，未获答复仍为未知。SRV 或地址不足时快照保持部分状态。应用通过 `Engine.is_negative(scope, name, type)` 或 `Browser.is_negative(name, type)` 检查当前否定证据。详见 [否定响应](docs/negative-response.md)。
 
 协议依据为 RFC 1035（DNS 字段/压缩）、2782（SRV）、6762（mDNS 查询与缓存）、6763（DNS-SD），及 RFC 4034 §4.1 的 NSEC 格式。以[逐条符合性矩阵](docs/rfc-conformance.md)为准；接收 ID/AA/TC 忽略规则依 RFC 6762 §18，不因顾问概述而额外拒绝结构完整响应。项目不提供 DNSSEC 签名验证、NSEC3，也没有 IETF 认证；必要查询端行为仍须逐条验收，不能由一个功能测试推断整份 RFC 合规。
 
