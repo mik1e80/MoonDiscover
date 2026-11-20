@@ -88,8 +88,8 @@ async fn main {
     "passed": Json(true), "source_commit": Json(command("git", ["rev-parse", "HEAD"])), "source_dirty": Json(!command("git", ["status", "--porcelain"]).is_empty()), "binary_sha256": Json(hash[:hash.find(" ").unwrap()].to_owned()), "system": Json(command("uname", ["-srm"])), "ci_run_url": Json(@env.get_env_var("GITHUB_SERVER_URL").unwrap_or("") + "/" + @env.get_env_var("GITHUB_REPOSITORY").unwrap_or("") + "/actions/runs/" + @env.get_env_var("GITHUB_RUN_ID").unwrap_or("")), "experiment": Json(args[1]), "result": result,
   })
   @fs.write_file(".tools/protocol-live-" + args[1] + ".json", report.stringify(indent=2) + "\n")
-  if result is {"subtypes": {"avahi_omitted_known_ptr": omitted, ..}, ..} {
-    println(Json::object({"avahi_omitted_known_ptr": omitted}).stringify())
+  if result is {"subtypes": {"known_answer_observation": observed, ..}, ..} {
+    println(Json::object({"avahi_known_answer_observation": observed}).stringify())
   }
   println(Json::object({"passed": Json(true), "experiment": Json(args[1])}).stringify())
 }

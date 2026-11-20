@@ -5,7 +5,7 @@
 | 项目 | 当前可复现证据 |
 | --- | --- |
 | 模型、Wire、Cache、Engine、Replay | 79 项定向 JS smoke。含跨报文正向优先、scope 隔离、明确否定 TXT 的空属性、负缓存到期及刷新、异常位图、Additional 和回放 |
-| Avahi Known-Answer | 两个服务由同一 daemon 发布。对照查询必须收齐两条 PTR，携带 Known-Answer 的查询必须收到另一条 PTR，并单独记录是否仍收到已知 PTR |
+| Avahi Known-Answer | 两个服务由同一 daemon 发布。对照收到两条 PTR 且带 Known-Answer 的查询收到另一条 PTR 时，才报告是否省略已知记录。任一条件不足时报告不可比较。此前运行既曾返回已知 PTR，也曾缺少对照记录，保留现象作为未闭环证据 |
 | Native 实时 NSEC | Windows 同机实际组播，受控 Additional NSEC TTL 为 1 秒，约 1079ms 时观察到出站 AAAA 问题，然后返回 IPv6 地址并由 Browser 接纳。独立解析器检查出站问题 |
 | 独立发布者与解码器 | 固定 zeroconf 0.148.0. 实际录制中的 NSEC 由其解码器和 MoonDiscover 分别解析，逐条对照 TTL 与全部置位类型。Windows 本机 18 条一致，Replay 另观察 12 次有效否定。受控短 TTL 实验是另一条证据 |
 | 外部 API | 单独目录的 MoonBit 工程通过源码映射运行 JS，验证 NSEC 存在和到期，Native 消费工程构建成功 |

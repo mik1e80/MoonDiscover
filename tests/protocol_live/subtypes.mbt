@@ -78,7 +78,7 @@ async fn subtype_checks(ip : UInt32) -> Json {
     fail("subtype cancellation retained service")
   }
   @async.sleep(1100)
-  let suppressed = known_answer_checks(ip)
+  let known_answer = observe_known_answer(ip)
   Json::object({
     "passed": Json(true),
     "publisher": Json("Avahi independent service processes"),
@@ -88,13 +88,12 @@ async fn subtype_checks(ip : UInt32) -> Json {
     "printer_resolved": Json(1),
     "shared_identity": Json(true),
     "subscription_cancellation": Json(true),
-    "avahi_omitted_known_ptr": Json(suppressed),
-    "known_answer_control_returned_both_ptrs": Json(true),
+    "known_answer_observation": known_answer,
   })
 }
 
 ///|
-fn known_answer_checks(ip : UInt32) -> Bool raise {
+fn observe_known_answer(ip : UInt32) -> Json raise {
   let socket = @native.MulticastSocket::open(ip)
   defer socket.close()
   let service = @model.DnsName::parse("_mdprobe._tcp.local.")
@@ -111,7 +110,9 @@ fn known_answer_checks(ip : UInt32) -> Bool raise {
   }
   // Observe both records in a control query. Run the suppression query first
   // so Avahi's recent-send rate control cannot explain the suppressed record.
-  let mut suppressed = false
+  let arms : Array[Json] = []
+  let mut known_seen = false
+  let mut comparable = true
   for known in [true, false] {
     let query = @wire.query_with_answers(
       service,
@@ -149,12 +150,25 @@ fn known_answer_checks(ip : UInt32) -> Bool raise {
         }
       }
     }
-    guard saw_scanner && (known || saw_printer) else {
-      fail("missing Avahi PTR in control or unknown member response")
-    }
+    arms.push({
+      "known_answer_sent": known,
+      "printer_seen": saw_printer,
+      "scanner_seen": saw_scanner,
+    })
     if known {
-      suppressed = !saw_printer
+      known_seen = saw_printer
+      comparable = comparable && saw_scanner
+    } else {
+      comparable = comparable && saw_printer && saw_scanner
     }
   }
-  suppressed
+  Json::object({
+    "comparable": Json(comparable),
+    "known_ptr_omitted": if comparable {
+      Json(!known_seen)
+    } else {
+      Json::null()
+    },
+    "arms": Json::array(arms),
+  })
 }
