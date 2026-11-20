@@ -415,6 +415,8 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 
 ## 验证与文档
 
+Avahi 与 python-zeroconf 在同机 IPv4 组播中均观察到立即 TC 续包的已知 PTR 抑制。等待时间和未覆盖的多查询器及跨设备场景见 [双响应器实验](docs/tc-interop.md)。
+
 [库接入与 CLI](docs/usage.md) · [模型](docs/model.md) · [0.3.0 预发布验收](docs/release-acceptance-0.3.0.md) · [维护路线](docs/maintenance-roadmap-2026.md) · [安全报告](SECURITY.md)
 
 最近代码加固的 [轻量 CI](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654335009)对应 `82a5297`，45 项 JS smoke 及其余轻量步骤成功；同提交 [Linux Avahi 检查](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654334969)八项通过。历史 [Windows 报告](docs/evidence/windows-live-20261024.json)对应 `f2baff7`，[Linux 存档](docs/evidence/linux-avahi-20261028.json)对应 `a8703be`，不混作同一版本全平台证明。

@@ -1,0 +1,113 @@
+{
+  "source_commit": "5997931a2b0a144f4ac4f37aefccf0d98d5176a7",
+  "avahi_version": "avahi-daemon 0.8",
+  "zeroconf_version": "0.148.0",
+  "result": {
+    "baseline_both_responders": true,
+    "arms": [
+      {
+        "mode": "plain",
+        "tail_sent_ms": null,
+        "avahi": {
+          "known_ptr_ms": 24,
+          "unknown_ptr_ms": 24,
+          "first_ptr_ms": 24,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 27,
+          "unknown_ptr_ms": 27,
+          "first_ptr_ms": 27,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        }
+      },
+      {
+        "mode": "single",
+        "tail_sent_ms": null,
+        "avahi": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 24,
+          "first_ptr_ms": 24,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 94,
+          "first_ptr_ms": 94,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        }
+      },
+      {
+        "mode": "immediate_tail",
+        "tail_sent_ms": 0,
+        "avahi": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 100,
+          "first_ptr_ms": 100,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 70,
+          "first_ptr_ms": 70,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        }
+      },
+      {
+        "mode": "delayed_tail",
+        "tail_sent_ms": 252,
+        "avahi": {
+          "known_ptr_ms": 99,
+          "unknown_ptr_ms": 99,
+          "first_ptr_ms": 99,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": true,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 274,
+          "first_ptr_ms": 274,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        }
+      },
+      {
+        "mode": "head_only",
+        "tail_sent_ms": null,
+        "avahi": {
+          "known_ptr_ms": 99,
+          "unknown_ptr_ms": 99,
+          "first_ptr_ms": 99,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 564,
+          "unknown_ptr_ms": 564,
+          "first_ptr_ms": 564,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        }
+      }
+    ],
+    "scope": "same Linux runner; two responder processes and implementations; results attributed by exclusively registered PTR targets"
+  },
+  "source_run": "https://github.com/mik1e80/MoonDiscover/actions/runs/44744493713",
+  "source_job": 136316159997
+}

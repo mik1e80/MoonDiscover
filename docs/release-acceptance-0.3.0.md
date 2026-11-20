@@ -17,4 +17,8 @@ Linux 实验运行 [44730748989](https://github.com/mik1e80/MoonDiscover/actions
 
 RFC 6762 §7.3 受限路径新增跨 scope、子集、TTL、TC、反复输入与 Native 回环回归。在 [Linux 44742577533](https://github.com/mik1e80/MoonDiscover/actions/runs/44742577533)，两个独立源 IPv4 地址通过隔离网络实际交换查询，本端在 1008ms 恢复发送。
 
-[Linux 44743492242](https://github.com/mik1e80/MoonDiscover/actions/runs/44743492242) 复测本端在 1010ms 恢复发送。普通查询收到两条 PTR，单包和 TC 续包只收到未知成员。首条匹配回答分别约为 55ms、55ms、38ms。这一结果确认了该 Avahi 环境中的续包抑制观测，尚未取得 RFC 6762 §7.2 所述等待窗口证据。剩余验证包括第二设备上的跨查询器行为、多独立响应器的续包等待与互操作、长时间实网，以及发布标签、归档散列与 Mooncakes 独立安装闭环。发布条件满足后才标记稳定版。
+[Linux 44743492242](https://github.com/mik1e80/MoonDiscover/actions/runs/44743492242) 复测本端在 1010ms 恢复发送。单 Avahi daemon 的普通查询收到两条 PTR，单包和 TC 续包只收到未知成员。首条匹配回答分别约为 55ms、55ms、38ms。
+
+后续已在同一 Linux VM 完成 Avahi 与 python-zeroconf 的独立双响应器对照。普通查询观察到四条 PTR，立即续包后两者都只返回各自的未知 PTR。250ms 级延迟续包分离出了不同的等待行为。多独立响应器的同机协同已取得证据，400–500ms 等待窗口、多查询器同时要求同一答案和跨设备路径仍待验证。历史单响应器结论见上文。[双响应器实验及数据](tc-interop.md)
+
+长时间实网与发布标签、归档散列、Mooncakes 独立安装仍待验收。发布条件满足后才标记稳定版。
