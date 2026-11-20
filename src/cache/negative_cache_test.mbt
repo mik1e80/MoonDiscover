@@ -142,3 +142,28 @@ test "smoke: repeated negative cache update expiry cycles remain bounded" {
     assert_eq(cache.negative_count(), 0)
   }
 }
+
+///|
+test "smoke: a refreshed NSEC consults earlier live A in its own scope" {
+  let cache = @cache.RecordCache::new()
+  let host = @model.DnsName::parse("host.local.")
+  let positive : @wire.Record = {
+    name: host,
+    rr_type: 1,
+    rr_class: 1,
+    cache_flush: true,
+    ttl: 1U,
+    data: @wire.A(b"\xc0\x00\x02\x01"),
+    section: @wire.Answer,
+  }
+  let _ = cache.ingest("first", response([positive]), 0)
+  let nsec = nsec_record(host, b"\x00\x00\x00\x08", 4U)
+  let _ = cache.ingest("first", response([nsec]), 100)
+  let _ = cache.ingest("second", response([nsec]), 100)
+  assert_false(cache.is_negative("first", host, 1))
+  assert_true(cache.is_negative("second", host, 1))
+  let _ = cache.advance(1000)
+  assert_false(cache.is_negative("first", host, 1))
+  let _ = cache.ingest("first", response([nsec]), 1100)
+  assert_true(cache.is_negative("first", host, 1))
+}

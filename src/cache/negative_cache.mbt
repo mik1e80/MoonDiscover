@@ -22,11 +22,7 @@ pub fn RecordCache::is_negative(
   name : @model.DnsName,
   rr_type : Int32,
 ) -> Bool {
-  if rr_type <= 0 ||
-    rr_type > 255 ||
-    rr_type == 12 ||
-    rr_type == 47 ||
-    !self.records(scope, name, rr_type).is_empty() {
+  if rr_type <= 0 || rr_type > 255 || rr_type == 12 || rr_type == 47 {
     return false
   }
   self.negatives.any(e => {
@@ -43,8 +39,10 @@ fn RecordCache::accept_negatives(
   self : RecordCache,
   scope : String,
   records : Array[@wire.Record],
+  accepted : Array[@wire.Record],
   now : Int64,
 ) -> Unit raise CacheError {
+  let refreshed : Map[Bytes, Unit] = Map([])
   for record in records {
     if record.rr_class != 1 {
       continue
@@ -69,18 +67,53 @@ fn RecordCache::accept_negatives(
           expires_at: now + record.ttl.to_int64() * 1000L,
           contradicted: [],
         })
+        refreshed[record.name.canonical_key()] = ()
       }
     }
   }
   // Positive assertions win independent of section or packet order. Remember
   // that contradiction for this NSEC lifetime even after the positive expires.
+  if self.negatives.is_empty() {
+    return
+  }
+  let assertions : Map[Bytes, Array[Int32]] = Map([])
+  fn mark(record : @wire.Record) {
+    let key = record.name.canonical_key()
+    match assertions.get(key) {
+      Some(types) =>
+        if !types.contains(record.rr_type) {
+          types.push(record.rr_type)
+        }
+      None => assertions[key] = [record.rr_type]
+    }
+  }
+  for record in accepted {
+    if record.ttl != 0 {
+      mark(record)
+    }
+  }
+  if !refreshed.is_empty() {
+    for entry in self.entries {
+      if entry.scope == scope &&
+        refreshed.contains(entry.record.name.canonical_key()) {
+        mark(entry.record)
+      }
+    }
+  }
+  if assertions.is_empty() {
+    return
+  }
   self.negatives = self.negatives.map(e => {
+    if e.scope != scope {
+      return e
+    }
+    guard assertions.get(e.name.canonical_key()) is Some(types) else {
+      return e
+    }
     let contradicted = e.contradicted.copy()
-    for positive in self.entries {
-      if positive.scope == e.scope &&
-        positive.record.name.same_name(e.name) &&
-        !contradicted.contains(positive.record.rr_type) {
-        contradicted.push(positive.record.rr_type)
+    for rr_type in types {
+      if !contradicted.contains(rr_type) {
+        contradicted.push(rr_type)
       }
     }
     { ..e, contradicted, }

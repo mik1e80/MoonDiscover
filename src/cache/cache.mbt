@@ -268,9 +268,7 @@ pub fn RecordCache::ingest(
         }
       }
     }
-  }
-  if (message.flags & 0xf80f) == 0x8000 {
-    next.accept_negatives(scope, message.records, now)
+    next.accept_negatives(scope, message.records, records, now)
   }
   self.entries = next.entries
   self.negatives = next.negatives
