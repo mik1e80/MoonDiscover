@@ -48,9 +48,38 @@ pub fn IngressPolicy::new(
 }
 
 ///|
-/// Called by Browser before capture or ingestion. Rejections are silent and
-/// cannot amplify an untrusted stream into diagnostics/events.
+/// Check whether a response is acceptable on the selected multicast link.
 pub fn IngressPolicy::accepts(
+  self : IngressPolicy,
+  packet : Datagram,
+  interface_index : Int32,
+) -> Bool {
+  self.accepts_link(packet, interface_index) &&
+  (packet.bytes[2].to_int() & 0x80) != 0
+}
+
+///|
+fn IngressPolicy::accepts_browser_packet(
+  self : IngressPolicy,
+  packet : Datagram,
+  interface_index : Int32,
+  interface_ipv4 : UInt32,
+) -> Bool {
+  self.accepts_link(packet, interface_index) &&
+  (
+    (packet.bytes[2].to_int() & 0x80) != 0 ||
+    (
+      packet.source_ipv4 != interface_ipv4 &&
+      packet.bytes[2] == 0 &&
+      packet.bytes[3] == 0 &&
+      packet.bytes[4] == 0 &&
+      packet.bytes[5] == 1
+    )
+  )
+}
+
+///|
+fn IngressPolicy::accepts_link(
   self : IngressPolicy,
   packet : Datagram,
   interface_index : Int32,
@@ -61,7 +90,6 @@ pub fn IngressPolicy::accepts(
   packet.source_port == 5353 &&
   packet.bytes.length() >= 12 &&
   packet.bytes.length() <= 9000 &&
-  (packet.bytes[2].to_int() & 0x80) != 0 &&
   (!self.require_ip_ttl_255 || packet.ip_ttl == Some(255)) &&
   (
     self.allowed_sources.is_empty() ||

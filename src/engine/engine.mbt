@@ -622,8 +622,11 @@ fn Engine::ingest_admitted(
   now : Int64,
   source~ : @model.PacketSource?,
 ) -> Unit raise {
+  let response = (message.flags & 0x8000) != 0
+  let negative_count = self.cache.negative_count()
   let removed = self.cache.ingest(scope, message, now, source~)
-  if message.records.any(r => r.rr_type == 47 && r.data is @wire.Unknown(_)) {
+  if response &&
+    message.records.any(r => r.rr_type == 47 && r.data is @wire.Unknown(_)) {
     self.emit(
       Diagnostic("nsec_ignored", "unsupported or malformed NSEC RDATA ignored"),
     )
@@ -639,7 +642,15 @@ fn Engine::ingest_admitted(
     )
     return
   }
+  if !response &&
+    removed.is_empty() &&
+    self.cache.negative_count() == negative_count {
+    self.schedule_queries()
+    self.observe_peer_query(scope, message)
+    return
+  }
   self.reconcile("response", removals=removed)
+  self.observe_peer_query(scope, message)
 }
 
 ///|

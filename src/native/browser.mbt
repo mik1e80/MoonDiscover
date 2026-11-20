@@ -218,7 +218,11 @@ fn Browser::poll_driven(
         if !self.receive_budget.allow(packet.source_ipv4, self.checked_time()) {
           continue
         }
-        if !self.ingress_policy.accepts(packet, self.interface_index) {
+        if !self.ingress_policy.accepts_browser_packet(
+            packet,
+            self.interface_index,
+            self.interface_ipv4,
+          ) {
           self.policy_dropped += 1
           continue
         }

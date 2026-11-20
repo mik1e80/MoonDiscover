@@ -11,6 +11,25 @@ fn response() -> Datagram {
 }
 
 ///|
+test "smoke: Browser observes matching-link peer queries without self-loopback" {
+  let policy = IngressPolicy::new(require_ip_ttl_255=true)
+  let packet = {
+    ..response(),
+    bytes: b"\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x01a\x00\x00\x01\x00\x01",
+  }
+  let own = 0x0a000001U
+  assert_false(policy.accepts(packet, 7))
+  assert_true(policy.accepts_browser_packet(packet, 7, own))
+  assert_false(
+    policy.accepts_browser_packet({ ..packet, source_ipv4: own, }, 7, own),
+  )
+  assert_false(
+    policy.accepts_browser_packet({ ..packet, ip_ttl: Some(254), }, 7, own),
+  )
+  assert_false(policy.accepts_browser_packet(packet, 8, own))
+}
+
+///|
 test "smoke: ingress policy rejects incorrect path and fails closed on strict TTL" {
   let packet = response()
   let policy = IngressPolicy::new()

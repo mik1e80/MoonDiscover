@@ -13,6 +13,8 @@ struct QueryJob {
   mut interval_ms : Int64
   mut stamp : String
   mut refresh_step : Int32
+  mut peer_deferred : Bool
+  mut pending_refresh : Bool
 }
 
 ///|
@@ -133,6 +135,8 @@ fn Engine::sync_queries(self : Engine) -> Unit {
           interval_ms: 1000,
           stamp: "",
           refresh_step: 0,
+          peer_deferred: false,
+          pending_refresh: false,
         }
     }
     let records = self.cache.records(q.scope, q.name, q.rr_type)
@@ -185,6 +189,7 @@ fn Engine::schedule_queries(self : Engine) -> Unit {
       continue
     }
     self.pending.push(job.question)
+    job.pending_refresh = refresh_due
     if regular_due {
       job.regular_at = Some(self.now_ms + job.interval_ms)
       job.interval_ms = (job.interval_ms * 2L).min(3600000L)
@@ -205,17 +210,7 @@ pub fn Engine::poll_outbound(self : Engine) -> Outbound? {
   }
   while !self.pending.is_empty() {
     let q = self.pending.remove(0)
-    let answers : Array[@wire.Record] = []
-    for e in self.cache.records(q.scope, q.name, q.rr_type) {
-      let remaining = e.expires_at - self.now_ms
-      if remaining >= (e.original_ttl_ms + 1L) / 2L && remaining >= 1000L {
-        answers.push({
-          ..e.record,
-          ttl: (remaining / 1000L).to_int().reinterpret_as_uint(),
-          cache_flush: false,
-        })
-      }
-    }
+    let answers = self.known_answers(q)
     let packets = @wire.query_packets(q.name, q.rr_type, answers) catch {
       encoding_error => {
         let plain = @wire.qm_query(q.name, q.rr_type) catch {
@@ -246,9 +241,37 @@ pub fn Engine::poll_outbound(self : Engine) -> Outbound? {
         bytes,
       })
     }
+    for job in self.jobs {
+      if same_question(job.question, q) {
+        job.peer_deferred = false
+        job.pending_refresh = false
+        break
+      }
+    }
     return Some(self.fragments.remove(0))
   }
   None
+}
+
+///|
+fn Engine::known_answers(
+  self : Engine,
+  q : QuestionSpec,
+) -> Array[@wire.Record] {
+  self.cache
+  .records(q.scope, q.name, q.rr_type)
+  .filter_map(e => {
+    let remaining = e.expires_at - self.now_ms
+    if remaining >= (e.original_ttl_ms + 1L) / 2L && remaining >= 1000L {
+      Some({
+        ..e.record,
+        ttl: (remaining / 1000L).to_int().reinterpret_as_uint(),
+        cache_flush: false,
+      })
+    } else {
+      None
+    }
+  })
 }
 
 ///|
