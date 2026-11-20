@@ -126,18 +126,21 @@ fn known_answer_checks(ip : UInt32) -> Unit raise {
     let mut saw_scanner = false
     while @native.monotonic_ms() < deadline {
       if socket.receive(timeout_ms=25) is Some(datagram) {
-        let response = @probe.independent_packet(datagram.bytes) catch {
-          _ => continue
-        }
+        // Avahi emits compressed responses, including Additional records.
+        let response = @wire.decode(datagram.bytes) catch { _ => continue }
         if (response.flags & 0x8000) == 0 {
           continue
         }
-        for rr in response.answers {
-          if rr.owner == service.to_presentation() && rr.rr_type == 12 {
-            if rr.target == printer.to_presentation() {
+        for rr in response.records {
+          if rr.section is @wire.Answer &&
+            rr.name.same_name(service) &&
+            rr.rr_type == 12 &&
+            rr.ttl > 0 &&
+            rr.data is @wire.Ptr(target) {
+            if target.same_name(printer) {
               saw_printer = true
             }
-            if rr.target == scanner {
+            if target.to_presentation() == scanner {
               saw_scanner = true
             }
           }
@@ -146,7 +149,7 @@ fn known_answer_checks(ip : UInt32) -> Unit raise {
     }
     guard saw_scanner && saw_printer != known else {
       fail(
-        "Avahi PTR known-answer experiment did not distinguish known and missing members",
+        "Avahi PTR suppression: known=\{known} printer=\{saw_printer} scanner=\{saw_scanner}",
       )
     }
   }

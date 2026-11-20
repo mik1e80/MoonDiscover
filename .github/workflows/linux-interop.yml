@@ -50,6 +50,7 @@ jobs:
       - name: Independently verify Known-Answer UDP and Avahi subtype publication
         run: moon run scripts/protocol-live.mbtx -- avahi
       - name: Observe real-time NSEC expiry and positive recovery
+        shell: bash
         run: |
           ip=$(_build/native/debug/build/tests/native_ttl/native_ttl.exe --interface | python3 -c 'import sys,json; print(json.load(sys.stdin)["interface_ipv4"])')
           _build/native/debug/build/tests/protocol_live/protocol_live.exe nsec-expiry "$ip" | tee .tools/protocol-live-nsec-expiry.json
