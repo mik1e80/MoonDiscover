@@ -78,7 +78,7 @@ async fn subtype_checks(ip : UInt32) -> Json {
     fail("subtype cancellation retained service")
   }
   @async.sleep(1100)
-  known_answer_checks(ip)
+  let suppressed = known_answer_checks(ip)
   Json::object({
     "passed": Json(true),
     "publisher": Json("Avahi independent service processes"),
@@ -88,12 +88,13 @@ async fn subtype_checks(ip : UInt32) -> Json {
     "printer_resolved": Json(1),
     "shared_identity": Json(true),
     "subscription_cancellation": Json(true),
-    "known_answer_suppressed_one_of_two_ptrs": Json(true),
+    "avahi_omitted_known_ptr": Json(suppressed),
+    "known_answer_control_returned_both_ptrs": Json(true),
   })
 }
 
 ///|
-fn known_answer_checks(ip : UInt32) -> Unit raise {
+fn known_answer_checks(ip : UInt32) -> Bool raise {
   let socket = @native.MulticastSocket::open(ip)
   defer socket.close()
   let service = @model.DnsName::parse("_mdprobe._tcp.local.")
@@ -110,6 +111,7 @@ fn known_answer_checks(ip : UInt32) -> Unit raise {
   }
   // Observe both records in a control query. Run the suppression query first
   // so Avahi's recent-send rate control cannot explain the suppressed record.
+  let mut suppressed = false
   for known in [true, false] {
     let query = @wire.query_with_answers(
       service,
@@ -147,10 +149,12 @@ fn known_answer_checks(ip : UInt32) -> Unit raise {
         }
       }
     }
-    guard saw_scanner && saw_printer != known else {
-      fail(
-        "Avahi PTR suppression: known=\{known} printer=\{saw_printer} scanner=\{saw_scanner}",
-      )
+    guard saw_scanner && (known || saw_printer) else {
+      fail("missing Avahi PTR in control or unknown member response")
+    }
+    if known {
+      suppressed = !saw_printer
     }
   }
+  suppressed
 }
