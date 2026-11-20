@@ -112,9 +112,12 @@ async fn observe_known_answer(ip : UInt32) -> Json {
   // second arm so recent multicast responses do not explain missing data.
   let arms : Array[Json] = []
   let mut known_seen = false
+  let mut control_complete = false
   let mut comparable = true
-  for known in [false, true] {
-    if known {
+  let mut split_comparable = false
+  let mut split_omitted = false
+  for mode in ["plain", "single", "continuation"] {
+    if mode != "plain" {
       @async.sleep(2000)
       // Drain announcements captured during the quiet period.
       for _ in 0..<64 {
@@ -123,19 +126,28 @@ async fn observe_known_answer(ip : UInt32) -> Json {
         }
       }
     }
-    let query = @wire.query_with_answers(
-      service,
-      12,
-      if known {
-        [answer]
-      } else {
-        []
-      },
-    )
-    socket.send(query)
-    let deadline = @native.monotonic_ms() + 1300L
+    let started = @native.monotonic_ms()
+    if mode == "continuation" {
+      let (head, tail) = known_answer_continuation(service, answer)
+      socket.send(head)
+      socket.send(tail)
+    } else {
+      socket.send(
+        @wire.query_with_answers(
+          service,
+          12,
+          if mode == "single" {
+            [answer]
+          } else {
+            []
+          },
+        ),
+      )
+    }
+    let deadline = started + 1300L
     let mut saw_printer = false
     let mut saw_scanner = false
+    let mut first_ptr_at : Int64? = None
     while @native.monotonic_ms() < deadline {
       if socket.receive(timeout_ms=25) is Some(datagram) {
         // Avahi emits compressed responses, including Additional records.
@@ -155,20 +167,35 @@ async fn observe_known_answer(ip : UInt32) -> Json {
             if target.to_presentation() == scanner {
               saw_scanner = true
             }
+            if (
+                target.same_name(printer) || target.to_presentation() == scanner
+              ) &&
+              first_ptr_at is None {
+              first_ptr_at = Some(@native.monotonic_ms() - started)
+            }
           }
         }
       }
     }
-    arms.push({
-      "known_answer_sent": known,
-      "printer_seen": saw_printer,
-      "scanner_seen": saw_scanner,
-    })
-    if known {
+    arms.push(
+      Json::object({
+        "mode": Json(mode),
+        "printer_seen": Json(saw_printer),
+        "scanner_seen": Json(saw_scanner),
+        "first_matching_ptr_ms": match first_ptr_at {
+          Some(time) => Json(time.to_double())
+          None => Json::null()
+        },
+      }),
+    )
+    if mode == "single" {
       known_seen = saw_printer
-      comparable = comparable && saw_scanner
+      comparable = control_complete && saw_scanner
+    } else if mode == "continuation" {
+      split_comparable = control_complete && saw_scanner
+      split_omitted = !saw_printer
     } else {
-      comparable = comparable && saw_printer && saw_scanner
+      control_complete = saw_printer && saw_scanner
     }
   }
   Json::object({
@@ -179,5 +206,41 @@ async fn observe_known_answer(ip : UInt32) -> Json {
       Json::null()
     },
     "arms": Json::array(arms),
+    "continuation_comparable": Json(split_comparable),
+    "continuation_known_ptr_omitted": if split_comparable {
+      Json(split_omitted)
+    } else {
+      Json::null()
+    },
   })
+}
+
+///|
+// Small deliberate TC chain, with the matching PTR only in the final packet.
+fn known_answer_continuation(
+  service : @model.DnsName,
+  answer : @wire.Record,
+) -> (Bytes, Bytes) raise {
+  let head = @wire.qm_query(service, 12).to_array()
+  head[2] = b'\x02'
+  let question_size = head.length()
+  let complete = @wire.query_with_answers(service, 12, [answer])
+  let tail = Array::make(12, b'\x00')
+  tail[7] = b'\x01'
+  for i in question_size..<complete.length() {
+    tail.push(complete[i])
+  }
+  let first = Bytes::makei(head.length(), i => head[i])
+  let last = Bytes::makei(tail.length(), i => tail[i])
+  let first_check = @probe.independent_packet(first)
+  let last_check = @probe.independent_packet(last)
+  guard first_check.flags == 0x0200 &&
+    first_check.questions.length() == 1 &&
+    first_check.answers.is_empty() &&
+    last_check.flags == 0 &&
+    last_check.questions.is_empty() &&
+    last_check.answers.length() == 1 else {
+    fail("wrong known answer continuation fixture")
+  }
+  (first, last)
 }
