@@ -43,6 +43,16 @@ fn main raise {
   println("consumer_native_ok")
 }
 """
+NSEC_CORE_CHECK = """  let host = @dnssd.DnsName::parse("consumer.local.")
+  let record : @dnssd.Record = {
+    name: host, rr_type: 47, rr_class: 1, ttl: 1U, cache_flush: true,
+    section: @dnssd.Section::Additional, data: @dnssd.RData::Nsec(host, b"\\x40"),
+  }
+  engine.ingest_message({id: 0, flags: 0x8400, questions: [], records: [record]}, "consumer", 120)
+  guard engine.is_negative("consumer", host, 28) else { fail("missing public NSEC evidence") }
+  engine.advance(1120)
+  guard !engine.is_negative("consumer", host, 28) else { fail("stale public NSEC evidence") }
+"""
 SEMVER = re.compile(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?\Z")
 
 
@@ -136,7 +146,9 @@ def main():
         consumer = workspace / "consumer"
         write(consumer / "moon.mod", 'name = "mik1e80/dnssd-consumer-check"\nversion = "0.0.0"\npreferred_target = "js"\nimport {\n  "mik1e80/dnssd@' + args.version + '",\n  "moonbitlang/async@0.22.5",\n}\n')
         write(consumer / "cmd/core/moon.pkg", 'import { "mik1e80/dnssd" }\npkgtype(kind: "executable")\n')
-        write(consumer / "cmd/core/main.mbt", CORE)
+        check_nsec = args.mode == "local" or tuple(map(int, re.split(r"[+-]", args.version, 1)[0].split("."))) >= (0, 3, 0)
+        core = CORE.replace('  println("consumer_core_ok")', NSEC_CORE_CHECK + '  println("consumer_core_ok")') if check_nsec else CORE
+        write(consumer / "cmd/core/main.mbt", core)
         write(consumer / "cmd/native/moon.pkg", 'import {\n  "mik1e80/dnssd/src/native" @discovery,\n  "moonbitlang/async/socket",\n  "moonbitlang/core/env",\n}\nsupported_targets = "native"\npkgtype(kind: "executable")\n')
         write(consumer / "cmd/native/main.mbt", NATIVE)
         if args.mode == "local":
@@ -148,6 +160,7 @@ def main():
         run(cwd, "--version")
         run(cwd, "run", prefix + "cmd/core", "--target", "js", expected="consumer_core_ok")
         report["checks"]["core_public_api"] = True
+        report["checks"]["nsec_public_api"] = True if check_nsec else None
         run(cwd, "build", prefix + "cmd/native", "--target", "native")
         report["checks"]["native_public_api_build"] = True
         if args.interface:

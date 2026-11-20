@@ -77,6 +77,8 @@ async fn subtype_checks(ip : UInt32) -> Json {
   guard browser.snapshots().is_empty() else {
     fail("subtype cancellation retained service")
   }
+  @async.sleep(1100)
+  known_answer_checks(ip)
   Json::object({
     "passed": Json(true),
     "publisher": Json("Avahi independent service processes"),
@@ -86,5 +88,66 @@ async fn subtype_checks(ip : UInt32) -> Json {
     "printer_resolved": Json(1),
     "shared_identity": Json(true),
     "subscription_cancellation": Json(true),
+    "known_answer_suppressed_one_of_two_ptrs": Json(true),
   })
+}
+
+///|
+fn known_answer_checks(ip : UInt32) -> Unit raise {
+  let socket = @native.MulticastSocket::open(ip)
+  defer socket.close()
+  let service = @model.DnsName::parse("_mdprobe._tcp.local.")
+  let printer = @model.DnsName::parse("printer-probe._mdprobe._tcp.local.")
+  let scanner = "scanner-probe._mdprobe._tcp.local."
+  let answer : @wire.Record = {
+    name: service,
+    rr_type: 12,
+    rr_class: 1,
+    ttl: 4500U,
+    cache_flush: false,
+    data: @wire.Ptr(printer),
+    section: @wire.Answer,
+  }
+  // Observe both records in a control query. Run the suppression query first
+  // so Avahi's recent-send rate control cannot explain the suppressed record.
+  for known in [true, false] {
+    let query = @wire.query_with_answers(
+      service,
+      12,
+      if known {
+        [answer]
+      } else {
+        []
+      },
+    )
+    socket.send(query)
+    let deadline = @native.monotonic_ms() + 1300L
+    let mut saw_printer = false
+    let mut saw_scanner = false
+    while @native.monotonic_ms() < deadline {
+      if socket.receive(timeout_ms=25) is Some(datagram) {
+        let response = @probe.independent_packet(datagram.bytes) catch {
+          _ => continue
+        }
+        if (response.flags & 0x8000) == 0 {
+          continue
+        }
+        for rr in response.answers {
+          if rr.owner == service.to_presentation() && rr.rr_type == 12 {
+            if rr.target == printer.to_presentation() {
+              saw_printer = true
+            }
+            if rr.target == scanner {
+              saw_scanner = true
+            }
+          }
+        }
+      }
+    }
+    guard saw_scanner && saw_printer != known else {
+      fail(
+        "Avahi PTR known-answer experiment did not distinguish known and missing members",
+      )
+    }
+  }
 }
