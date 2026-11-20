@@ -80,3 +80,5 @@ Native 操作检测单调时钟不可用/倒退时报告 socket_error；elapsed 
 run 活动期间，另一个 run、公开 poll、browse/resolve/cancel 抛 DriverBusy；检查发生在第二个 run 的关闭 defer 之前，不会误关第一个驱动者。只允许一个协作式驱动者；这不是多线程互斥锁。外部 close 或 notify_network_changed 可用于停止，run 在下一协作边界退出；关闭幂等。地址/索引未变的换网由宿主调用 notify_network_changed，旧对象立即关闭，重新 open/browse 后使用新 scope。库不自动恢复业务订阅。
 
 查询容量压力中的轮换只保留当前窗口任务，重新进入窗口的任务重新建立退避/刷新安排；不宣称压力状态与无限容量时的发送时刻完全相同。query_limit 在进入压力状态时诊断一次，退出后再进入可再次诊断。按 next_deadline 推进时钟，否则任何定时公平性都无法执行。
+
+同 scope 的单问题 IN QM 可以影响普通任务的发送时刻。收到完整同链路问题后，若距离本端计划发送至多 120ms 或该普通任务已经排队，且对端 Known-Answer 是本端实际可编码的子集，则安排在收到后的 1 秒重试。同一保留任务在本端再次发出查询前只允许延期一次。刷新队列、跨 scope、带 TC 的查询和多问题报文不参与。Native 忽略与绑定地址相同的查询回环，同地址多个进程因而不会相互抑制。缓存数据仍来自响应，Replay 复现已接纳 peer 报文的调度。

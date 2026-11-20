@@ -3,7 +3,7 @@ async fn main {
   let args = @env.args()
   guard args.length() >= 3 else {
     fail(
-      "usage: protocol_live <packets|subtypes|interface|ingress|nsec-expiry> <ipv4> [marker]",
+      "usage: protocol_live <packets|subtypes|interface|ingress|nsec-expiry|peer-query> <ipv4> [marker|peer-ipv4]",
     )
   }
   let address = @socket.Addr::parse(args[2] + ":0")
@@ -13,6 +13,12 @@ async fn main {
     "packets" => packet_checks(ip)
     "ingress" => ingress_checks(ip)
     "nsec-expiry" => nsec_expiry_checks(ip)
+    "peer-query" => {
+      guard args.length() == 4 else { fail("peer IPv4 required") }
+      let peer = @socket.Addr::parse(args[3] + ":0")
+      guard !peer.is_ipv6() else { fail("peer IPv4 required") }
+      peer_query_checks(ip, peer.ip())
+    }
     "subtypes" => subtype_checks(ip)
     "interface" => {
       guard args.length() == 4 else { fail("interface marker required") }

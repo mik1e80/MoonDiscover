@@ -55,7 +55,12 @@ async fn interface(binary : String) -> Json {
   let _ = command("ip", ["link", "add", "mdprobe0", "type", "dummy"])
   let _ = command("ip", ["link", "set", "mdprobe0", "multicast", "on", "up"])
   let _ = command("ip", ["addr", "add", "10.255.240.1/24", "dev", "mdprobe0"])
+  let _ = command("ip", ["addr", "add", "10.255.240.2/24", "dev", "mdprobe0"])
   let _ = command("ip", ["route", "add", "224.0.0.0/4", "dev", "mdprobe0"])
+  let peer = @json.parse(command(binary, ["peer-query", "10.255.240.1", "10.255.240.2"]))
+  @fs.write_file(".tools/protocol-live-peer-query.json", peer.stringify(indent=2) + "\n")
+  println(peer.stringify())
+  let _ = command("ip", ["addr", "del", "10.255.240.2/24", "dev", "mdprobe0"])
   let marker = ".tools/interface-probe-ready"
   for path in [marker, marker + ".failed"] { if @fs.exists(path) { @fs.remove(path) } }
   @async.with_task_group(group => {

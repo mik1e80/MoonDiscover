@@ -42,7 +42,7 @@ Supported = 所列子项已实现且有对应验证；Partial = 有限行为或�
 | 高频输入、压力查询轮换与版本化视图 | Supported（稳定集合） | 实时全局/来源/核心令牌桶；每秒轮换容量窗口；异步旧事件按 epoch/sequence 丢弃。任意持续变化无无条件公平延迟保证 |
 | 第二物理设备、Bonjour、长时间实网压力 | Untested | 不用同机/同 VM/核心资源循环替代 |
 | 受限 NSEC 解码、负缓存与同机实时恢复 | Supported（0.3.0-dev） | 仅限 RFC 6762 的窗口 0 与项目接收范围。扩展窗口、DNSSEC 和跨设备场景分别看 [否定响应证据](negative-response.md) |
-| RFC 6762 §7.3 跨查询器重复问题抑制 | Unsupported | 本地任务去重独立实现，其他查询器的 Known-Answer 不推迟本地任务 |
+| RFC 6762 §7.3 跨查询器重复问题抑制 | Partial | 同 scope 单问题 IN QM 的普通任务可短暂延期一次，要求 Known-Answer 子集。刷新、TC 及多问题不参与，待补跨物理设备验证 |
 | IPv6 组播、发布者、跨子网反射 | Unsupported | 不属于本期查询端角色 |
 
 安全、Scope/事件/退化规则、解析和 RFC 追踪分别见[安全模型](security-model.md)、[行为契约](behavior-contract.md)、[解析契约](dnssd-resolution-contract.md)、[RFC 对照](rfc-conformance.md)。

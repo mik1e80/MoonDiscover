@@ -350,6 +350,8 @@ python -m http.server 8000 --bind 127.0.0.1 --directory .tools/browser-replay
 
 协议依据为 RFC 1035（DNS 字段/压缩）、2782（SRV）、6762（mDNS 查询与缓存）、6763（DNS-SD），及 RFC 4034 §4.1 的 NSEC 格式。以[逐条符合性矩阵](docs/rfc-conformance.md)为准；接收 ID/AA/TC 忽略规则依 RFC 6762 §18，不因顾问概述而额外拒绝结构完整响应。项目不提供 DNSSEC 签名验证、NSEC3，也没有 IETF 认证；必要查询端行为仍须逐条验收，不能由一个功能测试推断整份 RFC 合规。
 
+开发版部分支持 RFC 6762 §7.3。同一 scope 中，满足 Known-Answer 子集条件的单问题 IN QM 可让临近的普通查询短暂延期一次。刷新和 TC 续包沿用原调度，来自查询的记录只做比较。Native 将绑定地址的查询回环排除。完整约束见 [行为契约](docs/behavior-contract.md)。
+
 ### 许可证与使用责任
 
 源码采用完整 [Apache License 2.0](LICENSE)，允许按许可使用、修改和分发；再分发须保留许可及适用声明、标明修改，并遵守许可中的专利、商标及免责条款。本项目不另加禁止商业用途等冲突限制。运行依赖 `moonbitlang/async@0.22.5` 的安装 LICENSE 为 Apache-2.0；工具链/core 单独分发并保留自身声明。Avahi、python-zeroconf 仅为独立测试进程，不作为运行时链接或捆绑代码。协议参考不等于复制第三方实现；当前未提取 RFC Code Components，今后提取须附 RFC 要求的 Simplified BSD 文本。来源、依赖和再分发核对见 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) 与[许可说明](docs/license-compliance.md)。这些说明不承诺未经审查的未来依赖没有许可冲突。

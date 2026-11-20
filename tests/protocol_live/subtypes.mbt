@@ -93,7 +93,7 @@ async fn subtype_checks(ip : UInt32) -> Json {
 }
 
 ///|
-fn observe_known_answer(ip : UInt32) -> Json raise {
+async fn observe_known_answer(ip : UInt32) -> Json {
   let socket = @native.MulticastSocket::open(ip)
   defer socket.close()
   let service = @model.DnsName::parse("_mdprobe._tcp.local.")
@@ -108,12 +108,21 @@ fn observe_known_answer(ip : UInt32) -> Json raise {
     data: @wire.Ptr(printer),
     section: @wire.Answer,
   }
-  // Observe both records in a control query. Run the suppression query first
-  // so Avahi's recent-send rate control cannot explain the suppressed record.
+  // Establish a plain-query baseline. Allow a quiet period before the
+  // second arm so recent multicast responses do not explain missing data.
   let arms : Array[Json] = []
   let mut known_seen = false
   let mut comparable = true
-  for known in [true, false] {
+  for known in [false, true] {
+    if known {
+      @async.sleep(2000)
+      // Drain announcements captured during the quiet period.
+      for _ in 0..<64 {
+        if socket.receive(timeout_ms=0) is None {
+          break
+        }
+      }
+    }
     let query = @wire.query_with_answers(
       service,
       12,
