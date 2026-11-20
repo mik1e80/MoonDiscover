@@ -1,0 +1,424 @@
+{
+  "source_commit": "fd1c59636dc7957b8ea35c08bd5c2a597451f634",
+  "avahi_version": "avahi-daemon 0.8",
+  "zeroconf_version": "0.148.0",
+  "result": {
+    "baseline_both_responders": true,
+    "arms": [
+      {
+        "mode": "plain",
+        "trial": 1,
+        "tail_sent_ms": null,
+        "avahi": {
+          "known_ptr_ms": 61,
+          "unknown_ptr_ms": 61,
+          "first_ptr_ms": 61,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 63,
+          "unknown_ptr_ms": 63,
+          "first_ptr_ms": 63,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "single",
+        "trial": 2,
+        "tail_sent_ms": null,
+        "avahi": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 61,
+          "first_ptr_ms": 61,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 38,
+          "first_ptr_ms": 38,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "immediate_tail",
+        "trial": 3,
+        "tail_sent_ms": 0,
+        "avahi": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 68,
+          "first_ptr_ms": 68,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 33,
+          "first_ptr_ms": 33,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "delayed_tail",
+        "trial": 4,
+        "tail_sent_ms": 251,
+        "avahi": {
+          "known_ptr_ms": 68,
+          "unknown_ptr_ms": 68,
+          "first_ptr_ms": 68,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": true,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 339,
+          "first_ptr_ms": 339,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "head_only",
+        "trial": 5,
+        "tail_sent_ms": null,
+        "avahi": {
+          "known_ptr_ms": 68,
+          "unknown_ptr_ms": 68,
+          "first_ptr_ms": 68,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 520,
+          "unknown_ptr_ms": 520,
+          "first_ptr_ms": 520,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "head_only",
+        "trial": 6,
+        "tail_sent_ms": null,
+        "avahi": {
+          "known_ptr_ms": 68,
+          "unknown_ptr_ms": 68,
+          "first_ptr_ms": 68,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 536,
+          "unknown_ptr_ms": 536,
+          "first_ptr_ms": 536,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "head_only",
+        "trial": 7,
+        "tail_sent_ms": null,
+        "avahi": {
+          "known_ptr_ms": 37,
+          "unknown_ptr_ms": 37,
+          "first_ptr_ms": 37,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 517,
+          "unknown_ptr_ms": 517,
+          "first_ptr_ms": 517,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "head_only",
+        "trial": 8,
+        "tail_sent_ms": null,
+        "avahi": {
+          "known_ptr_ms": 37,
+          "unknown_ptr_ms": 37,
+          "first_ptr_ms": 37,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 556,
+          "unknown_ptr_ms": 556,
+          "first_ptr_ms": 556,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "head_only",
+        "trial": 9,
+        "tail_sent_ms": null,
+        "avahi": {
+          "known_ptr_ms": 37,
+          "unknown_ptr_ms": 37,
+          "first_ptr_ms": 37,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 551,
+          "unknown_ptr_ms": 551,
+          "first_ptr_ms": 551,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "solo_tail",
+        "trial": 10,
+        "tail_sent_ms": 31,
+        "avahi": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 45,
+          "first_ptr_ms": 45,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 133,
+          "first_ptr_ms": 133,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "two_queriers",
+        "trial": 11,
+        "tail_sent_ms": 30,
+        "avahi": {
+          "known_ptr_ms": 45,
+          "unknown_ptr_ms": 45,
+          "first_ptr_ms": 45,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 85,
+          "unknown_ptr_ms": 85,
+          "first_ptr_ms": 85,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": 30,
+        "distinct_querier_udp_verified": true,
+        "second_querier_received": {
+          "avahi": {
+            "known_ptr_ms": 45,
+            "unknown_ptr_ms": 45,
+            "first_ptr_ms": 45,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 85,
+            "unknown_ptr_ms": 85,
+            "first_ptr_ms": 85,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      },
+      {
+        "mode": "solo_tail",
+        "trial": 12,
+        "tail_sent_ms": 30,
+        "avahi": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 44,
+          "first_ptr_ms": 44,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 51,
+          "first_ptr_ms": 51,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "two_queriers",
+        "trial": 13,
+        "tail_sent_ms": 30,
+        "avahi": {
+          "known_ptr_ms": 45,
+          "unknown_ptr_ms": 45,
+          "first_ptr_ms": 45,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 65,
+          "unknown_ptr_ms": 65,
+          "first_ptr_ms": 65,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": 30,
+        "distinct_querier_udp_verified": true,
+        "second_querier_received": {
+          "avahi": {
+            "known_ptr_ms": 45,
+            "unknown_ptr_ms": 45,
+            "first_ptr_ms": 45,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 65,
+            "unknown_ptr_ms": 65,
+            "first_ptr_ms": 65,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      },
+      {
+        "mode": "solo_tail",
+        "trial": 14,
+        "tail_sent_ms": 31,
+        "avahi": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 116,
+          "first_ptr_ms": 116,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": null,
+          "unknown_ptr_ms": 101,
+          "first_ptr_ms": 101,
+          "known_ptr_omitted_with_unknown_observed": true,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": null,
+        "distinct_querier_udp_verified": false,
+        "second_querier_received": null
+      },
+      {
+        "mode": "two_queriers",
+        "trial": 15,
+        "tail_sent_ms": 31,
+        "avahi": {
+          "known_ptr_ms": 115,
+          "unknown_ptr_ms": 115,
+          "first_ptr_ms": 115,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "zeroconf": {
+          "known_ptr_ms": 106,
+          "unknown_ptr_ms": 106,
+          "first_ptr_ms": 106,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": false,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "second_query_ms": 31,
+        "distinct_querier_udp_verified": true,
+        "second_querier_received": {
+          "avahi": {
+            "known_ptr_ms": 115,
+            "unknown_ptr_ms": 115,
+            "first_ptr_ms": 115,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 106,
+            "unknown_ptr_ms": 106,
+            "first_ptr_ms": 106,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      }
+    ],
+    "scope": "same Linux runner; two responder implementations; two querier source IPv4 addresses on the same interface"
+  },
+  "source_run": "https://github.com/mik1e80/MoonDiscover/actions/runs/44745369101",
+  "source_job": 136319172421
+}
