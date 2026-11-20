@@ -46,12 +46,21 @@ async fn main {
     guard a.try_wait() is None && b.try_wait() is None && z.try_wait() is None else { fail("publisher exited during the probe") }
     @json.parse(sample)
   })
+  let timers : Array[Json] = []
+  for line in @fs.read_file(".tools/tc-zeroconf.log").text().split("\n") {
+    let line = line.trim().to_owned()
+    if line.has_prefix("{") { timers.push(@json.parse(line)) }
+  }
   let report = Json::object({
     "source_commit": Json(command("git", ["rev-parse", "HEAD"])),
     "avahi_version": Json(command("avahi-daemon", ["--version"])),
     "zeroconf_version": Json(command(args[1], ["-c", "from importlib.metadata import version; print(version('zeroconf'))"])),
     "result": result,
+    "zeroconf_tc_timers": Json::array(timers),
   })
   @fs.write_file(".tools/tc-interop.json", report.stringify(indent=2) + "\n")
   println(report.stringify())
+  guard timers.filter(t => t is {"tc_timer": "fired", ..}).length() >= 5 else {
+    fail("missing independently observed zeroconf TC dispatch samples")
+  }
 }

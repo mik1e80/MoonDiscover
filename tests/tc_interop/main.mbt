@@ -196,6 +196,7 @@ async fn main {
       Json::object({
         "mode": Json(mode),
         "trial": Json(trial + 1),
+        "query_start_monotonic_ms": Json(t0.to_double()),
         "tail_sent_ms": nullable_ms(tail_at),
         "avahi": observation(seen, names[0], names[1], tail_at),
         "zeroconf": observation(seen, names[2], names[3], tail_at),
