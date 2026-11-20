@@ -4,7 +4,7 @@
 
 MoonDiscover 是面向 MoonBit 应用开发者的 IPv4 mDNS 查询端与 DNS-SD 服务浏览、解析库，模块名 `mik1e80/dnssd`，采用 [Apache-2.0](LICENSE) 许可。应用只需知道约定的服务类型，例如 `_http._tcp.local.`，就可以查询实例、目标主机、端口、TXT 属性和 IP 地址，减少手工填写与写死端点的需要。
 
-项目包含纯 MoonBit 协议核心、Native IPv4 组播适配层、命令行工具，以及录制和离线回放功能。**当前适合在明确支持范围内接入服务发现；0.2.0 聚焦已经说明的 IPv4 浏览与解析范围，不宣称完整 RFC 或所有平台支持。**
+项目包含纯 MoonBit 协议核心、Native IPv4 组播适配层、命令行工具，以及录制和离线回放功能。注册表发布版为 **0.2.0**，开发版 **0.3.0-dev** 在此基础上增加受限 mDNS NSEC、查询恢复和输入资源保护。安装方式、平台及协议验收范围按版本分别说明。
 
 **发现结果未经身份认证。** 名称、TXT、SRV 和地址都可能由同链路设备伪造；连接前执行自己的地址/端口许可和 TLS、配对等认证策略。来源白名单也不是身份认证。[安全模型](docs/security-model.md)说明输入、文件和连接的责任边界。
 
@@ -51,7 +51,7 @@ flowchart LR
 
 ## 版本选择
 
-状态更新：**2026-11-18**。`0.2.0` 已发布至 Mooncakes。main 为 **0.3.0-dev（未发布）**，新增 NSEC 查询端整改，并包含此前来源/TTL、资源保护与恢复改进；安装 0.2.0 不包含这些改进。下面比较已发布版本；开发改进见 [CHANGELOG](CHANGELOG.md)、[NSEC 契约](docs/negative-response.md)及[此前验证](docs/security-review-20261106.md)。[0.2.0 发布与独立安装验证](docs/release-0.2.0.md)。
+状态更新：**2026-11-20**。`0.2.0` 已发布至 Mooncakes。main 为 **0.3.0-dev（未发布）**，具备受限 NSEC 和此前的来源、资源保护与恢复改进。下面比较已发布版本。[开发版验证](docs/verification.md) · [变更记录](CHANGELOG.md) · [0.2.0 独立安装验证](docs/release-0.2.0.md)
 
 2026-11-06 又补充了[高频输入保护](docs/resource-protection.md)、查询轮换、版本化视图、广告端点筛选、来源观察、[独立进程回放预算](docs/replay-isolation.md)及三类状态变异测试。最新证据和未完成验证见[第四轮落实记录](docs/security-review-20261106.md)；这些能力仍未发布到 Mooncakes。
 
@@ -344,7 +344,7 @@ python -m http.server 8000 --bind 127.0.0.1 --directory .tools/browser-replay
 
 ### 查询端协议职责与否定响应
 
-main 自 2026-11-17 为 **0.3.0-dev（未发布）**；上文 0.2.0/0.2.1 的描述属于先前版本。面向本地开发工具、桌面设备面板及约定类型的服务连接应用，核心职责包括 IPv4 QM 查询/重传、Known-Answer 与有界分包、PTR/SRV/TXT/A/AAAA 聚合、子类型、TTL/goodbye/cache-flush、生命周期事件，以及 NSEC 否定响应的接收、负缓存、查询抑制和过期恢复。Native 接口实际收发，CLI 为操作入口，JS 示例仅离线回放。
+开发版 **0.3.0-dev** 面向本地开发工具、桌面设备面板及按约定类型查找服务的应用。核心职责包括 IPv4 QM 查询和重传、Known-Answer 与有界分包、PTR/SRV/TXT/A/AAAA 聚合、子类型、TTL/goodbye/cache-flush、生命周期事件，以及 NSEC 否定响应的接收、负缓存、查询抑制和过期恢复。Native 负责实际收发，CLI 提供操作入口，JS 示例提供离线回放。
 
 NSEC 是必要的查询端能力，已经纳入本轮代码整改与最终验收，不再作为可选扩展排除。受限 NSEC 使用窗口 0、1–32 字节位图；Next Domain Name 不同时仍处理位图；扩展或畸形 NSEC 单条忽略，不拖累同包正常 RR。否定证据按 scope/name/IN/type 隔离、受容量及 TTL 限制；正向记录优先；共享 DNS-SD PTR 不受否定抑制。只有 A、没有 AAAA 仍可解析完整；SRV/TXT 或所有地址缺失仍不完整。未响应不是否定证据，发现完整不等于可连接或已认证。调用方可用 `Engine.is_negative(scope, name, type)` 或 `Browser.is_negative(name, type)` 区分 Unknown 与 Negative，详见[否定响应案例](docs/negative-response.md)。
 
@@ -412,6 +412,8 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 提交 [GitHub Issue](https://github.com/mik1e80/MoonDiscover/issues)时，优先提供版本、平台、接口选择、命令、诊断和经过检查的受控录制。
 
 ## 验证与文档
+
+[库接入与 CLI](docs/usage.md) · [模型](docs/model.md) · [0.3.0 预发布验收](docs/release-acceptance-0.3.0.md) · [维护路线](docs/maintenance-roadmap-2026.md) · [安全报告](SECURITY.md)
 
 最近代码加固的 [轻量 CI](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654335009)对应 `82a5297`，45 项 JS smoke 及其余轻量步骤成功；同提交 [Linux Avahi 检查](https://github.com/mik1e80/moonbit-mDNS-DNS-SD-/actions/runs/40654334969)八项通过。历史 [Windows 报告](docs/evidence/windows-live-20261024.json)对应 `f2baff7`，[Linux 存档](docs/evidence/linux-avahi-20261028.json)对应 `a8703be`，不混作同一版本全平台证明。
 

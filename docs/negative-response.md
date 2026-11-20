@@ -14,6 +14,8 @@ Engine 在收包和到期时重建问题集合，取消有效否定类型的待�
 
 ## 八类验收案例
 
+2026-11-20 补充同机 IPv4 组播实验。初始响应的 Additional 含 1 秒 NSEC，生产 Browser 抑制 AAAA，随后按系统单调时间恢复出站查询。测试端只有观测到查询才发布 AAAA，最后检查快照接纳。该实验使用受控短 TTL。独立 zeroconf 收包是下述另一条证据。运行方式、平台和其他剩余验证见 [0.3.0 预发布验收](release-acceptance-0.3.0.md)。
+
 Linux 新独立发布者专项已通过：[CI 44249939017](https://github.com/mik1e80/MoonDiscover/actions/runs/44249939017)，基线 1f60451，见[日志摘要](evidence/linux-nsec-20261118.json)。两平台实际收包与 Replay 证据相符，但下表中的全部场景仍主要用确定性核心测试验收。
 
 | 场景 | 可执行证据与预期 |
