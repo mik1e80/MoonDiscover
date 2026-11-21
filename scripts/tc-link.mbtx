@@ -34,7 +34,7 @@ async fn tc(args : Array[String]) -> String {
 
 async fn setup_interface(ns : String, device : String, address : String) -> Unit {
   let _ = command("ip", ["-n", ns, "link", "set", "lo", "up"])
-  let _ = command("ip", ["-n", ns, "addr", "add", address + "/29", "dev", device])
+  let _ = command("ip", ["-n", ns, "addr", "add", address + "/27", "dev", device])
   let _ = command("ip", ["-n", ns, "link", "set", device, "up"])
   let _ = command("ip", ["-n", ns, "route", "add", "224.0.0.251/32", "dev", device, "src", address])
 }
@@ -90,7 +90,9 @@ async fn measure(binary : String, mode : String, trial : Int, additional : Array
     (sent, @fs.read_file(".tools/tc-link-monitor.json").json())
   })
   let queues = @json.parse(tc(["-j", "-s", "qdisc", "show", "dev", "mdtx"]))
-  let prefix = if additional.is_empty() { [0, 1] } else { [0, 4, 5, 6, 7, 1] }
+  let prefix = [0]
+  for i in 0..<additional.length() { prefix.push(i + 4) }
+  prefix.push(1)
   let sent_order = prefix.copy()
   sent_order.push(2)
   sent_order.push(3)
@@ -122,10 +124,15 @@ async fn measure(binary : String, mode : String, trial : Int, additional : Array
 
 async fn main {
   let args = @env.args()
-  guard args.length() == 3 || (args.length() == 4 && args[3] == "--five") else {
-    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--five]")
+  guard args.length() == 3 ||
+    (args.length() == 4 && (args[3] == "--five" || args[3] == "--six")) else {
+    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--five|--six]")
   }
-  let additional = if args.length() == 4 { ["192.0.2.11", "192.0.2.12", "192.0.2.13", "192.0.2.14"] } else { [] }
+  let additional : Array[String] = []
+  if args.length() == 4 {
+    for i in 11..=14 { additional.push("192.0.2.\{i}") }
+    if args[3] == "--six" { additional.push("192.0.2.15") }
+  }
   @fs.mkdir(".tools", allow_exist=true)
   let binary = "_build/native/debug/build/tests/tc_interop/tc_interop.exe"
   let python = args[1]
@@ -170,7 +177,11 @@ async fn main {
   })
   let report = Json::object({
     "source_commit": Json(args[2]),
-    "scenario": if additional.is_empty() { "isolated veth TC loss and reordering" } else { "five queriers with isolated veth TC loss and reordering" },
+    "scenario": match additional.length() {
+      5 => "six queriers with isolated veth TC loss and reordering"
+      4 => "five queriers with isolated veth TC loss and reordering"
+      _ => "isolated veth TC loss and reordering"
+    },
     "kernel": Json(command("uname", ["-r"])),
     "zeroconf_version": Json(command(python, ["-c", "from importlib.metadata import version; print(version('zeroconf'))"])),
     "baseline": baseline,

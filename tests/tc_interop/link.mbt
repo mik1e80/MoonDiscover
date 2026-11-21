@@ -27,7 +27,7 @@ fn link_fixture() -> (
   let competitors = [@wire.qm_query(service, 12)]
   // A fixture-only, unpublished PTR makes the other queries distinct without
   // claiming either of the responder's two published PTRs.
-  for i in 0U..<3U {
+  for i in 0U..<4U {
     competitors.push(
       @wire.query_with_answers(service, 12, [{ ..answer(2), ttl: 4500U - i, }]),
     )
@@ -39,16 +39,17 @@ fn link_fixture() -> (
 fn link_schedule(
   burst : Array[Bytes],
   competitors : Array[Bytes],
-  compete : Bool,
+  competing_sources : Int32,
 ) -> Array[(Int32, Int32, Bytes, Int64)] {
-  if compete {
+  if competing_sources > 0 {
     let scheduled = [(0, 0, burst[0], 0L)]
-    for i, query in competitors {
-      scheduled.push((i + 4, i + 1, query, 8L + 6L * i.to_int64()))
+    for i in 0..<competing_sources {
+      scheduled.push((i + 4, i + 1, competitors[i], 8L + 6L * i.to_int64()))
     }
-    scheduled.push((1, 0, burst[1], 34L))
-    scheduled.push((2, 0, burst[2], 59L))
-    scheduled.push((3, 0, burst[3], 84L))
+    let first_continuation = 10L + 6L * competing_sources.to_int64()
+    scheduled.push((1, 0, burst[1], first_continuation))
+    scheduled.push((2, 0, burst[2], first_continuation + 25L))
+    scheduled.push((3, 0, burst[3], first_continuation + 50L))
     scheduled
   } else {
     burst.mapi((i, packet) => (i, 0, packet, 25L * i.to_int64()))
@@ -78,7 +79,7 @@ async fn link_send(
   let timeline = if plain {
     [(0, 0, @wire.qm_query(service, 12), 0L)]
   } else {
-    link_schedule(burst, competitors, !additional.is_empty())
+    link_schedule(burst, competitors, additional.length())
   }
   let origin = @native.monotonic_ms()
   let sent : Array[Json] = []
@@ -142,7 +143,7 @@ async fn link_receive(
   additional : Array[String],
 ) -> Unit {
   let (_, _, burst, competitors) = link_fixture()
-  let timeline = link_schedule(burst, competitors, !additional.is_empty())
+  let timeline = link_schedule(burst, competitors, additional.length())
   let addresses = [peer]
   addresses.append(additional)
   let ips = addresses.map(extended_address)
