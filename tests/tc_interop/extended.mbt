@@ -27,6 +27,7 @@ async fn extended_probe(
   first : String,
   second : String,
   third : String,
+  fourth : String?,
 ) -> Unit {
   let a_ip = extended_address(first)
   let b_ip = extended_address(second)
@@ -40,6 +41,15 @@ async fn extended_probe(
   defer b.close()
   let c = @native.MulticastSocket::open(c_ip)
   defer c.close()
+  let sockets = [a, b, c]
+  let ips = [a_ip, b_ip, c_ip]
+  if fourth is Some(value) {
+    let ip = extended_address(value)
+    guard !ips.contains(ip) else { fail("fourth IPv4 must be distinct") }
+    ips.push(ip)
+    sockets.push(@native.MulticastSocket::open(ip))
+  }
+  defer (if sockets.length() == 4 { sockets[3].close() })
   let service = @model.DnsName::parse("_md-tcproof._tcp.local.")
   let names = ["av-known", "av-unknown", "zc-known", "zc-unknown"].map(label => {
     @model.DnsName::parse(label + "." + service.to_presentation())
@@ -73,16 +83,26 @@ async fn extended_probe(
   // responder with a recent-packet duplicate filter. B and C lack both PTRs
   // listed by A. C already knows the other two PTRs.
   let c_query = @wire.query_with_answers(service, 12, [answer(1), answer(3)])
-  let arms : Array[Json] = []
-  for
-    trial, mode in [
+  let d_query = @wire.query_with_answers(service, 12, [answer(1)])
+  let (_, finish) = tc_burst(service, [answer(1)])
+  let modes = if ips.length() == 4 {
+    [
+      "plain", "tc_chain", "tc_chain", "tc_chain", "ordered", "drop_middle", "swap_middle",
+      "early_terminal", "solo", "four_queriers", "solo", "four_queriers", "solo",
+      "four_queriers",
+    ]
+  } else {
+    [
       "plain", "tc_chain", "tc_chain", "tc_chain", "solo", "three_queriers", "solo",
       "three_queriers", "solo", "three_queriers",
-    ] {
+    ]
+  }
+  let arms : Array[Json] = []
+  for trial, mode in modes {
     if trial != 0 {
       @async.sleep(2100)
     }
-    for socket in [a, b, c] {
+    for socket in sockets {
       for _ in 0..<128 {
         if socket.receive(timeout_ms=0) is None {
           break
@@ -93,7 +113,38 @@ async fn extended_probe(
       "plain" => [(a_ip, plain, 0L)]
       "tc_chain" =>
         [(a_ip, head, 0L), (a_ip, tc_one, 150L), (a_ip, tc_two, 300L)]
+      "ordered" =>
+        [
+          (a_ip, head, 0L),
+          (a_ip, tc_one, 35L),
+          (a_ip, tc_two, 70L),
+          (a_ip, finish, 105L),
+        ]
+      "drop_middle" =>
+        [(a_ip, head, 0L), (a_ip, tc_one, 35L), (a_ip, finish, 105L)]
+      "swap_middle" =>
+        [
+          (a_ip, head, 0L),
+          (a_ip, tc_two, 35L),
+          (a_ip, tc_one, 70L),
+          (a_ip, finish, 105L),
+        ]
+      "early_terminal" =>
+        [
+          (a_ip, head, 0L),
+          (a_ip, tc_one, 35L),
+          (a_ip, finish, 70L),
+          (a_ip, tc_two, 105L),
+        ]
       "solo" => [(a_ip, head, 0L), (a_ip, tail, 35L)]
+      "four_queriers" =>
+        [
+          (a_ip, head, 0L),
+          (b_ip, plain, 18L),
+          (c_ip, c_query, 24L),
+          (ips[3], d_query, 30L),
+          (a_ip, tail, 37L),
+        ]
       _ =>
         [
           (a_ip, head, 0L),
@@ -108,6 +159,12 @@ async fn extended_probe(
     let seen : Map[Bytes, Int64] = Map([])
     let b_after_tail : Map[Bytes, Int64] = Map([])
     let c_after_tail : Map[Bytes, Int64] = Map([])
+    let d_after_tail : Map[Bytes, Int64] = Map([])
+    let waiters = [(b, b_after_tail), (c, c_after_tail)]
+    if mode == "four_queriers" {
+      waiters.push((sockets[3], d_after_tail))
+    }
+    let competing = mode == "three_queriers" || mode == "four_queriers"
     let mut sent = 0
     let mut observed = 0
     let mut tail_at : Int64? = None
@@ -115,11 +172,15 @@ async fn extended_probe(
       if sent < timeline.length() {
         let (ip, bytes, when) = timeline[sent]
         if @native.monotonic_ms() - t0 >= when {
-          let tx = if ip == a_ip { a } else if ip == b_ip { b } else { c }
-          tx.send(bytes)
+          for i, source in ips {
+            if source == ip {
+              sockets[i].send(bytes)
+              break
+            }
+          }
           let emitted_at = @native.monotonic_ms() - t0
           emitted.push(Json(emitted_at.to_double()))
-          if bytes == tail {
+          if bytes == tail || bytes == finish {
             tail_at = Some(emitted_at)
           }
           sent += 1
@@ -139,8 +200,8 @@ async fn extended_probe(
         }
         record_answers(packet, now, service, names, seen)
       }
-      if mode == "three_queriers" {
-        for (sock, answers) in [(b, b_after_tail), (c, c_after_tail)] {
+      if competing {
+        for (sock, answers) in waiters {
           for _ in 0..<16 {
             guard sock.receive(timeout_ms=0) is Some(packet) else { break }
             // Drain each socket throughout the arm. Start counting at A's
@@ -172,9 +233,9 @@ async fn extended_probe(
         fail("incomplete plain baseline")
       }
     }
-    if mode == "three_queriers" {
-      guard b_after_tail.contains(b"") && c_after_tail.contains(b"") else {
-        fail("a second or third querier did not observe A's tail")
+    if competing {
+      guard waiters.all(pair => pair.1.contains(b"")) else {
+        fail("a competing querier did not observe A's tail")
       }
     }
     arms.push(
@@ -185,13 +246,18 @@ async fn extended_probe(
         "tx_ms": Json::array(emitted),
         "a_observed_query_ms": Json::array(heard),
         "a_observed_responses": by_responder(seen, names, tail_at),
-        "b_after_tail": if mode == "three_queriers" {
+        "b_after_tail": if competing {
           by_responder(b_after_tail, names, tail_at)
         } else {
           Json::null()
         },
-        "c_after_tail": if mode == "three_queriers" {
+        "c_after_tail": if competing {
           by_responder(c_after_tail, names, tail_at)
+        } else {
+          Json::null()
+        },
+        "d_after_tail": if mode == "four_queriers" {
+          by_responder(d_after_tail, names, tail_at)
         } else {
           Json::null()
         },
@@ -200,7 +266,11 @@ async fn extended_probe(
   }
   println(
     Json::object({
-      "scenario": "repeated TC and three-source competition",
+      "scenario": if ips.length() == 4 {
+        "TC loss reorder and four-source competition"
+      } else {
+        "repeated TC and three-source competition"
+      },
       "arms": Json::array(arms),
     }).stringify(),
   )

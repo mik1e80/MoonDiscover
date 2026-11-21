@@ -69,12 +69,14 @@ fn observation(
 ///|
 async fn main {
   let args = @env.args()
-  if args.length() == 4 {
-    extended_probe(args[1], args[2], args[3])
+  if args.length() == 4 || args.length() == 5 {
+    extended_probe(args[1], args[2], args[3], args.get(4))
     return
   }
   guard args.length() == 3 else {
-    fail("usage: tc_interop <IPv4> <second-source-IPv4> [third-source-IPv4]")
+    fail(
+      "usage: tc_interop <IPv4> <second-source-IPv4> [third-source-IPv4] [fourth-source-IPv4]",
+    )
   }
   let addr = @socket.Addr::parse(args[1] + ":0")
   let second = @socket.Addr::parse(args[2] + ":0")

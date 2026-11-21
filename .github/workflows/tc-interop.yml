@@ -40,9 +40,10 @@ jobs:
           moon build tests/tc_interop --target native
           dev=$(ip -j -4 route get 224.0.0.251 | python3 -c 'import json,sys; print(json.load(sys.stdin)[0]["dev"])')
           sudo ip addr add 192.0.2.242/32 dev "$dev"
-          trap 'sudo ip addr del 192.0.2.243/32 dev "$dev" 2>/dev/null || true; sudo ip addr del 192.0.2.242/32 dev "$dev"' EXIT
+          trap 'for alias in 192.0.2.244 192.0.2.243 192.0.2.242; do sudo ip addr del "$alias/32" dev "$dev" 2>/dev/null || true; done' EXIT
           sudo ip addr add 192.0.2.243/32 dev "$dev"
-          moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243
+          sudo ip addr add 192.0.2.244/32 dev "$dev"
+          moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192.0.2.244
       - name: Retain observations and publisher logs
         if: always()
         uses: actions/upload-artifact@v4

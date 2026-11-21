@@ -19,7 +19,7 @@ async fn command(program : String, args : Array[String]) -> String {
 
 async fn main {
   let args = @env.args()
-  guard args.length() == 3 || args.length() == 4 else { fail("usage: tc-interop.mbtx <zeroconf-python> <second-source-IPv4> [third-source-IPv4]") }
+  guard args.length() >= 3 && args.length() <= 5 else { fail("usage: tc-interop.mbtx <zeroconf-python> <second-source-IPv4> [third-source-IPv4] [fourth-source-IPv4]") }
   @fs.mkdir(".tools", allow_exist=true)
   let route = @json.parse(command("ip", ["-j", "-4", "route", "get", "224.0.0.251"]))
   guard route is [{ "prefsrc": String(ip), .. }, ..] else { fail("no active IPv4 route") }
@@ -43,7 +43,7 @@ async fn main {
     guard @fs.exists(marker) else { fail("zeroconf did not finish registration") }
     @async.sleep(2300)
     let sources = [ip, args[2]]
-    if args.length() == 4 { sources.push(args[3]) }
+    for i in 3..<args.length() { sources.push(args[i]) }
     let sample = command("_build/native/debug/build/tests/tc_interop/tc_interop.exe", sources)
     guard a.try_wait() is None && b.try_wait() is None && z.try_wait() is None else { fail("publisher exited during the probe") }
     @json.parse(sample)
@@ -62,7 +62,7 @@ async fn main {
   })
   @fs.write_file(".tools/tc-interop.json", report.stringify(indent=2) + "\n")
   println(report.stringify())
-  let required = if args.length() == 4 { 3 } else { 5 }
+  let required = if args.length() >= 4 { 3 } else { 5 }
   guard timers.filter(t => t is {"tc_timer": "fired", ..}).length() >= required else {
     fail("missing independently observed zeroconf TC dispatch samples")
   }
