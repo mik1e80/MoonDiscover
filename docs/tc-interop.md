@@ -63,13 +63,37 @@ zeroconf 三次均为每个 TC 包重新设定定时器，仅最后一个定时�
 
 四查询器实验中，A 发出 TC 首包，随后 B、C、D 在 18–31ms 陆续发出三份同名 QM 查询，A 在 37ms 发末包。B、C、D 都需要 A 已知的两条 PTR。三轮实验中，B、C、D 各自在观察到 A 的末包后均收到了两种响应器的所需 PTR。按 A 首包起算，Avahi 在 80–119ms 到达，zeroconf 在 129–521ms 到达。A 单独查询的三轮配对对照中，zeroconf 三次都省略 A 已知的 PTR，Avahi 两次省略，另一次在 35ms 已回包，末包于 36ms 发出。
 
-仍待验证五个及以上查询器、网络链路实际丢包或乱序、两台物理设备、Windows 与 Bonjour 的同类 TC 实验及其他响应器版本。长期实网与正式发布验收另行跟踪。
+## 五个查询器请求同一条 PTR
 
-复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入三个附加地址运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
+2026-11-21（北京时间），Linux 同机五个不同 IPv4 源请求同一服务类型。A 先发 TC 首包，B、C、D、E 在 18–38ms 发出查询，A 在 46–47ms 发出带两条已知 PTR 的末包。五方都缺少 `zc-unknown`。B 不携带 Known-Answer，C、D、E 携带同一条 `av-unknown`，用不同的剩余 TTL 保持报文可区分。
+
+三轮中，五方都在 A 发出末包后收到共同缺少的 `zc-unknown`，按每轮探针开始计为 519–520ms。B、C、D、E 也都在各自观察到末包后，收到 A 已知而它们缺少的两条 PTR。Avahi 的记录在 58–94ms 到达，zeroconf 的记录在 519–520ms 到达。三轮 A 单独查询对照中，两种响应器都省略 A 已知的 PTR，共同缺少的 `zc-unknown` 在 71–134ms 到达。[原始观测](evidence/linux-tc-five-queriers-netem-20261121.json) · [专项 CI](https://github.com/mik1e80/MoonDiscover/actions/runs/44881056220)
+
+## 隔离链路丢包与乱序
+
+同一 Linux VM 创建两个独立网络命名空间，用一对虚拟网卡（veth）连接。发送端每轮都按首包、续包 1、续包 2、末包的顺序发出四份真实 IPv4 组播 UDP 数据报。只有续包 2 声明 `zc-known`。发送端的 Linux netem 队列只处理这份续包。接收端根据源地址、接口和报文内容核对到达顺序，另读内核队列统计。普通查询先确认 python-zeroconf 0.148.0 发布的两条 PTR 都能收到。[Linux netem 手册](https://man7.org/linux/man-pages/man8/tc-netem.8.html) · [原始观测](evidence/linux-tc-five-queriers-netem-20261121.json)
+
+| 场景（各三轮） | 对端实际收包顺序 | 目标队列每轮通过 / 丢弃 | zeroconf 回包 |
+| --- | --- | --- | --- |
+| 无损对照 | 首包 → 续包 1 → 续包 2 → 末包 | 1 / 0 | `zc-known` 3/3 未收到，另一条在 114–150ms 到达 |
+| 定向丢包 | 首包 → 续包 1 → 末包 | 0 / 1 | 两条 PTR 3/3 均收到，100–193ms |
+| 将续包 2 延迟 125ms | 首包 → 续包 1 → 末包 → 续包 2 | 1 / 0 | 两条 PTR 3/3 均收到，117–149ms |
+
+回包时间从发送端探针开始计。乱序三轮中，接收端观察到续包 2 比末包晚约 100ms。内核作用于查询方向的一个指定包，响应方向保持正常。五查询器竞争与链路故障分别执行。前两次 CI 在隔离发布者的 Python 环境和准备阶段失败，作为调试记录保留。最终专项在修复后通过。[运行记录](https://github.com/mik1e80/MoonDiscover/actions/runs/44881056220)
+
+仍待验证六个及以上查询器、五查询器与链路故障叠加、Avahi 的同类隔离链路实验、随机或连续丢包、响应方向的链路故障、两台物理设备、Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+
+复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四个附加地址运行五查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
 ```sh
 moon build tests/tc_interop --target native
-moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192.0.2.244
+moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192.0.2.244 192.0.2.245
 ```
 
-CI 检查发布进程、实验报文语义、普通查询的注册记录、各查询报文的源地址与顺序、竞争查询器各自观察到的末包，以及定时器观测数量。时间和抑制字段记录实测值。
+隔离链路复用上面构建的探针。需有 Linux iproute2、veth、netem 和创建网络命名空间的权限。脚本创建并清理专用命名空间，只在虚拟接口上应用队列规则。报告位于 `.tools/tc-link.json`。
+
+```sh
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)"
+```
+
+CI 检查发布进程、实验报文语义、普通查询的注册记录、各查询报文的源地址与顺序、竞争查询器各自观察到的末包，以及适用场景的定时器和链路队列计数。时间和抑制字段记录实测值。
