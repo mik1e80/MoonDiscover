@@ -39,15 +39,15 @@ async fn setup_interface(ns : String, device : String, address : String) -> Unit
   let _ = command("ip", ["-n", ns, "route", "add", "224.0.0.251/32", "dev", device, "src", address])
 }
 
-async fn wait_ready(path : String, child : @process.Process, log : String) -> Unit {
-  for _ in 0..<200 {
+async fn wait_ready(path : String, child : @process.Process, log : String, attempts : Int) -> Unit {
+  for _ in 0..<attempts {
     if @fs.exists(path) { return }
     if child.try_wait() is Some(code) {
       fail("process exited \{code}: " + @fs.read_file(log).text())
     }
     @async.sleep(10)
   }
-  fail("timed out waiting for " + path)
+  fail("timed out waiting for " + path + ": " + @fs.read_file(log).text())
 }
 
 async fn measure(binary : String, mode : String, trial : Int) -> Json {
@@ -80,7 +80,7 @@ async fn measure(binary : String, mode : String, trial : Int) -> Json {
       "--link-receive", receiver_ip, sender_ip, marker,
     ]), stdout=out, stderr=err, no_wait=true)
     defer child.cancel()
-    wait_ready(marker, child, stderr)
+    wait_ready(marker, child, stderr, 100)
     let sent = @json.parse(command("ip", in_namespace(sender, binary, [
       "--link-send", sender_ip, receiver_ip,
     ])))
@@ -136,7 +136,7 @@ async fn main {
       "tests/interop/tc_publisher.py", receiver_ip, marker,
     ]), stdout=output, stderr=output, no_wait=true)
     defer publisher.cancel()
-    wait_ready(marker, publisher, log)
+    wait_ready(marker, publisher, log, 1000)
     @async.sleep(2300)
     let baseline = @json.parse(command("ip", in_namespace(sender, binary, [
       "--link-baseline", sender_ip, receiver_ip,

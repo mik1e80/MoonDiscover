@@ -90,7 +90,9 @@ async fn extended_probe(sources : Array[String]) -> Unit {
     4 => "four_queriers"
     _ => "three_queriers"
   }
-  let modes = if ips.length() >= 4 {
+  let modes = if ips.length() == 5 {
+    ["plain", "solo", competition, "solo", competition, "solo", competition]
+  } else if ips.length() == 4 {
     [
       "plain", "tc_chain", "tc_chain", "tc_chain", "ordered", "drop_middle", "swap_middle",
       "early_terminal", "solo", competition, "solo", competition, "solo", competition,

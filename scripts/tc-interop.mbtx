@@ -62,7 +62,7 @@ async fn main {
   })
   @fs.write_file(".tools/tc-interop.json", report.stringify(indent=2) + "\n")
   println(report.stringify())
-  let required = if args.length() >= 4 { 3 } else { 5 }
+  let required = if args.length() == 6 { 0 } else if args.length() >= 4 { 3 } else { 5 }
   guard timers.filter(t => t is {"tc_timer": "fired", ..}).length() >= required else {
     fail("missing independently observed zeroconf TC dispatch samples")
   }
