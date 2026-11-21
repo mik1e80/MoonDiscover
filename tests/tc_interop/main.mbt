@@ -70,7 +70,7 @@ fn observation(
 async fn main {
   let args = @env.args()
   if args.get(1) is Some("--link-send" | "--link-baseline") &&
-    (args.length() == 4 || args.length() == 8 || args.length() == 9) {
+    (args.length() == 4 || (args.length() >= 8 && args.length() <= 10)) {
     link_send(
       args[2],
       args[3],
@@ -80,17 +80,17 @@ async fn main {
     return
   }
   if args.get(1) == Some("--link-receive") &&
-    (args.length() == 5 || args.length() == 9 || args.length() == 10) {
+    (args.length() == 5 || (args.length() >= 9 && args.length() <= 11)) {
     link_receive(args[2], args[3], args[4], args[5:].to_owned())
     return
   }
-  if args.length() >= 4 && args.length() <= 8 {
+  if args.length() >= 4 && args.length() <= 9 {
     extended_probe(args[1:].to_owned())
     return
   }
   guard args.length() == 3 else {
     fail(
-      "usage: tc_interop <IPv4> <second-source-IPv4> [up to five more source IPv4 addresses]",
+      "usage: tc_interop <IPv4> <second-source-IPv4> [up to six more source IPv4 addresses]",
     )
   }
   let addr = @socket.Addr::parse(args[1] + ":0")

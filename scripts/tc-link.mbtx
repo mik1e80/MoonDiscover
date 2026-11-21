@@ -124,15 +124,18 @@ async fn measure(binary : String, mode : String, trial : Int, additional : Array
 
 async fn main {
   let args = @env.args()
-  guard args.length() == 3 ||
-    (args.length() == 4 && (args[3] == "--five" || args[3] == "--six")) else {
-    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--five|--six]")
+  let last_octet = match args.get(3) {
+    None => 10
+    Some("--five") => 14
+    Some("--six") => 15
+    Some("--seven") => 16
+    _ => 0
+  }
+  guard args.length() >= 3 && args.length() <= 4 && last_octet >= 10 else {
+    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--five|--six|--seven]")
   }
   let additional : Array[String] = []
-  if args.length() == 4 {
-    for i in 11..=14 { additional.push("192.0.2.\{i}") }
-    if args[3] == "--six" { additional.push("192.0.2.15") }
-  }
+  for i in 11..=last_octet { additional.push("192.0.2.\{i}") }
   @fs.mkdir(".tools", allow_exist=true)
   let binary = "_build/native/debug/build/tests/tc_interop/tc_interop.exe"
   let python = args[1]
@@ -178,6 +181,7 @@ async fn main {
   let report = Json::object({
     "source_commit": Json(args[2]),
     "scenario": match additional.length() {
+      6 => "seven queriers with isolated veth TC loss and reordering"
       5 => "six queriers with isolated veth TC loss and reordering"
       4 => "five queriers with isolated veth TC loss and reordering"
       _ => "isolated veth TC loss and reordering"
