@@ -415,7 +415,7 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 
 ## 验证与文档
 
-Avahi 与 python-zeroconf 在同机 IPv4 组播中均观察到立即 TC 续包的已知 PTR 抑制，并在六组对照中向第二个查询器返回所需 PTR。实测区分 zeroconf 的 TC 内部定时器与 UDP 到达时间。等待时窗、实验条件和跨设备待验证项见 [双响应器实验](docs/tc-interop.md)。
+Avahi 与 python-zeroconf 的同机 IPv4 组播实验覆盖立即 TC 续包、连续 TC 重新计时及两个或三个查询器。两个响应器的等待表现不同。实验条件、计时数据与跨设备待验证项见 [双响应器实验](docs/tc-interop.md)。
 
 [库接入与 CLI](docs/usage.md) · [模型](docs/model.md) · [0.3.0 预发布验收](docs/release-acceptance-0.3.0.md) · [维护路线](docs/maintenance-roadmap-2026.md) · [安全报告](SECURITY.md)
 

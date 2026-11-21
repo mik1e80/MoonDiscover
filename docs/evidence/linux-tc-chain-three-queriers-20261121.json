@@ -1,0 +1,585 @@
+{
+  "source_commit": "a21e16fdfd708454e8634562683e2ce92bbb33cc",
+  "avahi_version": "avahi-daemon 0.8",
+  "zeroconf_version": "0.148.0",
+  "result": {
+    "scenario": "repeated TC and three-source competition",
+    "arms": [
+      {
+        "mode": "plain",
+        "trial": 1,
+        "query_start_monotonic_ms": 73022,
+        "tx_ms": [
+          0
+        ],
+        "a_observed_query_ms": [
+          0
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 108,
+            "unknown_ptr_ms": 108,
+            "first_ptr_ms": 108,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 35,
+            "unknown_ptr_ms": 35,
+            "first_ptr_ms": 35,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null
+      },
+      {
+        "mode": "tc_chain",
+        "trial": 2,
+        "query_start_monotonic_ms": 76224,
+        "tx_ms": [
+          0,
+          151,
+          301
+        ],
+        "a_observed_query_ms": [
+          0,
+          151,
+          301
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 102,
+            "unknown_ptr_ms": 102,
+            "first_ptr_ms": 102,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 847,
+            "first_ptr_ms": 847,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null
+      },
+      {
+        "mode": "tc_chain",
+        "trial": 3,
+        "query_start_monotonic_ms": 79427,
+        "tx_ms": [
+          0,
+          151,
+          301
+        ],
+        "a_observed_query_ms": [
+          0,
+          151,
+          301
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 101,
+            "unknown_ptr_ms": 101,
+            "first_ptr_ms": 101,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 801,
+            "first_ptr_ms": 801,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null
+      },
+      {
+        "mode": "tc_chain",
+        "trial": 4,
+        "query_start_monotonic_ms": 82630,
+        "tx_ms": [
+          0,
+          151,
+          301
+        ],
+        "a_observed_query_ms": [
+          0,
+          151,
+          301
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 102,
+            "unknown_ptr_ms": 102,
+            "first_ptr_ms": 102,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 839,
+            "first_ptr_ms": 839,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null
+      },
+      {
+        "mode": "solo",
+        "trial": 5,
+        "query_start_monotonic_ms": 85832,
+        "tx_ms": [
+          0,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 101,
+            "first_ptr_ms": 101,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 131,
+            "first_ptr_ms": 131,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null
+      },
+      {
+        "mode": "three_queriers",
+        "trial": 6,
+        "query_start_monotonic_ms": 89036,
+        "tx_ms": [
+          0,
+          25,
+          31,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          25,
+          31,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 68,
+            "unknown_ptr_ms": 68,
+            "first_ptr_ms": 68,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 127,
+            "unknown_ptr_ms": 127,
+            "first_ptr_ms": 127,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 68,
+            "unknown_ptr_ms": 68,
+            "first_ptr_ms": 68,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 127,
+            "unknown_ptr_ms": 127,
+            "first_ptr_ms": 127,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "c_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 68,
+            "unknown_ptr_ms": 68,
+            "first_ptr_ms": 68,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 127,
+            "unknown_ptr_ms": 127,
+            "first_ptr_ms": 127,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      },
+      {
+        "mode": "solo",
+        "trial": 7,
+        "query_start_monotonic_ms": 92240,
+        "tx_ms": [
+          0,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 69,
+            "first_ptr_ms": 69,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 62,
+            "first_ptr_ms": 62,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null
+      },
+      {
+        "mode": "three_queriers",
+        "trial": 8,
+        "query_start_monotonic_ms": 95443,
+        "tx_ms": [
+          0,
+          25,
+          31,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          25,
+          31,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 69,
+            "unknown_ptr_ms": 69,
+            "first_ptr_ms": 69,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 134,
+            "unknown_ptr_ms": 134,
+            "first_ptr_ms": 134,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 69,
+            "unknown_ptr_ms": 69,
+            "first_ptr_ms": 69,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 134,
+            "unknown_ptr_ms": 134,
+            "first_ptr_ms": 134,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "c_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 69,
+            "unknown_ptr_ms": 69,
+            "first_ptr_ms": 69,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 134,
+            "unknown_ptr_ms": 134,
+            "first_ptr_ms": 134,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      },
+      {
+        "mode": "solo",
+        "trial": 9,
+        "query_start_monotonic_ms": 98648,
+        "tx_ms": [
+          0,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 64,
+            "first_ptr_ms": 64,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 87,
+            "first_ptr_ms": 87,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null
+      },
+      {
+        "mode": "three_queriers",
+        "trial": 10,
+        "query_start_monotonic_ms": 101852,
+        "tx_ms": [
+          0,
+          25,
+          31,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          25,
+          31,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 65,
+            "unknown_ptr_ms": 65,
+            "first_ptr_ms": 65,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 134,
+            "unknown_ptr_ms": 134,
+            "first_ptr_ms": 134,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 65,
+            "unknown_ptr_ms": 65,
+            "first_ptr_ms": 65,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 134,
+            "unknown_ptr_ms": 134,
+            "first_ptr_ms": 134,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "c_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 65,
+            "unknown_ptr_ms": 65,
+            "first_ptr_ms": 65,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 134,
+            "unknown_ptr_ms": 134,
+            "first_ptr_ms": 134,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      }
+    ]
+  },
+  "zeroconf_tc_timers": [
+    {
+      "tc_timer": "scheduled",
+      "id": 1,
+      "scheduled_monotonic_ms": 76225.145,
+      "deadline_monotonic_ms": 76697.126,
+      "nominal_delay_ms": 472
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 2,
+      "scheduled_monotonic_ms": 76375.622,
+      "deadline_monotonic_ms": 76791.609,
+      "nominal_delay_ms": 416
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 3,
+      "scheduled_monotonic_ms": 76525.837,
+      "deadline_monotonic_ms": 77024.826,
+      "nominal_delay_ms": 499
+    },
+    {
+      "tc_timer": "fired",
+      "id": 3,
+      "fired_monotonic_ms": 77025.505,
+      "from_schedule_ms": 499.668
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 4,
+      "scheduled_monotonic_ms": 79427.779,
+      "deadline_monotonic_ms": 79885.77,
+      "nominal_delay_ms": 458
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 5,
+      "scheduled_monotonic_ms": 79578.247,
+      "deadline_monotonic_ms": 80058.237,
+      "nominal_delay_ms": 480
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 6,
+      "scheduled_monotonic_ms": 79728.394,
+      "deadline_monotonic_ms": 80170.385,
+      "nominal_delay_ms": 442
+    },
+    {
+      "tc_timer": "fired",
+      "id": 6,
+      "fired_monotonic_ms": 80170.985,
+      "from_schedule_ms": 442.591
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 7,
+      "scheduled_monotonic_ms": 82631.169,
+      "deadline_monotonic_ms": 83113.159,
+      "nominal_delay_ms": 482
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 8,
+      "scheduled_monotonic_ms": 82781.626,
+      "deadline_monotonic_ms": 83273.616,
+      "nominal_delay_ms": 492
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 9,
+      "scheduled_monotonic_ms": 82931.79,
+      "deadline_monotonic_ms": 83407.781,
+      "nominal_delay_ms": 476
+    },
+    {
+      "tc_timer": "fired",
+      "id": 9,
+      "fired_monotonic_ms": 83409.412,
+      "from_schedule_ms": 477.623
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 10,
+      "scheduled_monotonic_ms": 85832.811,
+      "deadline_monotonic_ms": 86244.801,
+      "nominal_delay_ms": 412
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 11,
+      "scheduled_monotonic_ms": 89036.806,
+      "deadline_monotonic_ms": 89531.796,
+      "nominal_delay_ms": 495
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 12,
+      "scheduled_monotonic_ms": 92240.802,
+      "deadline_monotonic_ms": 92699.794,
+      "nominal_delay_ms": 459
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 13,
+      "scheduled_monotonic_ms": 95444.033,
+      "deadline_monotonic_ms": 95856.023,
+      "nominal_delay_ms": 412
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 14,
+      "scheduled_monotonic_ms": 98648.496,
+      "deadline_monotonic_ms": 99119.488,
+      "nominal_delay_ms": 471
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 15,
+      "scheduled_monotonic_ms": 101853.057,
+      "deadline_monotonic_ms": 102328.046,
+      "nominal_delay_ms": 475
+    }
+  ],
+  "source_run": "https://github.com/mik1e80/MoonDiscover/actions/runs/44746788465",
+  "source_job": 136324060025
+}

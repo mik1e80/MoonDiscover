@@ -19,6 +19,8 @@ RFC 6762 §7.3 受限路径新增跨 scope、子集、TTL、TC、反复输入与
 
 [Linux 44743492242](https://github.com/mik1e80/MoonDiscover/actions/runs/44743492242) 复测本端在 1010ms 恢复发送。单 Avahi daemon 的普通查询收到两条 PTR，单包和 TC 续包只收到未知成员。首条匹配回答分别约为 55ms、55ms、38ms。
 
-后续已在同一 Linux VM 完成 Avahi 与 python-zeroconf 双响应器对照。十次空续包观测使用仅发 TC 首包的查询，五次另记录 zeroconf 先设置 413–465ms 的定时器，实际约 415–466ms 触发。Avahi 十次实际回包均早于 400ms。六组双查询器对照均观察到第二个源地址的查询器在末包后收到所需 PTR。重复带 TC 续包的等待延长、其他平台与跨设备仍待验证。[双响应器实验及数据](tc-interop.md)
+后续已在同一 Linux VM 完成 Avahi 与 python-zeroconf 双响应器对照。十次仅发 TC 首包的实验中，五次另记录 zeroconf 的 413–465ms 内部定时器，实际约 415–466ms 触发。Avahi 十次实际回包均早于 400ms。六组双查询器对照均收到所需 PTR。
+
+2026-11-21 连续 TC 专项中，zeroconf 三次均从最后一个带 TC 的续包重新计时，约 443–500ms 后触发。Avahi 在第一份续包前已回包。三次三查询器测试中，B、C 均在 A 的末包之后收到了两种响应器的所需 PTR。四个及以上查询器、重排丢包和跨设备仍待验证。[双响应器实验及数据](tc-interop.md)
 
 长时间实网与发布标签、归档散列、Mooncakes 独立安装仍待验收。发布条件满足后才标记稳定版。

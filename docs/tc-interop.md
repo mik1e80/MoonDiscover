@@ -32,13 +32,29 @@
 
 两轮各三组对照。只有 A 时，6/6 在两种响应器上均只观察到未知 PTR。加入 B 后，6/6 的 B 在续包后收到两种响应器的已知及未知 PTR。按 A 首包起算，B 收到所需 PTR 的时间为 Avahi 32–119ms、zeroconf 65–533ms。该样本覆盖 B 在 A 的首包和末包之间发出普通 QM 的场景。
 
-仍待验证重复带 TC 的续包是否按规范延长等待、三个及以上查询器、两台物理设备、Windows/Bonjour 实网及其他响应器版本。长期实网与正式发布验收另行跟踪。
+## 连续 TC 续包与三个查询器
 
-复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。准备一个测试接口以及该接口上的两个不同 IPv4 地址。以下第二地址为专用 CI 示例。生成报告位于 .tools/tc-interop.json。
+2026-11-21 在同一 Linux 虚拟机复测。三次分别在 0、151、301ms 发首包和两个带 TC 的续包。两个续包各携带一条不同的已知 PTR，观察期间保持 TC，没有发送清除 TC 的末包。探针观察实际组播报文并按同机单调时钟核对 zeroconf 的内部定时器。
+
+| 连续 TC 试次 | Avahi 首条 UDP PTR（相对首包） | zeroconf 最后一个定时器设定 | zeroconf 最后一次设定至触发 | zeroconf 首条 UDP PTR（相对最后一个 TC 包） |
+| --- | ---: | ---: | ---: | ---: |
+| 1 | 102ms | 499ms | 499.668ms | 546ms |
+| 2 | 101ms | 442ms | 442.591ms | 500ms |
+| 3 | 102ms | 476ms | 477.623ms | 538ms |
+
+zeroconf 三次均为每个 TC 包重新设定定时器，仅最后一个定时器触发，并省略两个续包声明的已知 PTR。Avahi 三次都在第一份续包到达前回复，无法从这条网络观测推断它内部的定时器实现。[RFC 6762 §7.2](https://www.rfc-editor.org/rfc/rfc6762.html#section-7.2)
+
+三个查询器使用同一接口上不同源 IPv4 地址。A 在 0ms 发 TC 首包，B 在 25ms 发不含 Known-Answer 的查询，C 在 31ms 发携带另两条 Known-Answer 的同名查询。B 和 C 都需要 A 所知的两条 PTR。A 在 37ms 才发清除 TC 的末包。探针核对实际发送源和顺序，并从 B、C 各自套接字的末包标记之后开始计数。
+
+三组 A 单独查询对照中，两种响应器都省略 A 已知的 PTR。加入 B、C 后，三组里 B 和 C 都在 A 的末包之后收到了两种响应器返回的所需 PTR。Avahi 的首次到达时刻为 65–69ms，zeroconf 为 127–134ms，均从 A 的首包起算。[原始观测](evidence/linux-tc-chain-three-queriers-20261121.json) · [专项 CI](https://github.com/mik1e80/MoonDiscover/actions/runs/44746788465)
+
+仍待验证四个及以上查询器、重排和丢包、两台物理设备、Windows/Bonjour 实网及其他响应器版本。长期实网与正式发布验收另行跟踪。
+
+复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。三个查询器实验要求同一接口上的三个不同 IPv4 地址。以下两个附加地址为专用 CI 示例。生成报告位于 .tools/tc-interop.json。省略第三个地址时运行上一节的双查询器与首包复测。
 
 ```sh
 moon build tests/tc_interop --target native
-moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242
+moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243
 ```
 
 CI 检查发布进程、实验报文语义、普通查询的注册记录、双源报文顺序及定时器观测数量。时间和抑制字段记录实测值。
