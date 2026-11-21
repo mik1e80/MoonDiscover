@@ -132,10 +132,11 @@ async fn main {
     Some("--eight") => 17
     Some("--nine") => 18
     Some("--ten") => 19
+    Some("--eleven") => 20
     _ => 0
   }
   guard args.length() >= 3 && args.length() <= 4 && last_octet >= 10 else {
-    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--five|--six|--seven|--eight|--nine|--ten]")
+    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--five|--six|--seven|--eight|--nine|--ten|--eleven]")
   }
   let additional : Array[String] = []
   for i in 11..=last_octet { additional.push("192.0.2.\{i}") }
@@ -184,6 +185,7 @@ async fn main {
   let report = Json::object({
     "source_commit": Json(args[2]),
     "scenario": match additional.length() {
+      10 => "eleven queriers with isolated veth TC loss and reordering"
       9 => "ten queriers with isolated veth TC loss and reordering"
       8 => "nine queriers with isolated veth TC loss and reordering"
       7 => "eight queriers with isolated veth TC loss and reordering"
