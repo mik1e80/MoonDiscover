@@ -117,7 +117,7 @@ async fn main {
   guard args.length() == 3 else { fail("usage: tc-link.mbtx <zeroconf-python> <source-commit>") }
   @fs.mkdir(".tools", allow_exist=true)
   let binary = "_build/native/debug/build/tests/tc_interop/tc_interop.exe"
-  let python = @fs.realpath(args[1])
+  let python = args[1]
   // These namespaces must be new. Neither the qdisc nor the virtual interfaces
   // are attached to a pre-existing namespace or the runner's physical NIC.
   let _ = command("ip", ["netns", "add", sender])

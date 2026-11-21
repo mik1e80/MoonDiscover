@@ -75,7 +75,15 @@ async fn extended_probe(sources : Array[String]) -> Unit {
   // listed by A. C already knows the other two PTRs.
   let c_query = @wire.query_with_answers(service, 12, [answer(1), answer(3)])
   let d_query = @wire.query_with_answers(service, 12, [answer(1)])
-  let e_query = @wire.query_with_answers(service, 12, [answer(3)])
+  // Every source in the five-way race lacks zc-unknown. Different remaining
+  // TTLs on av-unknown preserve distinct queries for C, D and E.
+  let five_c = d_query
+  let five_d = @wire.query_with_answers(service, 12, [
+    { ..answer(1), ttl: 4499U, },
+  ])
+  let five_e = @wire.query_with_answers(service, 12, [
+    { ..answer(1), ttl: 4498U, },
+  ])
   let (_, finish) = tc_burst(service, [answer(1)])
   let competition = match ips.length() {
     5 => "five_queriers"
@@ -141,9 +149,9 @@ async fn extended_probe(sources : Array[String]) -> Unit {
         [
           (a_ip, head, 0L),
           (b_ip, plain, 18L),
-          (c_ip, c_query, 24L),
-          (ips[3], d_query, 30L),
-          (ips[4], e_query, 36L),
+          (c_ip, five_c, 24L),
+          (ips[3], five_d, 30L),
+          (ips[4], five_e, 36L),
           (a_ip, tail, 45L),
         ]
       "four_queriers" =>
