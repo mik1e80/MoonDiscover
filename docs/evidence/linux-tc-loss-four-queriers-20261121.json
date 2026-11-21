@@ -1,0 +1,885 @@
+{
+  "source_run": "https://github.com/mik1e80/MoonDiscover/actions/runs/44879924995",
+  "source_job": "https://github.com/mik1e80/MoonDiscover/actions/runs/44879924995/job/136772747425",
+  "source_commit": "7d8f1fce8e964e3f8fa2e36e57b2726e57581170",
+  "avahi_version": "avahi-daemon 0.8",
+  "zeroconf_version": "0.148.0",
+  "result": {
+    "scenario": "TC loss reorder and four-source competition",
+    "arms": [
+      {
+        "mode": "plain",
+        "trial": 1,
+        "query_start_monotonic_ms": 46203,
+        "tx_ms": [
+          0
+        ],
+        "a_observed_query_ms": [
+          0
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 66,
+            "unknown_ptr_ms": 66,
+            "first_ptr_ms": 66,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 73,
+            "unknown_ptr_ms": 73,
+            "first_ptr_ms": 73,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "tc_chain",
+        "trial": 2,
+        "query_start_monotonic_ms": 49405,
+        "tx_ms": [
+          0,
+          152,
+          302
+        ],
+        "a_observed_query_ms": [
+          0,
+          152,
+          302
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 47,
+            "unknown_ptr_ms": 47,
+            "first_ptr_ms": 47,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 777,
+            "first_ptr_ms": 777,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "tc_chain",
+        "trial": 3,
+        "query_start_monotonic_ms": 52610,
+        "tx_ms": [
+          0,
+          151,
+          302
+        ],
+        "a_observed_query_ms": [
+          0,
+          151,
+          302
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 47,
+            "unknown_ptr_ms": 47,
+            "first_ptr_ms": 47,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 859,
+            "first_ptr_ms": 859,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "tc_chain",
+        "trial": 4,
+        "query_start_monotonic_ms": 55813,
+        "tx_ms": [
+          1,
+          152,
+          303
+        ],
+        "a_observed_query_ms": [
+          1,
+          152,
+          303
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 48,
+            "unknown_ptr_ms": 48,
+            "first_ptr_ms": 48,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 808,
+            "first_ptr_ms": 808,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "ordered",
+        "trial": 5,
+        "query_start_monotonic_ms": 59017,
+        "tx_ms": [
+          1,
+          38,
+          72,
+          106
+        ],
+        "a_observed_query_ms": [
+          1,
+          38,
+          72,
+          106
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 48,
+            "first_ptr_ms": 48,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": true,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 213,
+            "first_ptr_ms": 213,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "drop_middle",
+        "trial": 6,
+        "query_start_monotonic_ms": 62221,
+        "tx_ms": [
+          0,
+          36,
+          106
+        ],
+        "a_observed_query_ms": [
+          0,
+          36,
+          106
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 35,
+            "unknown_ptr_ms": 35,
+            "first_ptr_ms": 35,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": true,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 177,
+            "unknown_ptr_ms": 177,
+            "first_ptr_ms": 177,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "swap_middle",
+        "trial": 7,
+        "query_start_monotonic_ms": 65426,
+        "tx_ms": [
+          0,
+          35,
+          72,
+          106
+        ],
+        "a_observed_query_ms": [
+          0,
+          35,
+          72,
+          106
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 35,
+            "unknown_ptr_ms": 35,
+            "first_ptr_ms": 35,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": true,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 134,
+            "first_ptr_ms": 134,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "early_terminal",
+        "trial": 8,
+        "query_start_monotonic_ms": 68628,
+        "tx_ms": [
+          0,
+          36,
+          73,
+          106
+        ],
+        "a_observed_query_ms": [
+          0,
+          36,
+          73,
+          106
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 36,
+            "unknown_ptr_ms": 36,
+            "first_ptr_ms": 36,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": true,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 119,
+            "unknown_ptr_ms": 119,
+            "first_ptr_ms": 119,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "solo",
+        "trial": 9,
+        "query_start_monotonic_ms": 71830,
+        "tx_ms": [
+          0,
+          36
+        ],
+        "a_observed_query_ms": [
+          0,
+          36
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 35,
+            "unknown_ptr_ms": 35,
+            "first_ptr_ms": 35,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": true,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 134,
+            "first_ptr_ms": 134,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "four_queriers",
+        "trial": 10,
+        "query_start_monotonic_ms": 75032,
+        "tx_ms": [
+          0,
+          18,
+          24,
+          31,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          18,
+          24,
+          31,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 118,
+            "unknown_ptr_ms": 118,
+            "first_ptr_ms": 118,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 520,
+            "unknown_ptr_ms": 520,
+            "first_ptr_ms": 520,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 118,
+            "unknown_ptr_ms": 118,
+            "first_ptr_ms": 118,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 520,
+            "unknown_ptr_ms": 520,
+            "first_ptr_ms": 520,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "c_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 118,
+            "unknown_ptr_ms": 118,
+            "first_ptr_ms": 118,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 520,
+            "unknown_ptr_ms": 520,
+            "first_ptr_ms": 520,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "d_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 118,
+            "unknown_ptr_ms": 118,
+            "first_ptr_ms": 118,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 520,
+            "unknown_ptr_ms": 520,
+            "first_ptr_ms": 520,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      },
+      {
+        "mode": "solo",
+        "trial": 11,
+        "query_start_monotonic_ms": 78235,
+        "tx_ms": [
+          0,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 118,
+            "first_ptr_ms": 118,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 112,
+            "first_ptr_ms": 112,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "four_queriers",
+        "trial": 12,
+        "query_start_monotonic_ms": 81439,
+        "tx_ms": [
+          0,
+          19,
+          25,
+          31,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          19,
+          25,
+          31,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 119,
+            "unknown_ptr_ms": 119,
+            "first_ptr_ms": 119,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 129,
+            "unknown_ptr_ms": 129,
+            "first_ptr_ms": 129,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 119,
+            "unknown_ptr_ms": 119,
+            "first_ptr_ms": 119,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 129,
+            "unknown_ptr_ms": 129,
+            "first_ptr_ms": 129,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "c_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 119,
+            "unknown_ptr_ms": 119,
+            "first_ptr_ms": 119,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 129,
+            "unknown_ptr_ms": 129,
+            "first_ptr_ms": 129,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "d_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 119,
+            "unknown_ptr_ms": 119,
+            "first_ptr_ms": 119,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 129,
+            "unknown_ptr_ms": 129,
+            "first_ptr_ms": 129,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      },
+      {
+        "mode": "solo",
+        "trial": 13,
+        "query_start_monotonic_ms": 84643,
+        "tx_ms": [
+          0,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 81,
+            "first_ptr_ms": 81,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": null,
+            "unknown_ptr_ms": 127,
+            "first_ptr_ms": 127,
+            "known_ptr_omitted_with_unknown_observed": true,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": null,
+        "c_after_tail": null,
+        "d_after_tail": null
+      },
+      {
+        "mode": "four_queriers",
+        "trial": 14,
+        "query_start_monotonic_ms": 87847,
+        "tx_ms": [
+          0,
+          19,
+          25,
+          31,
+          37
+        ],
+        "a_observed_query_ms": [
+          0,
+          19,
+          25,
+          31,
+          37
+        ],
+        "a_observed_responses": {
+          "avahi": {
+            "known_ptr_ms": 80,
+            "unknown_ptr_ms": 80,
+            "first_ptr_ms": 80,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 520,
+            "unknown_ptr_ms": 520,
+            "first_ptr_ms": 520,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "b_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 80,
+            "unknown_ptr_ms": 80,
+            "first_ptr_ms": 80,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 520,
+            "unknown_ptr_ms": 520,
+            "first_ptr_ms": 520,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "c_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 81,
+            "unknown_ptr_ms": 81,
+            "first_ptr_ms": 81,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 520,
+            "unknown_ptr_ms": 520,
+            "first_ptr_ms": 520,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        },
+        "d_after_tail": {
+          "avahi": {
+            "known_ptr_ms": 81,
+            "unknown_ptr_ms": 81,
+            "first_ptr_ms": 81,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "zeroconf": {
+            "known_ptr_ms": 521,
+            "unknown_ptr_ms": 521,
+            "first_ptr_ms": 521,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      }
+    ]
+  },
+  "zeroconf_tc_timers": [
+    {
+      "tc_timer": "scheduled",
+      "id": 1,
+      "scheduled_monotonic_ms": 49405.878,
+      "deadline_monotonic_ms": 49854.86,
+      "nominal_delay_ms": 449
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 2,
+      "scheduled_monotonic_ms": 49557.449,
+      "deadline_monotonic_ms": 49977.441,
+      "nominal_delay_ms": 420
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 3,
+      "scheduled_monotonic_ms": 49707.681,
+      "deadline_monotonic_ms": 50147.677,
+      "nominal_delay_ms": 440
+    },
+    {
+      "tc_timer": "fired",
+      "id": 3,
+      "fired_monotonic_ms": 50148.254,
+      "from_schedule_ms": 440.573
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 4,
+      "scheduled_monotonic_ms": 52610.3,
+      "deadline_monotonic_ms": 53049.29,
+      "nominal_delay_ms": 439
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 5,
+      "scheduled_monotonic_ms": 52761.938,
+      "deadline_monotonic_ms": 53226.929,
+      "nominal_delay_ms": 465
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 6,
+      "scheduled_monotonic_ms": 52912.26,
+      "deadline_monotonic_ms": 53399.252,
+      "nominal_delay_ms": 487
+    },
+    {
+      "tc_timer": "fired",
+      "id": 6,
+      "fired_monotonic_ms": 53399.923,
+      "from_schedule_ms": 487.663
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 7,
+      "scheduled_monotonic_ms": 55814.249,
+      "deadline_monotonic_ms": 56313.239,
+      "nominal_delay_ms": 499
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 8,
+      "scheduled_monotonic_ms": 55965.911,
+      "deadline_monotonic_ms": 56390.901,
+      "nominal_delay_ms": 425
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 9,
+      "scheduled_monotonic_ms": 56116.225,
+      "deadline_monotonic_ms": 56548.216,
+      "nominal_delay_ms": 432
+    },
+    {
+      "tc_timer": "fired",
+      "id": 9,
+      "fired_monotonic_ms": 56548.794,
+      "from_schedule_ms": 432.569
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 10,
+      "scheduled_monotonic_ms": 59018.23,
+      "deadline_monotonic_ms": 59419.222,
+      "nominal_delay_ms": 401
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 11,
+      "scheduled_monotonic_ms": 59055.177,
+      "deadline_monotonic_ms": 59524.169,
+      "nominal_delay_ms": 469
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 12,
+      "scheduled_monotonic_ms": 59090.062,
+      "deadline_monotonic_ms": 59491.053,
+      "nominal_delay_ms": 401
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 13,
+      "scheduled_monotonic_ms": 62221.826,
+      "deadline_monotonic_ms": 62703.816,
+      "nominal_delay_ms": 482
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 14,
+      "scheduled_monotonic_ms": 62257.231,
+      "deadline_monotonic_ms": 62673.224,
+      "nominal_delay_ms": 416
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 15,
+      "scheduled_monotonic_ms": 65426.361,
+      "deadline_monotonic_ms": 65895.352,
+      "nominal_delay_ms": 469
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 16,
+      "scheduled_monotonic_ms": 65461.806,
+      "deadline_monotonic_ms": 65912.8,
+      "nominal_delay_ms": 451
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 17,
+      "scheduled_monotonic_ms": 65498.597,
+      "deadline_monotonic_ms": 65959.591,
+      "nominal_delay_ms": 461
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 18,
+      "scheduled_monotonic_ms": 68628.996,
+      "deadline_monotonic_ms": 69112.987,
+      "nominal_delay_ms": 484
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 19,
+      "scheduled_monotonic_ms": 68664.311,
+      "deadline_monotonic_ms": 69131.305,
+      "nominal_delay_ms": 467
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 20,
+      "scheduled_monotonic_ms": 68734.982,
+      "deadline_monotonic_ms": 69211.975,
+      "nominal_delay_ms": 477
+    },
+    {
+      "tc_timer": "fired",
+      "id": 20,
+      "fired_monotonic_ms": 69213.055,
+      "from_schedule_ms": 478.073
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 21,
+      "scheduled_monotonic_ms": 71830.918,
+      "deadline_monotonic_ms": 72329.907,
+      "nominal_delay_ms": 499
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 22,
+      "scheduled_monotonic_ms": 75032.408,
+      "deadline_monotonic_ms": 75445.398,
+      "nominal_delay_ms": 413
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 23,
+      "scheduled_monotonic_ms": 78235.364,
+      "deadline_monotonic_ms": 78698.356,
+      "nominal_delay_ms": 463
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 24,
+      "scheduled_monotonic_ms": 81440.076,
+      "deadline_monotonic_ms": 81939.068,
+      "nominal_delay_ms": 499
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 25,
+      "scheduled_monotonic_ms": 84643.771,
+      "deadline_monotonic_ms": 85138.762,
+      "nominal_delay_ms": 495
+    },
+    {
+      "tc_timer": "scheduled",
+      "id": 26,
+      "scheduled_monotonic_ms": 87847.637,
+      "deadline_monotonic_ms": 88329.628,
+      "nominal_delay_ms": 482
+    }
+  ]
+}

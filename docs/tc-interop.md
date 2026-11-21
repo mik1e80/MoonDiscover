@@ -48,13 +48,28 @@ zeroconf 三次均为每个 TC 包重新设定定时器，仅最后一个定时�
 
 三组 A 单独查询对照中，两种响应器都省略 A 已知的 PTR。加入 B、C 后，三组里 B 和 C 都在 A 的末包之后收到了两种响应器返回的所需 PTR。Avahi 的首次到达时刻为 65–69ms，zeroconf 为 127–134ms，均从 A 的首包起算。[原始观测](evidence/linux-tc-chain-three-queriers-20261121.json) · [专项 CI](https://github.com/mik1e80/MoonDiscover/actions/runs/44746788465)
 
-仍待验证四个及以上查询器、重排和丢包、两台物理设备、Windows/Bonjour 实网及其他响应器版本。长期实网与正式发布验收另行跟踪。
+## 续包缺失、重排与四个查询器
 
-复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。三个查询器实验要求同一接口上的三个不同 IPv4 地址。以下两个附加地址为专用 CI 示例。生成报告位于 .tools/tc-interop.json。省略第三个地址时运行上一节的双查询器与首包复测。
+2026-11-21（北京时间）在 Linux CI 上用同样的两个响应器复测。普通 QM 对照收到四条 PTR。下表的时间从探针开始本组观测起算，括号内是实际发包时刻。每个顺序场景运行一次。省略续包由探针主动跳过发送，重排由探针改变发送顺序。[原始观测](evidence/linux-tc-loss-four-queriers-20261121.json) · [专项 CI](https://github.com/mik1e80/MoonDiscover/actions/runs/44879924995)
+
+| 场景和发包时刻（ms） | Avahi 的对照 PTR | zeroconf 的对照 PTR |
+| --- | --- | --- |
+| 顺序发送（1、38、72、106） | 声明为已知的 PTR 未收到，另一条 48ms 收到 | 声明为已知的 PTR 未收到，另一条 213ms 收到 |
+| 省略载有 zeroconf 对照 PTR 的续包（0、36、106） | 两条均在 35ms 收到 | 两条均在 177ms 收到 |
+| 交换两个带 TC 的续包（0、35、72、106） | 两条均在 35ms 收到 | 声明为已知的 PTR 未收到，另一条 134ms 收到 |
+| 末包先于最后一个带 TC 的续包（0、36、73、106） | 两条均在 36ms 收到 | 两条均在 119ms 收到 |
+
+各组的另一条 Avahi PTR 在末包中声明为已知，但本次均早于末包收到。交换续包时，Avahi 自己的已知 PTR 位于 72ms 发出的续包，晚于已观测的回答。末包提前时，zeroconf 在迟到的 TC 续包之后仍发出了该续包声明的 PTR。本轮另做三次只有带 TC 包的计时对照。zeroconf 从最后一个带 TC 的续包设定到触发分别为 440.573、487.663、432.569ms。Avahi 三次在 47–48ms 已回包，早于第一份续包。
+
+四查询器实验中，A 发出 TC 首包，随后 B、C、D 在 18–31ms 陆续发出三份同名 QM 查询，A 在 37ms 发末包。B、C、D 都需要 A 已知的两条 PTR。三轮实验中，B、C、D 各自在观察到 A 的末包后均收到了两种响应器的所需 PTR。按 A 首包起算，Avahi 在 80–119ms 到达，zeroconf 在 129–521ms 到达。A 单独查询的三轮配对对照中，zeroconf 三次都省略 A 已知的 PTR，Avahi 两次省略，另一次在 35ms 已回包，末包于 36ms 发出。
+
+仍待验证五个及以上查询器、网络链路实际丢包或乱序、两台物理设备、Windows 与 Bonjour 的同类 TC 实验及其他响应器版本。长期实网与正式发布验收另行跟踪。
+
+复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入三个附加地址运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
 ```sh
 moon build tests/tc_interop --target native
-moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243
+moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192.0.2.244
 ```
 
-CI 检查发布进程、实验报文语义、普通查询的注册记录、双源报文顺序及定时器观测数量。时间和抑制字段记录实测值。
+CI 检查发布进程、实验报文语义、普通查询的注册记录、各查询报文的源地址与顺序、竞争查询器各自观察到的末包，以及定时器观测数量。时间和抑制字段记录实测值。
