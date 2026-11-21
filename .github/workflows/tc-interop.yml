@@ -41,17 +41,18 @@ jobs:
           moon build tests/tc_interop --target native
           dev=$(ip -j -4 route get 224.0.0.251 | python3 -c 'import json,sys; print(json.load(sys.stdin)[0]["dev"])')
           sudo ip addr add 192.0.2.242/32 dev "$dev"
-          trap 'for alias in 192.0.2.248 192.0.2.247 192.0.2.246 192.0.2.245 192.0.2.244 192.0.2.243 192.0.2.242; do sudo ip addr del "$alias/32" dev "$dev" 2>/dev/null || true; done' EXIT
+          trap 'for alias in 192.0.2.249 192.0.2.248 192.0.2.247 192.0.2.246 192.0.2.245 192.0.2.244 192.0.2.243 192.0.2.242; do sudo ip addr del "$alias/32" dev "$dev" 2>/dev/null || true; done' EXIT
           sudo ip addr add 192.0.2.243/32 dev "$dev"
           sudo ip addr add 192.0.2.244/32 dev "$dev"
           sudo ip addr add 192.0.2.245/32 dev "$dev"
           sudo ip addr add 192.0.2.246/32 dev "$dev"
           sudo ip addr add 192.0.2.247/32 dev "$dev"
           sudo ip addr add 192.0.2.248/32 dev "$dev"
-          moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192.0.2.244 192.0.2.245 192.0.2.246 192.0.2.247 192.0.2.248
+          sudo ip addr add 192.0.2.249/32 dev "$dev"
+          moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192.0.2.244 192.0.2.245 192.0.2.246 192.0.2.247 192.0.2.248 192.0.2.249
       - name: Verify loss and reordering across an isolated virtual link
         shell: bash
-        run: sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --seven
+        run: sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --eight
       - name: Retain observations and publisher logs
         if: always()
         uses: actions/upload-artifact@v4
