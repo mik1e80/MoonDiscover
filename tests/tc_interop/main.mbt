@@ -69,22 +69,28 @@ fn observation(
 ///|
 async fn main {
   let args = @env.args()
-  if args.length() == 4 &&
-    (args[1] == "--link-send" || args[1] == "--link-baseline") {
-    link_send(args[2], args[3], args[1] == "--link-baseline")
+  if args.get(1) is Some("--link-send" | "--link-baseline") &&
+    (args.length() == 4 || args.length() == 8) {
+    link_send(
+      args[2],
+      args[3],
+      args[1] == "--link-baseline",
+      args[4:].to_owned(),
+    )
     return
   }
-  if args.length() == 5 && args[1] == "--link-receive" {
-    link_receive(args[2], args[3], args[4])
+  if args.get(1) == Some("--link-receive") &&
+    (args.length() == 5 || args.length() == 9) {
+    link_receive(args[2], args[3], args[4], args[5:].to_owned())
     return
   }
-  if args.length() >= 4 && args.length() <= 6 {
+  if args.length() >= 4 && args.length() <= 7 {
     extended_probe(args[1:].to_owned())
     return
   }
   guard args.length() == 3 else {
     fail(
-      "usage: tc_interop <IPv4> <second-source-IPv4> [third-source-IPv4] [fourth-source-IPv4] [fifth-source-IPv4]",
+      "usage: tc_interop <IPv4> <second-source-IPv4> [third-source-IPv4] [fourth-source-IPv4] [fifth-source-IPv4] [sixth-source-IPv4]",
     )
   }
   let addr = @socket.Addr::parse(args[1] + ":0")

@@ -75,22 +75,31 @@ async fn extended_probe(sources : Array[String]) -> Unit {
   // listed by A. C already knows the other two PTRs.
   let c_query = @wire.query_with_answers(service, 12, [answer(1), answer(3)])
   let d_query = @wire.query_with_answers(service, 12, [answer(1)])
-  // Every source in the five-way race lacks zc-unknown. Different remaining
-  // TTLs on av-unknown preserve distinct queries for C, D and E.
-  let five_c = d_query
-  let five_d = @wire.query_with_answers(service, 12, [
-    { ..answer(1), ttl: 4499U, },
-  ])
-  let five_e = @wire.query_with_answers(service, 12, [
-    { ..answer(1), ttl: 4498U, },
-  ])
+  // Each source lacks zc-unknown. The av-unknown remaining TTL keeps C and
+  // subsequent queries distinct even with a recent-packet duplicate filter.
+  let competitors = [plain]
+  for i in 2..<ips.length() {
+    competitors.push(
+      @wire.query_with_answers(service, 12, [
+        { ..answer(1), ttl: 4502U - i.reinterpret_as_uint(), },
+      ]),
+    )
+  }
   let (_, finish) = tc_burst(service, [answer(1)])
   let competition = match ips.length() {
+    6 => "six_queriers"
     5 => "five_queriers"
     4 => "four_queriers"
     _ => "three_queriers"
   }
-  let modes = if ips.length() == 5 {
+  let solo_tail_at = if ips.length() == 6 {
+    51L
+  } else if ips.length() == 5 {
+    45L
+  } else {
+    35L
+  }
+  let modes = if ips.length() >= 5 {
     ["plain", "solo", competition, "solo", competition, "solo", competition]
   } else if ips.length() == 4 {
     [
@@ -142,20 +151,15 @@ async fn extended_probe(sources : Array[String]) -> Unit {
           (a_ip, finish, 70L),
           (a_ip, tc_two, 105L),
         ]
-      "solo" =>
-        [
-          (a_ip, head, 0L),
-          (a_ip, tail, if ips.length() == 5 { 45L } else { 35L }),
-        ]
-      "five_queriers" =>
-        [
-          (a_ip, head, 0L),
-          (b_ip, plain, 18L),
-          (c_ip, five_c, 24L),
-          (ips[3], five_d, 30L),
-          (ips[4], five_e, 36L),
-          (a_ip, tail, 45L),
-        ]
+      "solo" => [(a_ip, head, 0L), (a_ip, tail, solo_tail_at)]
+      "five_queriers" | "six_queriers" => {
+        let queries = [(a_ip, head, 0L)]
+        for i, query in competitors {
+          queries.push((ips[i + 1], query, 18L + 6L * i.to_int64()))
+        }
+        queries.push((a_ip, tail, solo_tail_at))
+        queries
+      }
       "four_queriers" =>
         [
           (a_ip, head, 0L),
@@ -271,6 +275,7 @@ async fn extended_probe(sources : Array[String]) -> Unit {
         "c_after_tail": waiter_reports.get(1).unwrap_or(Json::null()),
         "d_after_tail": waiter_reports.get(2).unwrap_or(Json::null()),
         "e_after_tail": waiter_reports.get(3).unwrap_or(Json::null()),
+        "f_after_tail": waiter_reports.get(4).unwrap_or(Json::null()),
       }),
     )
   }

@@ -34,7 +34,7 @@ async fn tc(args : Array[String]) -> String {
 
 async fn setup_interface(ns : String, device : String, address : String) -> Unit {
   let _ = command("ip", ["-n", ns, "link", "set", "lo", "up"])
-  let _ = command("ip", ["-n", ns, "addr", "add", address + "/30", "dev", device])
+  let _ = command("ip", ["-n", ns, "addr", "add", address + "/29", "dev", device])
   let _ = command("ip", ["-n", ns, "link", "set", device, "up"])
   let _ = command("ip", ["-n", ns, "route", "add", "224.0.0.251/32", "dev", device, "src", address])
 }
@@ -50,7 +50,7 @@ async fn wait_ready(path : String, child : @process.Process, log : String, attem
   fail("timed out waiting for " + path + ": " + @fs.read_file(log).text())
 }
 
-async fn measure(binary : String, mode : String, trial : Int) -> Json {
+async fn measure(binary : String, mode : String, trial : Int, additional : Array[String]) -> Json {
   let _ = tc(["qdisc", "add", "dev", "mdtx", "root", "handle", "1:", "prio"])
   defer (ignore(tc(["qdisc", "del", "dev", "mdtx", "root"])))
   let options = match mode {
@@ -72,28 +72,36 @@ async fn measure(binary : String, mode : String, trial : Int) -> Json {
   ])
   let marker = ".tools/tc-link-monitor-ready"
   if @fs.exists(marker) { @fs.remove(marker) }
+  let receive_args = ["--link-receive", receiver_ip, sender_ip, marker]
+  let send_args = ["--link-send", sender_ip, receiver_ip]
+  for ip in additional {
+    receive_args.push(ip)
+    send_args.push(ip)
+  }
   let (sent, received) = @async.with_task_group(group => {
     let out = @process.redirect_to_file(".tools/tc-link-monitor.json")
     let stderr = ".tools/tc-link-monitor.log"
     let err = @process.redirect_to_file(stderr)
-    let child = @process.spawn(group, "ip", in_namespace(receiver, binary, [
-      "--link-receive", receiver_ip, sender_ip, marker,
-    ]), stdout=out, stderr=err, no_wait=true)
+    let child = @process.spawn(group, "ip", in_namespace(receiver, binary, receive_args), stdout=out, stderr=err, no_wait=true)
     defer child.cancel()
     wait_ready(marker, child, stderr, 100)
-    let sent = @json.parse(command("ip", in_namespace(sender, binary, [
-      "--link-send", sender_ip, receiver_ip,
-    ])))
+    let sent = @json.parse(command("ip", in_namespace(sender, binary, send_args)))
     guard child.wait() == 0 else { fail("receive probe failed: " + @fs.read_file(stderr).text()) }
     (sent, @fs.read_file(".tools/tc-link-monitor.json").json())
   })
   let queues = @json.parse(tc(["-j", "-s", "qdisc", "show", "dev", "mdtx"]))
-  let expected = match mode {
-    "drop" => [0, 1, 3]
-    "reorder" => [0, 1, 3, 2]
-    _ => [0, 1, 2, 3]
+  let prefix = if additional.is_empty() { [0, 1] } else { [0, 4, 5, 6, 7, 1] }
+  let sent_order = prefix.copy()
+  sent_order.push(2)
+  sent_order.push(3)
+  let expected = prefix
+  if mode == "control" { expected.push(2) }
+  expected.push(3)
+  if mode == "reorder" { expected.push(2) }
+  guard sent is { "queriers": Array(queriers), .. } && queriers.length() == additional.length() + 1 else {
+    fail("missing per-querier observations")
   }
-  guard sent is { "send_order": order, .. } && order == Json([0, 1, 2, 3]) &&
+  guard sent is { "send_order": order, .. } && order == Json(sent_order) &&
     received is { "receive_order": order, .. } && order == Json(expected) else {
     fail(mode + ": unable to verify sending and arrival order: " + sent.stringify() + " " + received.stringify() + " " + queues.stringify())
   }
@@ -114,7 +122,10 @@ async fn measure(binary : String, mode : String, trial : Int) -> Json {
 
 async fn main {
   let args = @env.args()
-  guard args.length() == 3 else { fail("usage: tc-link.mbtx <zeroconf-python> <source-commit>") }
+  guard args.length() == 3 || (args.length() == 4 && args[3] == "--five") else {
+    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--five]")
+  }
+  let additional = if args.length() == 4 { ["192.0.2.11", "192.0.2.12", "192.0.2.13", "192.0.2.14"] } else { [] }
   @fs.mkdir(".tools", allow_exist=true)
   let binary = "_build/native/debug/build/tests/tc_interop/tc_interop.exe"
   let python = args[1]
@@ -127,6 +138,9 @@ async fn main {
   let _ = command("ip", ["-n", sender, "link", "add", "mdtx", "type", "veth", "peer", "name", "mdrx", "netns", receiver])
   setup_interface(sender, "mdtx", sender_ip)
   setup_interface(receiver, "mdrx", receiver_ip)
+  for ip in additional {
+    let _ = command("ip", ["-n", sender, "addr", "add", ip + "/32", "dev", "mdtx"])
+  }
   let marker = ".tools/tc-link-publisher-ready"
   if @fs.exists(marker) { @fs.remove(marker) }
   let (baseline, arms) = @async.with_task_group(group => {
@@ -148,7 +162,7 @@ async fn main {
     for trial in 1..=3 {
       for mode in ["control", "drop", "reorder"] {
         @async.sleep(800)
-        arms.push(measure(binary, mode, trial))
+        arms.push(measure(binary, mode, trial, additional))
       }
     }
     guard publisher.try_wait() is None else { fail("publisher exited during measurements") }
@@ -156,7 +170,7 @@ async fn main {
   })
   let report = Json::object({
     "source_commit": Json(args[2]),
-    "scenario": "isolated veth TC loss and reordering",
+    "scenario": if additional.is_empty() { "isolated veth TC loss and reordering" } else { "five queriers with isolated veth TC loss and reordering" },
     "kernel": Json(command("uname", ["-r"])),
     "zeroconf_version": Json(command(python, ["-c", "from importlib.metadata import version; print(version('zeroconf'))"])),
     "baseline": baseline,
