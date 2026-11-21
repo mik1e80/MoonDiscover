@@ -1,0 +1,2029 @@
+{
+  "source_run": "https://github.com/mik1e80/MoonDiscover/actions/runs/44882530492",
+  "source_job": "https://github.com/mik1e80/MoonDiscover/actions/runs/44882530492/job/136780724749",
+  "seven_queriers": {
+    "source_commit": "5bb25a146b3727222871c8e58da8cfb0f5f6909c",
+    "avahi_version": "avahi-daemon 0.8",
+    "zeroconf_version": "0.148.0",
+    "result": {
+      "scenario": "seven_queriers",
+      "arms": [
+        {
+          "mode": "plain",
+          "trial": 1,
+          "query_start_monotonic_ms": 127114,
+          "tx_ms": [
+            0
+          ],
+          "a_observed_query_ms": [
+            0
+          ],
+          "a_observed_responses": {
+            "avahi": {
+              "known_ptr_ms": 84,
+              "unknown_ptr_ms": 84,
+              "first_ptr_ms": 84,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": null,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 116,
+              "unknown_ptr_ms": 116,
+              "first_ptr_ms": 116,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": null,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "b_after_tail": null,
+          "c_after_tail": null,
+          "d_after_tail": null,
+          "e_after_tail": null,
+          "f_after_tail": null,
+          "g_after_tail": null
+        },
+        {
+          "mode": "solo",
+          "trial": 2,
+          "query_start_monotonic_ms": 130317,
+          "tx_ms": [
+            0,
+            58
+          ],
+          "a_observed_query_ms": [
+            0,
+            58
+          ],
+          "a_observed_responses": {
+            "avahi": {
+              "known_ptr_ms": null,
+              "unknown_ptr_ms": 92,
+              "first_ptr_ms": 92,
+              "known_ptr_omitted_with_unknown_observed": true,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": null,
+              "unknown_ptr_ms": 131,
+              "first_ptr_ms": 131,
+              "known_ptr_omitted_with_unknown_observed": true,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "b_after_tail": null,
+          "c_after_tail": null,
+          "d_after_tail": null,
+          "e_after_tail": null,
+          "f_after_tail": null,
+          "g_after_tail": null
+        },
+        {
+          "mode": "seven_queriers",
+          "trial": 3,
+          "query_start_monotonic_ms": 133521,
+          "tx_ms": [
+            1,
+            19,
+            25,
+            32,
+            38,
+            44,
+            50,
+            59
+          ],
+          "a_observed_query_ms": [
+            1,
+            19,
+            25,
+            32,
+            38,
+            44,
+            50,
+            59
+          ],
+          "a_observed_responses": {
+            "avahi": {
+              "known_ptr_ms": 94,
+              "unknown_ptr_ms": 94,
+              "first_ptr_ms": 94,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 521,
+              "unknown_ptr_ms": 521,
+              "first_ptr_ms": 521,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "b_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 94,
+              "unknown_ptr_ms": 94,
+              "first_ptr_ms": 94,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 521,
+              "unknown_ptr_ms": 521,
+              "first_ptr_ms": 521,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "c_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 94,
+              "unknown_ptr_ms": 94,
+              "first_ptr_ms": 94,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 521,
+              "unknown_ptr_ms": 521,
+              "first_ptr_ms": 521,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "d_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 94,
+              "unknown_ptr_ms": 94,
+              "first_ptr_ms": 94,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 521,
+              "unknown_ptr_ms": 521,
+              "first_ptr_ms": 521,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "e_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 94,
+              "unknown_ptr_ms": 94,
+              "first_ptr_ms": 94,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 521,
+              "unknown_ptr_ms": 521,
+              "first_ptr_ms": 521,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "f_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 94,
+              "unknown_ptr_ms": 94,
+              "first_ptr_ms": 94,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 521,
+              "unknown_ptr_ms": 521,
+              "first_ptr_ms": 521,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "g_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 94,
+              "unknown_ptr_ms": 94,
+              "first_ptr_ms": 94,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 521,
+              "unknown_ptr_ms": 521,
+              "first_ptr_ms": 521,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          }
+        },
+        {
+          "mode": "solo",
+          "trial": 4,
+          "query_start_monotonic_ms": 136724,
+          "tx_ms": [
+            0,
+            59
+          ],
+          "a_observed_query_ms": [
+            0,
+            59
+          ],
+          "a_observed_responses": {
+            "avahi": {
+              "known_ptr_ms": null,
+              "unknown_ptr_ms": 93,
+              "first_ptr_ms": 93,
+              "known_ptr_omitted_with_unknown_observed": true,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": null,
+              "unknown_ptr_ms": 150,
+              "first_ptr_ms": 150,
+              "known_ptr_omitted_with_unknown_observed": true,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "b_after_tail": null,
+          "c_after_tail": null,
+          "d_after_tail": null,
+          "e_after_tail": null,
+          "f_after_tail": null,
+          "g_after_tail": null
+        },
+        {
+          "mode": "seven_queriers",
+          "trial": 5,
+          "query_start_monotonic_ms": 139926,
+          "tx_ms": [
+            0,
+            19,
+            25,
+            31,
+            37,
+            43,
+            50,
+            59
+          ],
+          "a_observed_query_ms": [
+            0,
+            19,
+            25,
+            31,
+            37,
+            43,
+            50,
+            59
+          ],
+          "a_observed_responses": {
+            "avahi": {
+              "known_ptr_ms": 93,
+              "unknown_ptr_ms": 93,
+              "first_ptr_ms": 93,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "b_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 93,
+              "unknown_ptr_ms": 93,
+              "first_ptr_ms": 93,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "c_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 93,
+              "unknown_ptr_ms": 93,
+              "first_ptr_ms": 93,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "d_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 93,
+              "unknown_ptr_ms": 93,
+              "first_ptr_ms": 93,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "e_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 93,
+              "unknown_ptr_ms": 93,
+              "first_ptr_ms": 93,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "f_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 93,
+              "unknown_ptr_ms": 93,
+              "first_ptr_ms": 93,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "g_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 93,
+              "unknown_ptr_ms": 93,
+              "first_ptr_ms": 93,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          }
+        },
+        {
+          "mode": "solo",
+          "trial": 6,
+          "query_start_monotonic_ms": 143128,
+          "tx_ms": [
+            0,
+            58
+          ],
+          "a_observed_query_ms": [
+            0,
+            58
+          ],
+          "a_observed_responses": {
+            "avahi": {
+              "known_ptr_ms": null,
+              "unknown_ptr_ms": 111,
+              "first_ptr_ms": 111,
+              "known_ptr_omitted_with_unknown_observed": true,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": null,
+              "unknown_ptr_ms": 135,
+              "first_ptr_ms": 135,
+              "known_ptr_omitted_with_unknown_observed": true,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "b_after_tail": null,
+          "c_after_tail": null,
+          "d_after_tail": null,
+          "e_after_tail": null,
+          "f_after_tail": null,
+          "g_after_tail": null
+        },
+        {
+          "mode": "seven_queriers",
+          "trial": 7,
+          "query_start_monotonic_ms": 146331,
+          "tx_ms": [
+            0,
+            18,
+            25,
+            31,
+            37,
+            43,
+            50,
+            59
+          ],
+          "a_observed_query_ms": [
+            0,
+            18,
+            25,
+            31,
+            37,
+            43,
+            50,
+            59
+          ],
+          "a_observed_responses": {
+            "avahi": {
+              "known_ptr_ms": 110,
+              "unknown_ptr_ms": 110,
+              "first_ptr_ms": 110,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 519,
+              "unknown_ptr_ms": 519,
+              "first_ptr_ms": 519,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "b_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 110,
+              "unknown_ptr_ms": 110,
+              "first_ptr_ms": 110,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 519,
+              "unknown_ptr_ms": 519,
+              "first_ptr_ms": 519,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "c_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 111,
+              "unknown_ptr_ms": 111,
+              "first_ptr_ms": 111,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "d_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 111,
+              "unknown_ptr_ms": 111,
+              "first_ptr_ms": 111,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "e_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 111,
+              "unknown_ptr_ms": 111,
+              "first_ptr_ms": 111,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "f_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 111,
+              "unknown_ptr_ms": 111,
+              "first_ptr_ms": 111,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          },
+          "g_after_tail": {
+            "avahi": {
+              "known_ptr_ms": 111,
+              "unknown_ptr_ms": 111,
+              "first_ptr_ms": 111,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            },
+            "zeroconf": {
+              "known_ptr_ms": 520,
+              "unknown_ptr_ms": 520,
+              "first_ptr_ms": 520,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": false,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          }
+        }
+      ]
+    },
+    "zeroconf_tc_timers": [
+      {
+        "tc_timer": "scheduled",
+        "id": 1,
+        "scheduled_monotonic_ms": 130317.563,
+        "deadline_monotonic_ms": 130753.546,
+        "nominal_delay_ms": 436
+      },
+      {
+        "tc_timer": "scheduled",
+        "id": 2,
+        "scheduled_monotonic_ms": 133522.236,
+        "deadline_monotonic_ms": 134018.223,
+        "nominal_delay_ms": 496
+      },
+      {
+        "tc_timer": "scheduled",
+        "id": 3,
+        "scheduled_monotonic_ms": 136724.876,
+        "deadline_monotonic_ms": 137188.867,
+        "nominal_delay_ms": 464
+      },
+      {
+        "tc_timer": "scheduled",
+        "id": 4,
+        "scheduled_monotonic_ms": 139926.979,
+        "deadline_monotonic_ms": 140411.969,
+        "nominal_delay_ms": 485
+      },
+      {
+        "tc_timer": "scheduled",
+        "id": 5,
+        "scheduled_monotonic_ms": 143128.854,
+        "deadline_monotonic_ms": 143531.844,
+        "nominal_delay_ms": 403
+      },
+      {
+        "tc_timer": "scheduled",
+        "id": 6,
+        "scheduled_monotonic_ms": 146331.547,
+        "deadline_monotonic_ms": 146786.538,
+        "nominal_delay_ms": 455
+      }
+    ]
+  },
+  "six_queriers_isolated_link": {
+    "source_commit": "5bb25a146b3727222871c8e58da8cfb0f5f6909c",
+    "scenario": "six queriers with isolated veth TC loss and reordering",
+    "kernel": "7.0.0-1020-azure",
+    "zeroconf_version": "0.148.0",
+    "baseline": {
+      "send_order": [
+        0
+      ],
+      "sent_ms": [
+        0
+      ],
+      "zeroconf": {
+        "known_ptr_ms": 88,
+        "unknown_ptr_ms": 88,
+        "first_ptr_ms": 88,
+        "known_ptr_omitted_with_unknown_observed": false,
+        "first_ptr_before_tail": null,
+        "first_ptr_in_400_to_500_ms": false
+      },
+      "queriers": [
+        {
+          "source_ipv4": "192.0.2.9",
+          "zeroconf": {
+            "known_ptr_ms": 88,
+            "unknown_ptr_ms": 88,
+            "first_ptr_ms": 88,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      ]
+    },
+    "arms": [
+      {
+        "mode": "control",
+        "trial": 1,
+        "sender": {
+          "send_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "sent_ms": [
+            0,
+            8,
+            15,
+            20,
+            26,
+            32,
+            40,
+            65,
+            90
+          ],
+          "zeroconf": {
+            "known_ptr_ms": 510,
+            "unknown_ptr_ms": 510,
+            "first_ptr_ms": 510,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "queriers": [
+            {
+              "source_ipv4": "192.0.2.9",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.11",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.12",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.13",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.14",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.15",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            }
+          ]
+        },
+        "peer": {
+          "receive_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "received_ms": [
+            0,
+            8,
+            15,
+            20,
+            26,
+            32,
+            40,
+            65,
+            90
+          ]
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "seed": 4259481258860439600,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 188,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "drop",
+        "trial": 1,
+        "sender": {
+          "send_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "sent_ms": [
+            0,
+            8,
+            14,
+            20,
+            26,
+            32,
+            40,
+            66,
+            90
+          ],
+          "zeroconf": {
+            "known_ptr_ms": 510,
+            "unknown_ptr_ms": 510,
+            "first_ptr_ms": 510,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "queriers": [
+            {
+              "source_ipv4": "192.0.2.9",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.11",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.12",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.13",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.14",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.15",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            }
+          ]
+        },
+        "peer": {
+          "receive_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            3
+          ],
+          "received_ms": [
+            0,
+            8,
+            14,
+            20,
+            26,
+            32,
+            40,
+            90
+          ]
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 1,
+              "correlation": 0
+            },
+            "seed": 14636634081327286000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "reorder",
+        "trial": 1,
+        "sender": {
+          "send_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "sent_ms": [
+            0,
+            8,
+            14,
+            20,
+            26,
+            32,
+            40,
+            65,
+            90
+          ],
+          "zeroconf": {
+            "known_ptr_ms": 78,
+            "unknown_ptr_ms": 78,
+            "first_ptr_ms": 78,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": true,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "queriers": [
+            {
+              "source_ipv4": "192.0.2.9",
+              "zeroconf": {
+                "known_ptr_ms": 78,
+                "unknown_ptr_ms": 78,
+                "first_ptr_ms": 78,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": true,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.11",
+              "zeroconf": {
+                "known_ptr_ms": 78,
+                "unknown_ptr_ms": 78,
+                "first_ptr_ms": 78,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": true,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.12",
+              "zeroconf": {
+                "known_ptr_ms": 78,
+                "unknown_ptr_ms": 78,
+                "first_ptr_ms": 78,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": true,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.13",
+              "zeroconf": {
+                "known_ptr_ms": 78,
+                "unknown_ptr_ms": 78,
+                "first_ptr_ms": 78,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": true,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.14",
+              "zeroconf": {
+                "known_ptr_ms": 78,
+                "unknown_ptr_ms": 78,
+                "first_ptr_ms": 78,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": true,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.15",
+              "zeroconf": {
+                "known_ptr_ms": 78,
+                "unknown_ptr_ms": 78,
+                "first_ptr_ms": 78,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": true,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            }
+          ]
+        },
+        "peer": {
+          "receive_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            3,
+            2
+          ],
+          "received_ms": [
+            0,
+            8,
+            14,
+            20,
+            26,
+            32,
+            40,
+            90,
+            190
+          ]
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "delay": {
+              "delay": 0.125,
+              "jitter": 0,
+              "correlation": 0
+            },
+            "seed": 3181947621496407600,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 188,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "control",
+        "trial": 2,
+        "sender": {
+          "send_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "sent_ms": [
+            0,
+            9,
+            14,
+            20,
+            26,
+            32,
+            40,
+            65,
+            90
+          ],
+          "zeroconf": {
+            "known_ptr_ms": 510,
+            "unknown_ptr_ms": 510,
+            "first_ptr_ms": 510,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "queriers": [
+            {
+              "source_ipv4": "192.0.2.9",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.11",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.12",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.13",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.14",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.15",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            }
+          ]
+        },
+        "peer": {
+          "receive_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "received_ms": [
+            0,
+            9,
+            14,
+            20,
+            26,
+            32,
+            40,
+            65,
+            90
+          ]
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "seed": 12939371695236844000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 188,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "drop",
+        "trial": 2,
+        "sender": {
+          "send_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "sent_ms": [
+            0,
+            8,
+            15,
+            20,
+            27,
+            32,
+            40,
+            65,
+            90
+          ],
+          "zeroconf": {
+            "known_ptr_ms": 510,
+            "unknown_ptr_ms": 510,
+            "first_ptr_ms": 510,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "queriers": [
+            {
+              "source_ipv4": "192.0.2.9",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.11",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.12",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.13",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.14",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.15",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            }
+          ]
+        },
+        "peer": {
+          "receive_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            3
+          ],
+          "received_ms": [
+            0,
+            8,
+            15,
+            20,
+            27,
+            32,
+            40,
+            90
+          ]
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 1,
+              "correlation": 0
+            },
+            "seed": 12087855625613584000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "reorder",
+        "trial": 2,
+        "sender": {
+          "send_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "sent_ms": [
+            1,
+            8,
+            15,
+            20,
+            26,
+            32,
+            40,
+            65,
+            90
+          ],
+          "zeroconf": {
+            "known_ptr_ms": 511,
+            "unknown_ptr_ms": 511,
+            "first_ptr_ms": 511,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "queriers": [
+            {
+              "source_ipv4": "192.0.2.9",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.11",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.12",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.13",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.14",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.15",
+              "zeroconf": {
+                "known_ptr_ms": 511,
+                "unknown_ptr_ms": 511,
+                "first_ptr_ms": 511,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            }
+          ]
+        },
+        "peer": {
+          "receive_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            3,
+            2
+          ],
+          "received_ms": [
+            0,
+            7,
+            14,
+            19,
+            25,
+            31,
+            39,
+            90,
+            189
+          ]
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "delay": {
+              "delay": 0.125,
+              "jitter": 0,
+              "correlation": 0
+            },
+            "seed": 7385355591692085000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 188,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "control",
+        "trial": 3,
+        "sender": {
+          "send_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "sent_ms": [
+            0,
+            8,
+            14,
+            20,
+            26,
+            32,
+            40,
+            65,
+            90
+          ],
+          "zeroconf": {
+            "known_ptr_ms": 510,
+            "unknown_ptr_ms": 510,
+            "first_ptr_ms": 510,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "queriers": [
+            {
+              "source_ipv4": "192.0.2.9",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.11",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.12",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.13",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.14",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.15",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            }
+          ]
+        },
+        "peer": {
+          "receive_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "received_ms": [
+            0,
+            8,
+            14,
+            20,
+            26,
+            32,
+            40,
+            65,
+            90
+          ]
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "seed": 5421158255610627000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 188,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "drop",
+        "trial": 3,
+        "sender": {
+          "send_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "sent_ms": [
+            0,
+            8,
+            15,
+            20,
+            27,
+            32,
+            40,
+            65,
+            91
+          ],
+          "zeroconf": {
+            "known_ptr_ms": 510,
+            "unknown_ptr_ms": 510,
+            "first_ptr_ms": 510,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "queriers": [
+            {
+              "source_ipv4": "192.0.2.9",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.11",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.12",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.13",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.14",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.15",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            }
+          ]
+        },
+        "peer": {
+          "receive_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            3
+          ],
+          "received_ms": [
+            0,
+            8,
+            15,
+            20,
+            27,
+            32,
+            40,
+            91
+          ]
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 1,
+              "correlation": 0
+            },
+            "seed": 9184485130391236000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "reorder",
+        "trial": 3,
+        "sender": {
+          "send_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            2,
+            3
+          ],
+          "sent_ms": [
+            1,
+            8,
+            14,
+            20,
+            26,
+            32,
+            40,
+            65,
+            90
+          ],
+          "zeroconf": {
+            "known_ptr_ms": 510,
+            "unknown_ptr_ms": 510,
+            "first_ptr_ms": 510,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": false,
+            "first_ptr_in_400_to_500_ms": false
+          },
+          "queriers": [
+            {
+              "source_ipv4": "192.0.2.9",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.11",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.12",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.13",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.14",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            },
+            {
+              "source_ipv4": "192.0.2.15",
+              "zeroconf": {
+                "known_ptr_ms": 510,
+                "unknown_ptr_ms": 510,
+                "first_ptr_ms": 510,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": false,
+                "first_ptr_in_400_to_500_ms": false
+              }
+            }
+          ]
+        },
+        "peer": {
+          "receive_order": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            1,
+            3,
+            2
+          ],
+          "received_ms": [
+            0,
+            7,
+            13,
+            19,
+            25,
+            31,
+            39,
+            89,
+            189
+          ]
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "delay": {
+              "delay": 0.125,
+              "jitter": 0,
+              "correlation": 0
+            },
+            "seed": 14263791438854447000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 188,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      }
+    ]
+  }
+}
