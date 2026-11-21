@@ -135,19 +135,37 @@ zeroconf 三次均为每个 TC 包重新设定定时器，仅最后一个定时�
 
 乱序三轮中，续包 2 都比末包晚 100ms 到达。九轮均在 A 发出末包后收到两条 PTR。表中的时间为发送端从探针启动到各套接字首次观察到记录的时间。响应方向的链路保持正常。[原始观测](evidence/linux-tc-eight-queriers-seven-netem-20261121.json)
 
-仍待验证九个及以上查询器、八个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、随机或连续丢包、响应方向的链路故障、两台物理设备、Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+## 九个查询器请求同一条 PTR
 
-复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至七个附加地址分别运行五至八查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
+2026-11-21（北京时间），Linux 同机九个独立 IPv4 源请求同一服务类型。B 至 I 在 A 的首包后 18–62ms 发出 QM 查询，A 在 69ms 发出声明 `av-known` 和 `zc-known` 的末包。九方都缺少 `zc-unknown`，三轮均在末包后收到这条 PTR，距首包 519–520ms。
+
+B 至 I 每轮也在各自观察到末包后收到 `zc-known`。`av-known` 在前两轮于 74–75ms 到达 B 至 I。第三轮 A 在 63ms 已观察到 `av-known`，早于 69ms 的末包，B 至 I 的末包后窗口均无这条记录。三轮 A 单独查询对照中，zeroconf 均省略 A 声明的已知记录，Avahi 两轮省略，另一轮在 64ms 回包，早于 70ms 的末包。[原始观测](evidence/linux-tc-nine-queriers-eight-netem-20261121.json) · [专项 CI](https://github.com/mik1e80/MoonDiscover/actions/runs/44918472984)
+
+## 八个查询器叠加链路丢包与乱序
+
+发送侧用八个独立 IPv4 源，接收侧运行 python-zeroconf 0.148.0。接收侧逐份确认 B 至 H 的七份竞争查询均到达。八方都缺少 `zc-unknown`，B 至 H 同时缺少 `zc-known`。netem 仅处理 A 携带 `zc-known` 的续包 2，各场景执行三轮。
+
+| 场景 | A 的报文到达顺序 | 目标队列每轮通过 / 丢弃 | 八个套接字收包 |
+| --- | --- | --- | --- |
+| 无损对照 | 首包 → 续包 1 → 续包 2 → 末包 | 1 / 0 | 两条 PTR 均收到（24/24），509–510ms |
+| 定向丢包 | 首包 → 续包 1 → 末包 | 0 / 1 | 两条 PTR 均收到（24/24），510–511ms |
+| 将续包 2 延迟 125ms | 首包 → 续包 1 → 末包 → 续包 2 | 1 / 0 | 两条 PTR 均收到（24/24），509–511ms |
+
+乱序组中，续包 2 每轮比末包晚 99–100ms 到达。九轮均在 A 发出末包后收到两条 PTR，表中的时间从发送端探针开始计。响应方向的链路保持正常。[原始观测](evidence/linux-tc-nine-queriers-eight-netem-20261121.json)
+
+仍待验证十个及以上查询器、九个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、随机或连续丢包、响应方向的链路故障、两台物理设备、Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+
+复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至八个附加地址分别运行五至九查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
 ```sh
 moon build tests/tc_interop --target native
-moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192.0.2.244 192.0.2.245 192.0.2.246 192.0.2.247 192.0.2.248
+moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192.0.2.244 192.0.2.245 192.0.2.246 192.0.2.247 192.0.2.248 192.0.2.249
 ```
 
-隔离链路复用上面构建的探针。需有 Linux iproute2、veth、netem 和创建网络命名空间的权限。脚本创建并清理专用命名空间，只在虚拟接口上应用队列规则。报告位于 `.tools/tc-link.json`。传入 `--seven`、`--six` 或 `--five` 运行对应的多查询器链路实验，省略时运行单查询器链路实验。
+隔离链路复用上面构建的探针。需有 Linux iproute2、veth、netem 和创建网络命名空间的权限。脚本创建并清理专用命名空间，只在虚拟接口上应用队列规则。报告位于 `.tools/tc-link.json`。传入 `--eight`、`--seven`、`--six` 或 `--five` 运行对应的多查询器链路实验，省略时运行单查询器链路实验。
 
 ```sh
-sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --seven
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --eight
 ```
 
 CI 检查发布进程、实验报文语义、普通查询的注册记录、各查询报文的源地址与顺序、竞争查询器各自观察到的末包，以及适用场景的定时器和链路队列计数。时间和抑制字段记录实测值。
