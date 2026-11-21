@@ -415,7 +415,7 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 
 ## 验证与文档
 
-Avahi 与 python-zeroconf 的 Linux 同机 IPv4 组播实验覆盖立即 TC 续包、连续 TC 重新计时，以及两个至五个查询器。另在两个 Linux 网络命名空间之间用虚拟链路验证 python-zeroconf 遇到指定 TC 续包丢失或迟到时的回包。实际记录、实验条件与跨设备待验证项见 [TC 互通实验](docs/tc-interop.md)。
+Avahi 与 python-zeroconf 的 Linux 同机 IPv4 组播实验覆盖立即 TC 续包、连续 TC 重新计时，以及两个至六个查询器。隔离虚拟链路上分别用单查询器和五查询器验证 python-zeroconf 遇到指定 TC 续包丢失或迟到时的回包。实际记录、实验条件与跨设备待验证项见 [TC 互通实验](docs/tc-interop.md)。
 
 [库接入与 CLI](docs/usage.md) · [模型](docs/model.md) · [0.3.0 预发布验收](docs/release-acceptance-0.3.0.md) · [维护路线](docs/maintenance-roadmap-2026.md) · [安全报告](SECURITY.md)
 
