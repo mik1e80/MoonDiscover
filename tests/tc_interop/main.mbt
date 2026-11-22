@@ -69,6 +69,18 @@ fn observation(
 ///|
 async fn main {
   let args = @env.args()
+  if args.length() == 14 && args[1] == "--link-multi-retry" {
+    link_multi_retry(args[2:].to_owned())
+    return
+  }
+  if args.length() == 3 && args[1] == "--reply-send" {
+    reply_send(args[2])
+    return
+  }
+  if args.length() == 5 && args[1] == "--reply-receive" {
+    reply_receive(args[2], args[3], args[4])
+    return
+  }
   if args.length() == 4 && args[1] == "--link-retry" {
     link_retry(args[2], args[3])
     return

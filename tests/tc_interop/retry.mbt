@@ -1,4 +1,79 @@
 ///|
+async fn link_multi_retry(addresses : Array[String]) -> Unit {
+  let ips = addresses.map(extended_address)
+  let monitor = @native.MulticastSocket::open(ips[0])
+  defer monitor.close()
+  let browsers : Array[@native.Browser] = []
+  defer (for browser in browsers {
+    browser.close()
+  })
+  for i, ip in ips {
+    browsers.push(
+      @native.Browser::open(ip, seed=Some(31U + i.reinterpret_as_uint())),
+    )
+  }
+  let service = @model.DnsName::parse("_md-tcproof._tcp.local.")
+  let presentation = service.to_presentation()
+  let names = ["zc-known.", "zc-unknown."].map(prefix => prefix + presentation)
+  let queries : Array[Array[Int64]] = ips.map(_ => [])
+  let resolved : Array[Int64?] = ips.map(_ => None)
+  let start = @native.monotonic_ms()
+  for browser in browsers {
+    let _ = browser.browse(service)
+  }
+  while @native.monotonic_ms() - start < 7800L {
+    for browser in browsers {
+      let _ = browser.poll(timeout_ms=0)
+    }
+    for _ in 0..<128 {
+      guard monitor.receive(timeout_ms=0) is Some(packet) else { break }
+      guard packet.source_port == 5353 && packet.destination_ipv4 == 0xe00000fbU else {
+        continue
+      }
+      let dns = @probe.independent_packet(packet.bytes) catch { _ => continue }
+      if dns.flags == 0 &&
+        dns.questions.any(q => q.name == presentation && q.rr_type == 12) {
+        for i, ip in ips {
+          if packet.source_ipv4 == ip {
+            queries[i].push(@native.monotonic_ms() - start)
+            break
+          }
+        }
+      }
+    }
+    for i, browser in browsers {
+      if resolved[i] is None {
+        let snapshots = browser.snapshots()
+        if names.all(name => {
+            snapshots.any(s => {
+              s.complete && s.instance.to_presentation() == name
+            })
+          }) {
+          resolved[i] = Some(@native.monotonic_ms() - start)
+        }
+      }
+    }
+    if resolved.all(t => t is Some(_)) {
+      break
+    }
+    @async.sleep(5)
+  }
+  println(
+    Json::object({
+      "queriers": Json::array(
+        addresses.mapi((i, address) => {
+          Json::object({
+            "source": Json(address),
+            "qm_ms": Json(queries[i]),
+            "resolved_ms": nullable_ms(resolved[i]),
+          })
+        }),
+      ),
+    }).stringify(),
+  )
+}
+
+///|
 async fn link_retry(address : String, restored : String) -> Unit {
   let ip = extended_address(address)
   let monitor = @native.MulticastSocket::open(ip)
