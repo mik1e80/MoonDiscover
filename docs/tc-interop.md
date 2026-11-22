@@ -236,7 +236,13 @@ A 三轮分别在 34ms、34ms、20ms 观察到 Avahi 回包，均早于末包。
 
 时间从对应查询的探针启动起算，包含响应器调度和传输时间。恢复阶段由探针主动发起一次新查询，本实验验证这条链路恢复后可以重新取得答案。
 
-仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、随机丢包、更长的连续丢包、多个查询器在响应方向故障时的表现、响应报文乱序和自动重试、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+## Browser 自动重试与随机响应丢包
+
+2026-11-22（北京时间），Linux 隔离 veth 上用生产 Browser 订阅一次服务类型，独立解析器记下同源发出的普通 QM 查询。netem 从响应器侧丢弃前两次回答，内核计数确认丢弃两份后解除丢包。探针持续驱动同一 Browser 并检查快照，不额外发查询。两次 CI 各三轮，六轮均在约 1.07s 发出第二次查询，在 3.075–3.080s 自动发出第三次查询，随后在 4.105–4.182s 验证两个目标实例均完整解析。恢复前浏览快照为空。时间相对 Browser 探针启动。[逐轮证据](evidence/linux-tc-browser-retry-random-response-20261122.json) · [首轮 CI](https://github.com/mik1e80/MoonDiscover/actions/runs/44986664401) · [复测 CI](https://github.com/mik1e80/MoonDiscover/actions/runs/44986753930)
+
+另用单查询器在相同隔离链路上执行 18 次普通 QM，响应方向配置 50% 随机丢包。内核实际放行 7 份、丢弃 11 份，每次查询对应一份响应。7 次放行均在 25–120ms 收到两条 PTR，11 次丢弃均无目标 PTR 到达，最长连续丢弃 5 份。每次由测试探针独立发起查询。50% 为队列配置，此次样本用于核对收到的记录与内核计数。[逐轮证据](evidence/linux-tc-browser-retry-random-response-20261122.json)
+
+仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、查询方向随机丢包、长时响应丢包恢复、多查询器叠加响应故障、响应乱序、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
 
 复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至十二个附加地址分别运行五至十三查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
@@ -247,11 +253,13 @@ moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192
 
 隔离链路复用上面构建的探针。需有 Linux iproute2、veth、netem 和创建网络命名空间的权限。脚本创建并清理专用命名空间，只在虚拟接口上应用队列规则。报告位于 `.tools/tc-link.json`。可用 `--five`、`--six`、`--seven`、`--eight`、`--nine`、`--ten`、`--eleven`、`--twelve` 选择查询器数量，省略时运行单查询器链路实验。
 
-使用 `--response` 可运行单查询器的响应方向实验，输出位于 `.tools/tc-response-link.json`。
+使用 `--response` 可运行单查询器的响应方向实验，输出位于 `.tools/tc-response-link.json`。 `--retry` 运行生产 Browser 自动重试实验，报告为 `.tools/tc-retry-link.json`。`--random-response` 运行随机响应丢包实验，报告为 `.tools/tc-random-response-link.json`。
 
 ```sh
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --twelve
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --response
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --retry
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --random-response
 ```
 
 CI 检查发布进程、实验报文语义、普通查询的注册记录、各查询报文的源地址与顺序、竞争查询器各自观察到的末包，以及适用场景的定时器和链路队列计数。时间和抑制字段记录实测值。

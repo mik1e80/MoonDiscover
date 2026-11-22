@@ -1,0 +1,1427 @@
+{
+  "source_run": "https://github.com/mik1e80/MoonDiscover/actions/runs/44986753930",
+  "source_job": "https://github.com/mik1e80/MoonDiscover/actions/runs/44986753930/job/137098893259",
+  "browser_retry": {
+    "source_commit": "d7025185fb22990b51399e92818b643b8c29770b",
+    "scenario": "Browser automatic retry across isolated veth",
+    "kernel": "7.0.0-1020-azure",
+    "zeroconf_version": "0.148.0",
+    "baseline": {
+      "send_order": [
+        0
+      ],
+      "sent_ms": [
+        0
+      ],
+      "zeroconf": {
+        "known_ptr_ms": 84,
+        "unknown_ptr_ms": 84,
+        "first_ptr_ms": 84,
+        "known_ptr_omitted_with_unknown_observed": false,
+        "first_ptr_before_tail": null,
+        "first_ptr_in_400_to_500_ms": false
+      },
+      "queriers": [
+        {
+          "source_ipv4": "192.0.2.9",
+          "zeroconf": {
+            "known_ptr_ms": 84,
+            "unknown_ptr_ms": 84,
+            "first_ptr_ms": 84,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      ]
+    },
+    "arms": [
+      {
+        "trial": 1,
+        "browser": {
+          "qm_ms": [
+            "72",
+            "1075",
+            "3077"
+          ],
+          "restore_observed_ms": "2200",
+          "resolved_ms": "4128",
+          "instances": [
+            "zc-unknown._md-tcproof._tcp.local.",
+            "zc-known._md-tcproof._tcp.local."
+          ]
+        },
+        "blocked": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 1,
+              "correlation": 0
+            },
+            "seed": 3897196128136843000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "restored": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "seed": 3897196128136843000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 2,
+        "browser": {
+          "qm_ms": [
+            "72",
+            "1074",
+            "3077"
+          ],
+          "restore_observed_ms": "2104",
+          "resolved_ms": "4182",
+          "instances": [
+            "zc-unknown._md-tcproof._tcp.local.",
+            "zc-known._md-tcproof._tcp.local."
+          ]
+        },
+        "blocked": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 1,
+              "correlation": 0
+            },
+            "seed": 8758151645618876000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "restored": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "seed": 8758151645618876000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 3,
+        "browser": {
+          "qm_ms": [
+            "72",
+            "1074",
+            "3075"
+          ],
+          "restore_observed_ms": "2190",
+          "resolved_ms": "4137",
+          "instances": [
+            "zc-unknown._md-tcproof._tcp.local.",
+            "zc-known._md-tcproof._tcp.local."
+          ]
+        },
+        "blocked": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 1,
+              "correlation": 0
+            },
+            "seed": 5001458833827198000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "restored": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "seed": 5001458833827198000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      }
+    ]
+  },
+  "random_response_loss": {
+    "source_commit": "d7025185fb22990b51399e92818b643b8c29770b",
+    "scenario": "isolated veth random response loss",
+    "kernel": "7.0.0-1020-azure",
+    "zeroconf_version": "0.148.0",
+    "baseline": {
+      "send_order": [
+        0
+      ],
+      "sent_ms": [
+        0
+      ],
+      "zeroconf": {
+        "known_ptr_ms": 110,
+        "unknown_ptr_ms": 110,
+        "first_ptr_ms": 110,
+        "known_ptr_omitted_with_unknown_observed": false,
+        "first_ptr_before_tail": null,
+        "first_ptr_in_400_to_500_ms": false
+      },
+      "queriers": [
+        {
+          "source_ipv4": "192.0.2.9",
+          "zeroconf": {
+            "known_ptr_ms": 110,
+            "unknown_ptr_ms": 110,
+            "first_ptr_ms": 110,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      ]
+    },
+    "arms": [
+      {
+        "mode": "random",
+        "trial": 1,
+        "observations": [
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": 77,
+                "unknown_ptr_ms": 77,
+                "first_ptr_ms": 77,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": false
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": 77,
+                    "unknown_ptr_ms": 77,
+                    "first_ptr_ms": 77,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": false
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 1096642185673762700,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 255,
+              "packets": 1,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 1096642185673762700,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 255,
+              "packets": 1,
+              "drops": 1,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": 36,
+                "unknown_ptr_ms": 36,
+                "first_ptr_ms": 36,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": false
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": 36,
+                    "unknown_ptr_ms": 36,
+                    "first_ptr_ms": 36,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": false
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 1096642185673762700,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 510,
+              "packets": 2,
+              "drops": 1,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": 94,
+                "unknown_ptr_ms": 94,
+                "first_ptr_ms": 94,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": false
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": 94,
+                    "unknown_ptr_ms": 94,
+                    "first_ptr_ms": 94,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": false
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 1096642185673762700,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 765,
+              "packets": 3,
+              "drops": 1,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": 64,
+                "unknown_ptr_ms": 64,
+                "first_ptr_ms": 64,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": false
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": 64,
+                    "unknown_ptr_ms": 64,
+                    "first_ptr_ms": 64,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": false
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 1096642185673762700,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 1020,
+              "packets": 4,
+              "drops": 1,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 1096642185673762700,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 1020,
+              "packets": 4,
+              "drops": 2,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          }
+        ]
+      },
+      {
+        "mode": "random",
+        "trial": 2,
+        "observations": [
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": 25,
+                "unknown_ptr_ms": 25,
+                "first_ptr_ms": 25,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": false
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": 25,
+                    "unknown_ptr_ms": 25,
+                    "first_ptr_ms": 25,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": false
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 14598466131764610000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 255,
+              "packets": 1,
+              "drops": 0,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 14598466131764610000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 255,
+              "packets": 1,
+              "drops": 1,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 14598466131764610000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 255,
+              "packets": 1,
+              "drops": 2,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                1
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 14598466131764610000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 255,
+              "packets": 1,
+              "drops": 3,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 14598466131764610000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 255,
+              "packets": 1,
+              "drops": 4,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 14598466131764610000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 255,
+              "packets": 1,
+              "drops": 5,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          }
+        ]
+      },
+      {
+        "mode": "random",
+        "trial": 3,
+        "observations": [
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 13469609692464062000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 0,
+              "packets": 0,
+              "drops": 1,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 13469609692464062000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 0,
+              "packets": 0,
+              "drops": 2,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": 70,
+                "unknown_ptr_ms": 70,
+                "first_ptr_ms": 70,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": false
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": 70,
+                    "unknown_ptr_ms": 70,
+                    "first_ptr_ms": 70,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": false
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 13469609692464062000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 255,
+              "packets": 1,
+              "drops": 2,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 13469609692464062000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 255,
+              "packets": 1,
+              "drops": 3,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": 120,
+                "unknown_ptr_ms": 120,
+                "first_ptr_ms": 120,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": false
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": 120,
+                    "unknown_ptr_ms": 120,
+                    "first_ptr_ms": 120,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": false
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 13469609692464062000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 510,
+              "packets": 2,
+              "drops": 3,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          },
+          {
+            "querier": {
+              "send_order": [
+                0
+              ],
+              "sent_ms": [
+                0
+              ],
+              "zeroconf": {
+                "known_ptr_ms": null,
+                "unknown_ptr_ms": null,
+                "first_ptr_ms": null,
+                "known_ptr_omitted_with_unknown_observed": false,
+                "first_ptr_before_tail": null,
+                "first_ptr_in_400_to_500_ms": null
+              },
+              "queriers": [
+                {
+                  "source_ipv4": "192.0.2.9",
+                  "zeroconf": {
+                    "known_ptr_ms": null,
+                    "unknown_ptr_ms": null,
+                    "first_ptr_ms": null,
+                    "known_ptr_omitted_with_unknown_observed": false,
+                    "first_ptr_before_tail": null,
+                    "first_ptr_in_400_to_500_ms": null
+                  }
+                }
+              ]
+            },
+            "netem": {
+              "kind": "netem",
+              "handle": "20:",
+              "parent": "1:3",
+              "options": {
+                "limit": 1000,
+                "loss-random": {
+                  "loss": 0.5,
+                  "correlation": 0
+                },
+                "seed": 13469609692464062000,
+                "ecn": false,
+                "gap": 0
+              },
+              "bytes": 510,
+              "packets": 2,
+              "drops": 4,
+              "overlimits": 0,
+              "requeues": 0,
+              "backlog": 0,
+              "qlen": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "earlier_retry": {
+    "source_run": "https://github.com/mik1e80/MoonDiscover/actions/runs/44986664401",
+    "source_job": "https://github.com/mik1e80/MoonDiscover/actions/runs/44986664401/job/137098612610",
+    "report": {
+      "source_commit": "dd67f604d1be0fcc45ec8c60b99a2b77e10375ca",
+      "scenario": "Browser automatic retry across isolated veth",
+      "kernel": "7.0.0-1020-azure",
+      "zeroconf_version": "0.148.0",
+      "baseline": {
+        "send_order": [
+          0
+        ],
+        "sent_ms": [
+          0
+        ],
+        "zeroconf": {
+          "known_ptr_ms": 106,
+          "unknown_ptr_ms": 106,
+          "first_ptr_ms": 106,
+          "known_ptr_omitted_with_unknown_observed": false,
+          "first_ptr_before_tail": null,
+          "first_ptr_in_400_to_500_ms": false
+        },
+        "queriers": [
+          {
+            "source_ipv4": "192.0.2.9",
+            "zeroconf": {
+              "known_ptr_ms": 106,
+              "unknown_ptr_ms": 106,
+              "first_ptr_ms": 106,
+              "known_ptr_omitted_with_unknown_observed": false,
+              "first_ptr_before_tail": null,
+              "first_ptr_in_400_to_500_ms": false
+            }
+          }
+        ]
+      },
+      "arms": [
+        {
+          "trial": 1,
+          "browser": {
+            "qm_ms": [
+              "72",
+              "1076",
+              "3080"
+            ],
+            "restore_observed_ms": "2173",
+            "resolved_ms": "4148",
+            "instances": [
+              "zc-unknown._md-tcproof._tcp.local.",
+              "zc-known._md-tcproof._tcp.local."
+            ]
+          },
+          "blocked": {
+            "kind": "netem",
+            "handle": "20:",
+            "parent": "1:3",
+            "options": {
+              "limit": 1000,
+              "loss-random": {
+                "loss": 1,
+                "correlation": 0
+              },
+              "seed": 13603981330273835000,
+              "ecn": false,
+              "gap": 0
+            },
+            "bytes": 0,
+            "packets": 0,
+            "drops": 2,
+            "overlimits": 0,
+            "requeues": 0,
+            "backlog": 0,
+            "qlen": 0
+          },
+          "restored": {
+            "kind": "netem",
+            "handle": "20:",
+            "parent": "1:3",
+            "options": {
+              "limit": 1000,
+              "seed": 13603981330273835000,
+              "ecn": false,
+              "gap": 0
+            },
+            "bytes": 255,
+            "packets": 1,
+            "drops": 2,
+            "overlimits": 0,
+            "requeues": 0,
+            "backlog": 0,
+            "qlen": 0
+          }
+        },
+        {
+          "trial": 2,
+          "browser": {
+            "qm_ms": [
+              "72",
+              "1072",
+              "3075"
+            ],
+            "restore_observed_ms": "2174",
+            "resolved_ms": "4105",
+            "instances": [
+              "zc-unknown._md-tcproof._tcp.local.",
+              "zc-known._md-tcproof._tcp.local."
+            ]
+          },
+          "blocked": {
+            "kind": "netem",
+            "handle": "20:",
+            "parent": "1:3",
+            "options": {
+              "limit": 1000,
+              "loss-random": {
+                "loss": 1,
+                "correlation": 0
+              },
+              "seed": 1598275148209831700,
+              "ecn": false,
+              "gap": 0
+            },
+            "bytes": 0,
+            "packets": 0,
+            "drops": 2,
+            "overlimits": 0,
+            "requeues": 0,
+            "backlog": 0,
+            "qlen": 0
+          },
+          "restored": {
+            "kind": "netem",
+            "handle": "20:",
+            "parent": "1:3",
+            "options": {
+              "limit": 1000,
+              "seed": 1598275148209831700,
+              "ecn": false,
+              "gap": 0
+            },
+            "bytes": 255,
+            "packets": 1,
+            "drops": 2,
+            "overlimits": 0,
+            "requeues": 0,
+            "backlog": 0,
+            "qlen": 0
+          }
+        },
+        {
+          "trial": 3,
+          "browser": {
+            "qm_ms": [
+              "72",
+              "1072",
+              "3076"
+            ],
+            "restore_observed_ms": "2174",
+            "resolved_ms": "4181",
+            "instances": [
+              "zc-unknown._md-tcproof._tcp.local.",
+              "zc-known._md-tcproof._tcp.local."
+            ]
+          },
+          "blocked": {
+            "kind": "netem",
+            "handle": "20:",
+            "parent": "1:3",
+            "options": {
+              "limit": 1000,
+              "loss-random": {
+                "loss": 1,
+                "correlation": 0
+              },
+              "seed": 2873516442949068300,
+              "ecn": false,
+              "gap": 0
+            },
+            "bytes": 0,
+            "packets": 0,
+            "drops": 2,
+            "overlimits": 0,
+            "requeues": 0,
+            "backlog": 0,
+            "qlen": 0
+          },
+          "restored": {
+            "kind": "netem",
+            "handle": "20:",
+            "parent": "1:3",
+            "options": {
+              "limit": 1000,
+              "seed": 2873516442949068300,
+              "ecn": false,
+              "gap": 0
+            },
+            "bytes": 255,
+            "packets": 1,
+            "drops": 2,
+            "overlimits": 0,
+            "requeues": 0,
+            "backlog": 0,
+            "qlen": 0
+          }
+        }
+      ]
+    }
+  }
+}
