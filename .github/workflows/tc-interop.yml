@@ -57,6 +57,9 @@ jobs:
       - name: Verify loss and reordering across an isolated virtual link
         shell: bash
         run: sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --twelve
+      - name: Verify response loss, restored delivery and delay
+        shell: bash
+        run: sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --response
       - name: Retain observations and publisher logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -65,5 +68,6 @@ jobs:
           path: |
             .tools/tc-interop.json
             .tools/tc-link.json
+            .tools/tc-response-link.json
             .tools/tc-*.log
           include-hidden-files: true
