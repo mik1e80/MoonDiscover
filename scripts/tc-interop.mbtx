@@ -19,7 +19,7 @@ async fn command(program : String, args : Array[String]) -> String {
 
 async fn main {
   let args = @env.args()
-  guard args.length() >= 3 && args.length() <= 13 else { fail("usage: tc-interop.mbtx <zeroconf-python> <second-source-IPv4> [up to ten more source IPv4 addresses]") }
+  guard args.length() >= 3 && args.length() <= 14 else { fail("usage: tc-interop.mbtx <zeroconf-python> <second-source-IPv4> [up to eleven more source IPv4 addresses]") }
   @fs.mkdir(".tools", allow_exist=true)
   let route = @json.parse(command("ip", ["-j", "-4", "route", "get", "224.0.0.251"]))
   guard route is [{ "prefsrc": String(ip), .. }, ..] else { fail("no active IPv4 route") }

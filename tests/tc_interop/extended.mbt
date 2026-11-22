@@ -87,6 +87,7 @@ async fn extended_probe(sources : Array[String]) -> Unit {
   }
   let (_, finish) = tc_burst(service, [answer(1)])
   let competition = match ips.length() {
+    13 => "thirteen_queriers"
     12 => "twelve_queriers"
     11 => "eleven_queriers"
     10 => "ten_queriers"
@@ -286,6 +287,7 @@ async fn extended_probe(sources : Array[String]) -> Unit {
         "j_after_tail": waiter_reports.get(8).unwrap_or(Json::null()),
         "k_after_tail": waiter_reports.get(9).unwrap_or(Json::null()),
         "l_after_tail": waiter_reports.get(10).unwrap_or(Json::null()),
+        "m_after_tail": waiter_reports.get(11).unwrap_or(Json::null()),
       }),
     )
   }

@@ -27,7 +27,7 @@ fn link_fixture() -> (
   let competitors = [@wire.qm_query(service, 12)]
   // A fixture-only, unpublished PTR makes the other queries distinct without
   // claiming either of the responder's two published PTRs.
-  for i in 0U..<9U {
+  for i in 0U..<10U {
     competitors.push(
       @wire.query_with_answers(service, 12, [{ ..answer(2), ttl: 4500U - i, }]),
     )
