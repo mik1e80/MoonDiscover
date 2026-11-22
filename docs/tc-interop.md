@@ -223,7 +223,20 @@ A 三轮分别在 34ms、34ms、20ms 观察到 Avahi 回包，均早于末包。
 
 乱序组中，续包 2 每轮比末包晚 99–100ms 到达。九轮均在 A 发出末包后收到两条 PTR，表中的时间从发送端探针开始计。响应方向的链路保持正常。[原始观测](evidence/linux-tc-thirteen-queriers-twelve-netem-20261122.json)
 
-仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、随机或连续丢包、响应方向的链路故障、两台物理设备、Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+## 响应方向丢包、恢复和延迟
+
+2026-11-22（北京时间），在同一 Linux VM 的隔离 veth 两侧运行单查询器和 python-zeroconf 0.148.0。查询器每次发出普通 QM。netem 从响应器侧匹配发往组播组的 IPv4 mDNS 响应，查询方向保持正常。每轮先跑无损对照，再连续查询两次并丢弃两次响应，随后恢复传输重新查询，最后单测 125ms 响应延迟。[原始观测](evidence/linux-tc-response-link-20261122.json) · [专项 CI](https://github.com/mik1e80/MoonDiscover/actions/runs/44986069774)
+
+| 场景 | 三轮实测 |
+| --- | --- |
+| 无损对照 | 每轮内核放行一份响应，两条 PTR 在 36–50ms 到达 |
+| 连续两次丢包 | 每轮内核分别丢弃两次查询各自的响应，累计 2 份，六次查询均未收到目标 PTR |
+| 恢复后重新查询 | 每轮内核放行一份响应，两条 PTR 在 54–121ms 到达 |
+| 在响应方向加 125ms 延迟 | 每轮内核放行一份响应，两条 PTR 在 188–230ms 到达 |
+
+时间从对应查询的探针启动起算，包含响应器调度和传输时间。恢复阶段由探针主动发起一次新查询，本实验验证这条链路恢复后可以重新取得答案。
+
+仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、随机丢包、更长的连续丢包、多个查询器在响应方向故障时的表现、响应报文乱序和自动重试、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
 
 复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至十二个附加地址分别运行五至十三查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
@@ -234,8 +247,11 @@ moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192
 
 隔离链路复用上面构建的探针。需有 Linux iproute2、veth、netem 和创建网络命名空间的权限。脚本创建并清理专用命名空间，只在虚拟接口上应用队列规则。报告位于 `.tools/tc-link.json`。可用 `--five`、`--six`、`--seven`、`--eight`、`--nine`、`--ten`、`--eleven`、`--twelve` 选择查询器数量，省略时运行单查询器链路实验。
 
+使用 `--response` 可运行单查询器的响应方向实验，输出位于 `.tools/tc-response-link.json`。
+
 ```sh
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --twelve
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --response
 ```
 
 CI 检查发布进程、实验报文语义、普通查询的注册记录、各查询报文的源地址与顺序、竞争查询器各自观察到的末包，以及适用场景的定时器和链路队列计数。时间和抑制字段记录实测值。
