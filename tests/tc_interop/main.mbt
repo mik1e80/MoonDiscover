@@ -69,6 +69,10 @@ fn observation(
 ///|
 async fn main {
   let args = @env.args()
+  if args.length() == 4 && args[1] == "--link-retry" {
+    link_retry(args[2], args[3])
+    return
+  }
   if args.get(1) is Some("--link-send" | "--link-baseline") &&
     (args.length() == 4 || (args.length() >= 8 && args.length() <= 15)) {
     link_send(
