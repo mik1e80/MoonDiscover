@@ -66,6 +66,9 @@ jobs:
       - name: Sample random response loss
         shell: bash
         run: sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --random-response
+      - name: Verify twelve queriers under response link faults
+        shell: bash
+        run: sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-response
       - name: Retain observations and publisher logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -77,5 +80,6 @@ jobs:
             .tools/tc-response-link.json
             .tools/tc-retry-link.json
             .tools/tc-random-response-link.json
+            .tools/tc-multi-response-link.json
             .tools/tc-*.log
           include-hidden-files: true

@@ -81,33 +81,10 @@ async fn measure(binary : String, mode : String, trial : Int, additional : Array
     "match", "u16", "0x0200", "0xffff", "at", "30",
     "match", "u16", "2", "0xffff", "at", "34", "flowid", "1:3",
   ])
-  let marker = ".tools/tc-link-monitor-ready"
-  if @fs.exists(marker) { @fs.remove(marker) }
-  let receive_args = ["--link-receive", receiver_ip, sender_ip, marker]
-  let send_args = ["--link-send", sender_ip, receiver_ip]
-  for ip in additional {
-    receive_args.push(ip)
-    send_args.push(ip)
-  }
-  let (sent, received) = @async.with_task_group(group => {
-    let out = @process.redirect_to_file(".tools/tc-link-monitor.json")
-    let stderr = ".tools/tc-link-monitor.log"
-    let err = @process.redirect_to_file(stderr)
-    let child = @process.spawn(group, "ip", in_namespace(receiver, binary, receive_args), stdout=out, stderr=err, no_wait=true)
-    defer child.cancel()
-    wait_ready(marker, child, stderr, 100)
-    let sent = @json.parse(command("ip", in_namespace(sender, binary, send_args)))
-    guard child.wait() == 0 else { fail("receive probe failed: " + @fs.read_file(stderr).text()) }
-    (sent, @fs.read_file(".tools/tc-link-monitor.json").json())
-  })
+  let (sent, received) = observe_link(binary, additional)
   let queues = @json.parse(tc(["-j", "-s", "qdisc", "show", "dev", "mdtx"]))
-  let prefix = [0]
-  for i in 0..<additional.length() { prefix.push(i + 4) }
-  prefix.push(1)
-  let sent_order = prefix.copy()
-  sent_order.push(2)
-  sent_order.push(3)
-  let expected = prefix
+  let sent_order = query_order(additional)
+  let expected = sent_order[:sent_order.length() - 2].to_owned()
   if mode == "control" { expected.push(2) }
   expected.push(3)
   if mode == "reorder" { expected.push(2) }
@@ -127,6 +104,35 @@ async fn measure(binary : String, mode : String, trial : Int, additional : Array
   Json::object({
     "mode": Json(mode), "trial": Json(trial), "sender": sent,
     "peer": received, "netem": netem,
+  })
+}
+
+fn query_order(additional : Array[String]) -> Array[Int] {
+  let order = [0]
+  for i in 0..<additional.length() { order.push(i + 4) }
+  for i in 1..=3 { order.push(i) }
+  order
+}
+
+async fn observe_link(binary : String, additional : Array[String]) -> (Json, Json) {
+  let marker = ".tools/tc-link-monitor-ready"
+  if @fs.exists(marker) { @fs.remove(marker) }
+  let receive_args = ["--link-receive", receiver_ip, sender_ip, marker]
+  let send_args = ["--link-send", sender_ip, receiver_ip]
+  for ip in additional {
+    receive_args.push(ip)
+    send_args.push(ip)
+  }
+  @async.with_task_group(group => {
+    let out = @process.redirect_to_file(".tools/tc-link-monitor.json")
+    let stderr = ".tools/tc-link-monitor.log"
+    let err = @process.redirect_to_file(stderr)
+    let child = @process.spawn(group, "ip", in_namespace(receiver, binary, receive_args), stdout=out, stderr=err, no_wait=true)
+    defer child.cancel()
+    wait_ready(marker, child, stderr, 100)
+    let sent = @json.parse(command("ip", in_namespace(sender, binary, send_args)))
+    guard child.wait() == 0 else { fail("receive probe failed: " + @fs.read_file(stderr).text()) }
+    (sent, @fs.read_file(".tools/tc-link-monitor.json").json())
   })
 }
 
@@ -151,6 +157,41 @@ async fn attach_response_netem(policy : String, value : String) -> Unit {
 
 async fn response_queue() -> Json {
   netem_queue(@json.parse(response_tc(["-j", "-s", "qdisc", "show", "dev", "mdrx"])))
+}
+
+async fn measure_multi_response(binary : String, mode : String, trial : Int, additional : Array[String]) -> Json {
+  let _ = response_tc(["qdisc", "add", "dev", "mdrx", "root", "handle", "1:", "prio"])
+  defer (ignore(response_tc(["qdisc", "del", "dev", "mdrx", "root"])))
+  let (policy, value) = match mode {
+    "drop" => ("loss", "100%")
+    "delay" => ("delay", "125ms")
+    _ => ("delay", "0ms")
+  }
+  attach_response_netem(policy, value)
+  let (sent, peer) = observe_link(binary, additional)
+  let queue = response_queue()
+  let expected_order = Json(query_order(additional))
+  guard sent is { "send_order": order, "queriers": Array(queriers), .. } &&
+    order == expected_order && queriers.length() == additional.length() + 1 &&
+    peer is { "receive_order": arrival, .. } && arrival == expected_order else {
+    fail("some queries did not cross the unmodified link: " + sent.stringify() + " " + peer.stringify())
+  }
+  if mode == "drop" {
+    guard queue is { "packets": Number(0, ..), "drops": Number(drops, ..), .. } &&
+      drops >= 1.0 &&
+      queriers.all(q => q is { "zeroconf": { "known_ptr_ms": Null, "unknown_ptr_ms": Null, .. }, .. }) else {
+      fail("response loss was not observed at every querier: " + sent.stringify() + " " + queue.stringify())
+    }
+  } else {
+    let minimum = if mode == "delay" { 125.0 } else { 0.0 }
+    guard queue is { "packets": Number(packets, ..), "drops": Number(0, ..), .. } &&
+      packets >= 1.0 &&
+      queriers.all(q => q is { "zeroconf": { "known_ptr_ms": Number(known, ..), "unknown_ptr_ms": Number(unknown, ..), .. }, .. } &&
+        known >= minimum && unknown >= minimum) else {
+      fail("missing or premature response: " + sent.stringify() + " " + queue.stringify())
+    }
+  }
+  Json::object({ "mode": Json(mode), "trial": Json(trial), "sender": sent, "peer": peer, "netem": queue })
 }
 
 async fn measure_responses(binary : String, mode : String, trial : Int) -> Json {
@@ -244,6 +285,7 @@ async fn measure_retry(binary : String, trial : Int) -> Json {
 async fn main {
   let args = @env.args()
   let response = args.get(3) == Some("--response")
+  let multi_response = args.get(3) == Some("--multi-response")
   let retry = args.get(3) == Some("--retry")
   let random = args.get(3) == Some("--random-response")
   let last_octet = match args.get(3) {
@@ -255,11 +297,11 @@ async fn main {
     Some("--nine") => 18
     Some("--ten") => 19
     Some("--eleven") => 20
-    Some("--twelve") => 21
+    Some("--twelve") | Some("--multi-response") => 21
     _ => 0
   }
   guard args.length() >= 3 && args.length() <= 4 && last_octet >= 10 else {
-    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--response|--retry|--random-response|--five|--six|--seven|--eight|--nine|--ten|--eleven|--twelve]")
+    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--response|--multi-response|--retry|--random-response|--five|--six|--seven|--eight|--nine|--ten|--eleven|--twelve]")
   }
   let additional : Array[String] = []
   for i in 11..=last_octet { additional.push("192.0.2.\{i}") }
@@ -295,7 +337,12 @@ async fn main {
     }
     let arms : Array[Json] = []
     for trial in 1..=3 {
-      if retry {
+      if multi_response {
+        for mode in ["control", "drop", "restored", "delay"] {
+          @async.sleep(800)
+          arms.push(measure_multi_response(binary, mode, trial, additional))
+        }
+      } else if retry {
         @async.sleep(1100)
         arms.push(measure_retry(binary, trial))
       } else if random {
@@ -316,7 +363,7 @@ async fn main {
   })
   let report = Json::object({
     "source_commit": Json(args[2]),
-    "scenario": if retry { "Browser automatic retry across isolated veth" } else if random { "isolated veth random response loss" } else if response { "isolated veth response loss, restore and delay" } else { match additional.length() {
+    "scenario": if multi_response { "twelve queriers with isolated veth response faults" } else if retry { "Browser automatic retry across isolated veth" } else if random { "isolated veth random response loss" } else if response { "isolated veth response loss, restore and delay" } else { match additional.length() {
       11 => "twelve queriers with isolated veth TC loss and reordering"
       10 => "eleven queriers with isolated veth TC loss and reordering"
       9 => "ten queriers with isolated veth TC loss and reordering"
@@ -332,7 +379,7 @@ async fn main {
     "baseline": baseline,
     "arms": Json::array(arms),
   })
-  let path = if retry { ".tools/tc-retry-link.json" } else if random { ".tools/tc-random-response-link.json" } else if response { ".tools/tc-response-link.json" } else { ".tools/tc-link.json" }
+  let path = if multi_response { ".tools/tc-multi-response-link.json" } else if retry { ".tools/tc-retry-link.json" } else if random { ".tools/tc-random-response-link.json" } else if response { ".tools/tc-response-link.json" } else { ".tools/tc-link.json" }
   @fs.write_file(path, report.stringify(indent=2) + "\n")
   println(report.stringify())
 }
