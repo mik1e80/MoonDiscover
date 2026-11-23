@@ -110,6 +110,10 @@ async fn main {
     link_receive(args[2], args[3], args[4], args[5:].to_owned())
     return
   }
+  if args.length() == 5 && args[1] == "--link-observe-qm" {
+    link_receive(args[2], args[3], args[4], [], plain=true)
+    return
+  }
   if args.length() >= 4 && args.length() <= 14 {
     extended_probe(args[1:].to_owned())
     return

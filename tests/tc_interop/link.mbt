@@ -141,9 +141,14 @@ async fn link_receive(
   peer : String,
   ready : String,
   additional : Array[String],
+  plain~ : Bool = false,
 ) -> Unit {
-  let (_, _, burst, competitors) = link_fixture()
-  let timeline = link_schedule(burst, competitors, additional.length())
+  let (service, _, burst, competitors) = link_fixture()
+  let timeline = if plain {
+    [(0, 0, @wire.qm_query(service, 12), 0L)]
+  } else {
+    link_schedule(burst, competitors, additional.length())
+  }
   let addresses = [peer]
   addresses.append(additional)
   let ips = addresses.map(extended_address)
@@ -154,7 +159,8 @@ async fn link_receive(
   let mut origin : Int64? = None
   let order : Array[Int32] = []
   let times : Array[Json] = []
-  while @native.monotonic_ms() - start < 1850L {
+  let window = if plain { 650L } else { 1850L }
+  while @native.monotonic_ms() - start < window {
     if socket.receive(timeout_ms=10) is Some(packet) &&
       packet.source_port == 5353 &&
       packet.destination_ipv4 == 0xe00000fbU &&

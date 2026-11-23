@@ -54,6 +54,9 @@ jobs:
           sudo ip addr add 192.0.2.252/32 dev "$dev"
           sudo ip addr add 192.0.2.253/32 dev "$dev"
           moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192.0.2.244 192.0.2.245 192.0.2.246 192.0.2.247 192.0.2.248 192.0.2.249 192.0.2.250 192.0.2.251 192.0.2.252 192.0.2.253
+      - name: Compare random query loss with peer reception
+        shell: bash
+        run: sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --random-query
       - name: Verify concurrent Browser retry under random loss and response reorder
         shell: bash
         run: sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --advanced-response
@@ -83,6 +86,7 @@ jobs:
             .tools/tc-response-link.json
             .tools/tc-retry-link.json
             .tools/tc-random-response-link.json
+            .tools/tc-random-query-link.json
             .tools/tc-multi-response-link.json
             .tools/tc-advanced-response-link.json
             .tools/tc-*.log

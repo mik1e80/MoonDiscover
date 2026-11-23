@@ -114,11 +114,13 @@ fn query_order(additional : Array[String]) -> Array[Int] {
   order
 }
 
-async fn observe_link(binary : String, additional : Array[String]) -> (Json, Json) {
+async fn observe_link(binary : String, additional : Array[String], plain? : Bool = false) -> (Json, Json) {
   let marker = ".tools/tc-link-monitor-ready"
   if @fs.exists(marker) { @fs.remove(marker) }
-  let receive_args = ["--link-receive", receiver_ip, sender_ip, marker]
-  let send_args = ["--link-send", sender_ip, receiver_ip]
+  let receive_mode = if plain { "--link-observe-qm" } else { "--link-receive" }
+  let send_mode = if plain { "--link-baseline" } else { "--link-send" }
+  let receive_args = [receive_mode, receiver_ip, sender_ip, marker]
+  let send_args = [send_mode, sender_ip, receiver_ip]
   for ip in additional {
     receive_args.push(ip)
     send_args.push(ip)
@@ -140,6 +142,50 @@ async fn plain_query(binary : String) -> Json {
   @json.parse(command("ip", in_namespace(sender, binary, [
     "--link-baseline", sender_ip, receiver_ip,
   ])))
+}
+
+async fn measure_random_queries(binary : String, trial : Int) -> Json {
+  let _ = tc(["qdisc", "add", "dev", "mdtx", "root", "handle", "1:", "prio"])
+  defer (ignore(tc(["qdisc", "del", "dev", "mdtx", "root"])))
+  let _ = tc(["qdisc", "add", "dev", "mdtx", "parent", "1:3", "handle", "20:", "netem", "loss", "50%"])
+  // QR=0 selects only the isolated sender's multicast DNS queries.
+  let _ = tc([
+    "filter", "add", "dev", "mdtx", "parent", "1:", "protocol", "ip", "prio", "1",
+    "u32", "match", "ip", "protocol", "17", "0xff", "match", "ip", "src", sender_ip + "/32",
+    "match", "ip", "dst", "224.0.0.251/32", "match", "ip", "sport", "5353", "0xffff",
+    "match", "ip", "dport", "5353", "0xffff", "match", "u16", "0", "0x8000", "at", "30",
+    "flowid", "1:3",
+  ])
+  let observations : Array[Json] = []
+  let mut previous_packets = 0.0
+  let mut previous_drops = 0.0
+  for _ in 0..<6 {
+    @async.sleep(1000)
+    let (querier, peer) = observe_link(binary, [], plain=true)
+    let queue = netem_queue(@json.parse(tc(["-j", "-s", "qdisc", "show", "dev", "mdtx"])))
+    guard querier is { "send_order": order, .. } && order == Json([0]) &&
+      queue is { "packets": Number(packets, ..), "drops": Number(drops, ..), .. } else {
+      fail("missing outbound query or queue observations")
+    }
+    let delivered = packets == previous_packets + 1.0 && drops == previous_drops
+    let lost = packets == previous_packets && drops == previous_drops + 1.0
+    let observed = if delivered {
+      peer is { "receive_order": [0], .. } &&
+      querier is { "zeroconf": { "known_ptr_ms": Number(_, ..), "unknown_ptr_ms": Number(_, ..), .. }, .. }
+    } else {
+      lost && peer is { "receive_order": [], .. } &&
+      querier is { "zeroconf": { "known_ptr_ms": Null, "unknown_ptr_ms": Null, .. }, .. }
+    }
+    guard observed else {
+      fail("query queue, peer and response disagree: " + querier.stringify() + " " + peer.stringify() + " " + queue.stringify())
+    }
+    observations.push(Json::object({
+      "delivered": Json(delivered), "querier": querier, "peer": peer, "netem": queue,
+    }))
+    previous_packets = packets
+    previous_drops = drops
+  }
+  Json::object({ "trial": Json(trial), "observations": Json::array(observations) })
 }
 
 async fn attach_response_netem(policy : String, value : String, two_answers? : Bool = false) -> Unit {
@@ -373,8 +419,9 @@ async fn main {
   let advanced = args.get(3) == Some("--advanced-response")
   let retry = args.get(3) == Some("--retry")
   let random = args.get(3) == Some("--random-response")
+  let random_query = args.get(3) == Some("--random-query")
   let last_octet = match args.get(3) {
-    None | Some("--response") | Some("--retry") | Some("--random-response") => 10
+    None | Some("--response") | Some("--retry") | Some("--random-response") | Some("--random-query") => 10
     Some("--five") => 14
     Some("--six") => 15
     Some("--seven") => 16
@@ -386,7 +433,7 @@ async fn main {
     _ => 0
   }
   guard args.length() >= 3 && args.length() <= 4 && last_octet >= 10 else {
-    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--response|--multi-response|--advanced-response|--retry|--random-response|--five|--six|--seven|--eight|--nine|--ten|--eleven|--twelve]")
+    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--response|--multi-response|--advanced-response|--retry|--random-response|--random-query|--five|--six|--seven|--eight|--nine|--ten|--eleven|--twelve]")
   }
   let additional : Array[String] = []
   for i in 11..=last_octet { additional.push("192.0.2.\{i}") }
@@ -439,6 +486,8 @@ async fn main {
       } else if retry {
         @async.sleep(1100)
         arms.push(measure_retry(binary, trial))
+      } else if random_query {
+        arms.push(measure_random_queries(binary, trial))
       } else if random {
         arms.push(measure_responses(binary, "random", trial))
       } else if response {
@@ -465,7 +514,7 @@ async fn main {
   }
   let report = Json::object({
     "source_commit": Json(args[2]),
-    "scenario": if advanced { "twelve Browsers with random response loss and isolated response reorder" } else if multi_response { "twelve queriers with isolated veth response faults" } else if retry { "Browser automatic retry across isolated veth" } else if random { "isolated veth random response loss" } else if response { "isolated veth response loss, restore and delay" } else { match additional.length() {
+    "scenario": if random_query { "isolated veth random query loss" } else if advanced { "twelve Browsers with random response loss and isolated response reorder" } else if multi_response { "twelve queriers with isolated veth response faults" } else if retry { "Browser automatic retry across isolated veth" } else if random { "isolated veth random response loss" } else if response { "isolated veth response loss, restore and delay" } else { match additional.length() {
       11 => "twelve queriers with isolated veth TC loss and reordering"
       10 => "eleven queriers with isolated veth TC loss and reordering"
       9 => "ten queriers with isolated veth TC loss and reordering"
@@ -486,7 +535,7 @@ async fn main {
     fields["response_reorder"] = Json::array(reordered)
     fields["browser_response_reorder"] = Json::array(browser_reordered)
   }
-  let path = if advanced { ".tools/tc-advanced-response-link.json" } else if multi_response { ".tools/tc-multi-response-link.json" } else if retry { ".tools/tc-retry-link.json" } else if random { ".tools/tc-random-response-link.json" } else if response { ".tools/tc-response-link.json" } else { ".tools/tc-link.json" }
+  let path = if random_query { ".tools/tc-random-query-link.json" } else if advanced { ".tools/tc-advanced-response-link.json" } else if multi_response { ".tools/tc-multi-response-link.json" } else if retry { ".tools/tc-retry-link.json" } else if random { ".tools/tc-random-response-link.json" } else if response { ".tools/tc-response-link.json" } else { ".tools/tc-link.json" }
   @fs.write_file(path, report.stringify(indent=2) + "\n")
   println(report.stringify())
 }
