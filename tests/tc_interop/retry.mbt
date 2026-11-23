@@ -60,6 +60,7 @@ async fn link_multi_retry(addresses : Array[String]) -> Unit {
   }
   println(
     Json::object({
+      "origin_ms": Json(start.to_double()),
       "queriers": Json::array(
         addresses.mapi((i, address) => {
           Json::object({
@@ -67,6 +68,56 @@ async fn link_multi_retry(addresses : Array[String]) -> Unit {
             "qm_ms": Json(queries[i]),
             "resolved_ms": nullable_ms(resolved[i]),
           })
+        }),
+      ),
+    }).stringify(),
+  )
+}
+
+///|
+async fn link_retry_peer(
+  address : String,
+  ready : String,
+  done : String,
+  sources : Array[String],
+) -> Unit {
+  let ips = sources.map(extended_address)
+  let socket = @native.MulticastSocket::open(extended_address(address))
+  defer socket.close()
+  let service = "_md-tcproof._tcp.local."
+  let qm : Array[Array[Int64]] = ips.map(_ => [])
+  let start = @native.monotonic_ms()
+  let mut total = 0
+  @fs.write_file(ready, "")
+  while @native.monotonic_ms() - start < 9500L {
+    if socket.receive(timeout_ms=10) is Some(packet) &&
+      packet.interface_index == socket.interface_index &&
+      packet.source_port == 5353 &&
+      packet.destination_ipv4 == 0xe00000fbU {
+      let dns = @probe.independent_packet(packet.bytes) catch { _ => continue }
+      if (dns.flags & 0x8000) == 0 {
+        for i, ip in ips {
+          if packet.source_ipv4 == ip {
+            total += 1
+            if dns.flags == 0 &&
+              dns.questions.any(q => q.name == service && q.rr_type == 12) {
+              qm[i].push(@native.monotonic_ms() - start)
+            }
+            break
+          }
+        }
+      }
+    } else if @fs.exists(done) {
+      break
+    }
+  }
+  println(
+    Json::object({
+      "origin_ms": Json(start.to_double()),
+      "query_packets": Json(total),
+      "queriers": Json::array(
+        sources.mapi((i, source) => {
+          Json::object({ "source": Json(source), "qm_ms": Json(qm[i]) })
         }),
       ),
     }).stringify(),
