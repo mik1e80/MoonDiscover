@@ -294,6 +294,22 @@ async fn measure_query_retry(binary : String, additional : Array[String], trial 
   result
 }
 
+async fn measure_bidirectional_retry(binary : String, additional : Array[String], trial : Int) -> Json {
+  let _ = response_tc(["qdisc", "add", "dev", "mdrx", "root", "handle", "1:", "prio"])
+  defer (ignore(response_tc(["qdisc", "del", "dev", "mdrx", "root"])))
+  attach_response_netem("loss", "50%")
+  let result = measure_query_retry(binary, additional, trial)
+  let response = response_queue()
+  guard result is Object(fields) &&
+    result is { "browsers": { "queriers": Array(queriers), .. }, .. } &&
+    response is { "packets": Number(passed, ..), .. } &&
+    (passed > 0.0 || queriers.all(q => q is { "resolved_ms": Null, .. })) else {
+    fail("Browser resolved without a response traversing netem: " + result.stringify() + " " + response.stringify())
+  }
+  fields["response_netem"] = response
+  result
+}
+
 async fn measure_reply_order(binary : String, mode : String, trial : Int, browser? : Bool = false) -> Json {
   let _ = response_tc(["qdisc", "add", "dev", "mdrx", "root", "handle", "1:", "prio"])
   defer (ignore(response_tc(["qdisc", "del", "dev", "mdrx", "root"])))
@@ -465,9 +481,10 @@ async fn main {
   let retry = args.get(3) == Some("--retry")
   let random = args.get(3) == Some("--random-response")
   let random_query = args.get(3) == Some("--random-query")
-  let query_retry = args.get(3) is Some("--query-retry" | "--multi-query-retry")
+  let bidirectional = args.get(3) is Some("--bidirectional-retry" | "--multi-bidirectional-retry")
+  let query_retry = bidirectional || args.get(3) is Some("--query-retry" | "--multi-query-retry")
   let last_octet = match args.get(3) {
-    None | Some("--response") | Some("--retry") | Some("--random-response") | Some("--random-query") | Some("--query-retry") => 10
+    None | Some("--response") | Some("--retry") | Some("--random-response") | Some("--random-query") | Some("--query-retry") | Some("--bidirectional-retry") => 10
     Some("--five") => 14
     Some("--six") => 15
     Some("--seven") => 16
@@ -475,11 +492,11 @@ async fn main {
     Some("--nine") => 18
     Some("--ten") => 19
     Some("--eleven") => 20
-    Some("--twelve") | Some("--multi-response") | Some("--advanced-response") | Some("--multi-query-retry") => 21
+    Some("--twelve") | Some("--multi-response") | Some("--advanced-response") | Some("--multi-query-retry") | Some("--multi-bidirectional-retry") => 21
     _ => 0
   }
   guard args.length() >= 3 && args.length() <= 4 && last_octet >= 10 else {
-    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--response|--multi-response|--advanced-response|--retry|--random-response|--random-query|--query-retry|--multi-query-retry|--five|--six|--seven|--eight|--nine|--ten|--eleven|--twelve]")
+    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--response|--multi-response|--advanced-response|--retry|--random-response|--random-query|--query-retry|--multi-query-retry|--bidirectional-retry|--multi-bidirectional-retry|--five|--six|--seven|--eight|--nine|--ten|--eleven|--twelve]")
   }
   let additional : Array[String] = []
   for i in 11..=last_octet { additional.push("192.0.2.\{i}") }
@@ -517,10 +534,20 @@ async fn main {
     if query_retry {
       for trial in 1..=8 {
         @async.sleep(1100)
-        arms.push(measure_query_retry(binary, additional, trial))
+        let result = if bidirectional {
+          measure_bidirectional_retry(binary, additional, trial)
+        } else {
+          measure_query_retry(binary, additional, trial)
+        }
+        arms.push(result)
       }
       guard arms.any(a => a is { "all_resolved_after_initial_block_and_retransmission": true, .. }) else {
         fail("no observed recovery after initial query loss: " + Json(arms).stringify())
+      }
+      if bidirectional {
+        guard arms.any(a => a is { "response_netem": { "drops": Number(drops, ..), .. }, .. } && drops > 0.0) else {
+          fail("no response loss observed in the bidirectional sample: " + Json(arms).stringify())
+        }
       }
     } else if advanced {
       for trial in 1..=8 {
@@ -568,7 +595,10 @@ async fn main {
   }
   let report = Json::object({
     "source_commit": Json(args[2]),
-    "scenario": if query_retry {
+    "scenario": if bidirectional {
+      if additional.is_empty() { "one Browser with isolated veth bidirectional random loss" }
+      else { "twelve Browsers with isolated veth bidirectional random loss" }
+    } else if query_retry {
       if additional.is_empty() { "one Browser with isolated veth random query loss" }
       else { "twelve Browsers with isolated veth random query loss" }
     } else if random_query { "isolated veth random query loss" } else if advanced { "twelve Browsers with random response loss and isolated response reorder" } else if multi_response { "twelve queriers with isolated veth response faults" } else if retry { "Browser automatic retry across isolated veth" } else if random { "isolated veth random response loss" } else if response { "isolated veth response loss, restore and delay" } else { match additional.length() {
@@ -592,7 +622,9 @@ async fn main {
     fields["response_reorder"] = Json::array(reordered)
     fields["browser_response_reorder"] = Json::array(browser_reordered)
   }
-  let path = if query_retry {
+  let path = if bidirectional {
+    if additional.is_empty() { ".tools/tc-bidirectional-retry-link.json" } else { ".tools/tc-multi-bidirectional-retry-link.json" }
+  } else if query_retry {
     if additional.is_empty() { ".tools/tc-query-retry-link.json" } else { ".tools/tc-multi-query-retry-link.json" }
   } else if random_query { ".tools/tc-random-query-link.json" } else if advanced { ".tools/tc-advanced-response-link.json" } else if multi_response { ".tools/tc-multi-response-link.json" } else if retry { ".tools/tc-retry-link.json" } else if random { ".tools/tc-random-response-link.json" } else if response { ".tools/tc-response-link.json" } else { ".tools/tc-link.json" }
   @fs.write_file(path, report.stringify(indent=2) + "\n")

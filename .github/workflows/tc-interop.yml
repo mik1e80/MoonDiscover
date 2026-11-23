@@ -18,6 +18,38 @@ on:
 permissions:
   contents: read
 jobs:
+  bidirectional-loss:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install the pinned toolchain and independent responder
+        shell: bash
+        run: |
+          version=$(python3 -c 'import json; print(json.load(open("toolchain.json"))["release"])')
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- "$version"
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+          python3 -m venv .venv
+          .venv/bin/pip install -r tests/interop/requirements.txt
+          command -v ip
+          command -v tc
+      - name: Run single-Browser then twelve-Browser bidirectional loss
+        shell: bash
+        run: |
+          moon update
+          moon build tests/tc_interop --target native
+          sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --bidirectional-retry
+          sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-retry
+      - name: Retain bidirectional loss observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bidirectional-loss-evidence
+          path: |
+            .tools/tc-bidirectional-retry-link.json
+            .tools/tc-multi-bidirectional-retry-link.json
+            .tools/tc-*.log
+          include-hidden-files: true
   tc-interop:
     runs-on: ubuntu-latest
     timeout-minutes: 9
