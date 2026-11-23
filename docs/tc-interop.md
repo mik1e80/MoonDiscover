@@ -265,9 +265,20 @@ A 三轮分别在 34ms、34ms、20ms 观察到 Avahi 回包，均早于末包。
 
 ## 响应报文乱序
 
-同一隔离链路上用测试探针发送两份带不同 PTR 的 IPv4 组播 mDNS 响应，发送顺序始终为第 1 份、第 2 份，两者相隔 35ms。无损对照三轮的接收顺序均为 1 → 2。仅对第 1 份施加 125ms 延迟后，三轮接收顺序均为 2 → 1，第 1 份比第 2 份晚 90ms。每轮 netem 放行被选中的一份响应、零丢弃，两条目标 PTR 均能由接收端解码。此项证据来自测试套接字及受控报文，生产 Browser 在乱序下的缓存和解析语义仍待验证。[原始观测](evidence/linux-tc-multi-retry-response-reorder-20261123.json)
+同一隔离链路上用测试探针发送两份带不同 PTR 的 IPv4 组播 mDNS 响应，发送顺序始终为第 1 份、第 2 份，两者相隔 35ms。无损对照三轮的接收顺序均为 1 → 2。仅对第 1 份施加 125ms 延迟后，三轮接收顺序均为 2 → 1，第 1 份比第 2 份晚 90ms。每轮 netem 放行被选中的一份响应、零丢弃，两条目标 PTR 均能由接收端解码。此项使用测试套接字和受控报文。[原始观测](evidence/linux-tc-multi-retry-response-reorder-20261123.json)
 
-仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、查询方向随机丢包、长时响应丢包恢复、其他并发规模与丢包配置、生产 Browser 在响应乱序下的行为、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+## 生产 Browser 聚合乱序响应
+
+2026-11-23（北京时间），Linux 隔离 veth 上发送两份受控 IPv4 组播 mDNS 响应。第一份含浏览 PTR 和一条用于区分报文的地址记录，第二份含实例的 SRV、TXT 和目标 IPv4 地址。发送顺序固定为第一份再第二份。乱序组只给第一份加 125ms 延迟，独立套接字逐份核对来源和到达顺序，生产 Browser 处理同一批报文。[逐轮原始观测](evidence/linux-tc-browser-response-reorder-20261123.json) · [Linux 专项](https://github.com/mik1e80/MoonDiscover/actions/runs/45176653389)
+
+| 到达顺序 | 首份响应后的三轮中间状态 | 两份响应到齐后的三轮结果 |
+| --- | --- | --- |
+| PTR 先到 | 缓存 2 条记录，显示 1 个未完成实例 | 均完整解析，46–48ms |
+| SRV、TXT、地址先到 | 缓存 3 条记录，尚无可见实例 | 均完整解析，136–137ms |
+
+乱序组的 PTR 比第二份响应晚 88–91ms 到达。六轮均恰好接纳两份响应，最终快照都只有一个完整实例，目标地址为 `192.0.2.10`，端口为 `18424`，TXT 为 `stage=split`。时间从接收端探针启动起算。本实验覆盖两份正向响应的聚合。首轮 CI 曾因测试编码器的已知答案约束在发送前退出，改为逐条编码记录后重跑通过。[首轮调试记录](https://github.com/mik1e80/MoonDiscover/actions/runs/45175970888)
+
+仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、查询方向随机丢包、长时响应丢包恢复、其他并发规模与丢包配置、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
 
 复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至十二个附加地址分别运行五至十三查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
@@ -278,7 +289,7 @@ moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192
 
 隔离链路复用上面构建的探针。需有 Linux iproute2、veth、netem 和创建网络命名空间的权限。脚本创建并清理专用命名空间，只在虚拟接口上应用队列规则。报告位于 `.tools/tc-link.json`。可用 `--five`、`--six`、`--seven`、`--eight`、`--nine`、`--ten`、`--eleven`、`--twelve` 选择查询器数量，省略时运行单查询器链路实验。
 
-使用 `--response` 可运行单查询器的响应方向实验，输出位于 `.tools/tc-response-link.json`。 `--retry` 运行生产 Browser 自动重试实验，报告为 `.tools/tc-retry-link.json`。`--random-response` 运行随机响应丢包实验，报告为 `.tools/tc-random-response-link.json`。 `--multi-response` 运行十二查询器的响应方向丢包、恢复和延迟实验，报告为 `.tools/tc-multi-response-link.json`。 `--advanced-response` 先运行十二个 Browser 的随机响应丢包实验，再运行响应乱序实验，报告为 `.tools/tc-advanced-response-link.json`。
+使用 `--response` 可运行单查询器的响应方向实验，输出位于 `.tools/tc-response-link.json`。 `--retry` 运行生产 Browser 自动重试实验，报告为 `.tools/tc-retry-link.json`。`--random-response` 运行随机响应丢包实验，报告为 `.tools/tc-random-response-link.json`。 `--multi-response` 运行十二查询器的响应方向丢包、恢复和延迟实验，报告为 `.tools/tc-multi-response-link.json`。 `--advanced-response` 先运行十二个 Browser 的随机响应丢包实验，再运行报文级与生产 Browser 的响应乱序实验，报告为 `.tools/tc-advanced-response-link.json`。
 
 ```sh
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --twelve
