@@ -23,8 +23,7 @@ fn reorder_fixture() -> (@model.DnsName, Array[@model.DnsName], Array[Bytes]) ra
 }
 
 ///|
-async fn reply_send(address : String) -> Unit {
-  let (_, _, packets) = reorder_fixture()
+async fn reply_send(address : String, packets : Array[Bytes]) -> Unit {
   let socket = @native.MulticastSocket::open(extended_address(address))
   defer socket.close()
   let start = @native.monotonic_ms()

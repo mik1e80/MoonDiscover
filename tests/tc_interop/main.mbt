@@ -74,7 +74,17 @@ async fn main {
     return
   }
   if args.length() == 3 && args[1] == "--reply-send" {
-    reply_send(args[2])
+    let (_, _, packets) = reorder_fixture()
+    reply_send(args[2], packets)
+    return
+  }
+  if args.length() == 3 && args[1] == "--browser-reply-send" {
+    let (_, _, _, packets) = browser_reorder_fixture()
+    reply_send(args[2], packets)
+    return
+  }
+  if args.length() == 5 && args[1] == "--browser-reply-receive" {
+    browser_reply_receive(args[2], args[3], args[4])
     return
   }
   if args.length() == 5 && args[1] == "--reply-receive" {

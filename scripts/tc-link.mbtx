@@ -203,7 +203,7 @@ async fn measure_multi_retry(binary : String, additional : Array[String], trial 
   })
 }
 
-async fn measure_reply_order(binary : String, mode : String, trial : Int) -> Json {
+async fn measure_reply_order(binary : String, mode : String, trial : Int, browser? : Bool = false) -> Json {
   let _ = response_tc(["qdisc", "add", "dev", "mdrx", "root", "handle", "1:", "prio"])
   defer (ignore(response_tc(["qdisc", "del", "dev", "mdrx", "root"])))
   let delay = if mode == "reorder" { "125ms" } else { "0ms" }
@@ -215,22 +215,28 @@ async fn measure_reply_order(binary : String, mode : String, trial : Int) -> Jso
     let error_log = ".tools/tc-reply-order-error.log"
     let out = @process.redirect_to_file(log)
     let err = @process.redirect_to_file(error_log)
+    let receive_mode = if browser { "--browser-reply-receive" } else { "--reply-receive" }
+    let send_mode = if browser { "--browser-reply-send" } else { "--reply-send" }
     let monitor = @process.spawn(group, "ip", in_namespace(sender, binary, [
-      "--reply-receive", sender_ip, receiver_ip, marker,
+      receive_mode, sender_ip, receiver_ip, marker,
     ]), stdout=out, stderr=err, no_wait=true)
     defer monitor.cancel()
     wait_ready(marker, monitor, error_log, 100)
     let sent = @json.parse(command("ip", in_namespace(receiver, binary, [
-      "--reply-send", receiver_ip,
+      send_mode, receiver_ip,
     ])))
     guard monitor.wait() == 0 else { fail("response receive probe failed: " + @fs.read_file(error_log).text()) }
     (sent, @fs.read_file(log).json())
   })
   let queue = response_queue()
   let expected = if mode == "reorder" { [1, 0] } else { [0, 1] }
+  let decoded = if browser {
+    received is { "complete": true, .. }
+  } else {
+    received is { "first_ptr_ms": Number(_, ..), "second_ptr_ms": Number(_, ..), .. }
+  }
   guard sent is { "order": send_order, .. } && send_order == Json([0, 1]) &&
-    received is { "order": recv_order, "first_ptr_ms": Number(_, ..), "second_ptr_ms": Number(_, ..), .. } &&
-    recv_order == Json(expected) &&
+    received is { "order": recv_order, .. } && recv_order == Json(expected) && decoded &&
     queue is { "packets": Number(1, ..), "drops": Number(0, ..), .. } else {
     fail("unexpected response order or queue result: " + sent.stringify() + " " + received.stringify() + " " + queue.stringify())
   }
@@ -450,9 +456,11 @@ async fn main {
     (baseline, arms)
   })
   let reordered : Array[Json] = []
+  let browser_reordered : Array[Json] = []
   if advanced {
     for trial in 1..=3 {
       for mode in ["control", "reorder"] { reordered.push(measure_reply_order(binary, mode, trial)) }
+      for mode in ["control", "reorder"] { browser_reordered.push(measure_reply_order(binary, mode, trial, browser=true)) }
     }
   }
   let report = Json::object({
@@ -476,6 +484,7 @@ async fn main {
   if advanced {
     guard report is Object(fields) else { fail("invalid report") }
     fields["response_reorder"] = Json::array(reordered)
+    fields["browser_response_reorder"] = Json::array(browser_reordered)
   }
   let path = if advanced { ".tools/tc-advanced-response-link.json" } else if multi_response { ".tools/tc-multi-response-link.json" } else if retry { ".tools/tc-retry-link.json" } else if random { ".tools/tc-random-response-link.json" } else if response { ".tools/tc-response-link.json" } else { ".tools/tc-link.json" }
   @fs.write_file(path, report.stringify(indent=2) + "\n")
