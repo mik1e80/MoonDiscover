@@ -39,8 +39,16 @@ fn browser_reorder_fixture() -> (
     name: @model.DnsName::parse("unrelated-orderproof.local."),
   }
   fn reply(records : Array[@wire.Record]) -> Bytes raise {
-    let (_, packet) = tc_burst(service, records)
-    Bytes::makei(packet.length(), i => if i == 2 { b'\x84' } else { packet[i] })
+    let bytes = b"\x00\x00\x84\x00\x00\x00\x00\x00\x00\x00\x00\x00".to_array()
+    bytes[7] = records.length().to_byte()
+    for record in records {
+      let query = @wire.query_with_answers(record.name, record.rr_type, [record])
+      let start = 16 + record.name.to_wire().length()
+      for i in start..<query.length() {
+        bytes.push(query[i])
+      }
+    }
+    Bytes::makei(bytes.length(), i => bytes[i])
   }
   // Only the PTR packet has two answers, so the egress classifier selects it.
   (service, instance, host, [reply([ptr, unrelated]), reply([srv, txt, addr])])
