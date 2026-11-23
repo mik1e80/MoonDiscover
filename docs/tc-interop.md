@@ -295,7 +295,20 @@ A 三轮分别在 34ms、34ms、20ms 观察到 Avahi 回包，均早于末包。
 
 并发场景中，最先发问的同一个源每轮发两次 QM，其他十一个源每轮各发一次。该源在 1026–1031ms 重发，六轮重发到达对端，两轮均未到达。这两轮十二个 Browser 仍通过共享组播响应完整解析。时间从每轮发送端 Browser 探针启动起算。50% 是配置值，放行和丢弃计数描述本次样本。
 
-仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、查询与响应同时丢包、不同随机配置及长时查询丢包恢复、长时响应丢包恢复、其他并发规模与丢包配置、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+## Browser 在双向随机丢包下的重试与解析
+
+2026-11-23（北京时间），同一 Linux VM 内的隔离 veth 两端分别对查询和响应方向配置 50% 随机丢包。先运行单个生产 Browser，再运行十二个独立 IPv4 源的 Browser，各八轮。每个 Browser 只订阅一次，随后由探针驱动其原有调度。对端为 python-zeroconf 0.148.0。查询端记录发包和完整服务快照，对端独立收包计数与查询方向内核放行数逐轮一致。[逐轮数据](evidence/linux-tc-browser-bidirectional-loss-20261123.json) · [Linux 专项](https://github.com/mik1e80/MoonDiscover/actions/runs/45186492892/job/137733347577)
+
+| 规模 | 查询放行 / 丢弃 | 响应放行 / 丢弃 | 7.8s 窗口内的完整解析 |
+| --- | --- | --- | --- |
+| 单 Browser | 10 / 16 | 4 / 6 | 4/8 轮，1120–3195ms |
+| 十二个 Browser | 94 / 89 | 9 / 10 | 8/8 轮均为 12/12，1124–3125ms |
+
+单 Browser 八轮均在 1070–1075ms 发出第二次普通 QM。四轮未在窗口内完整解析，其中两轮全部查询被丢弃，另两轮有查询到达，响应均被丢弃。完成解析的四轮中，有一轮同时观测到查询和响应被丢弃，于 3195ms 恢复。
+
+并发八轮均观测到自动重发。七轮的十二个源都至少发了两次 QM，另一轮只有最先发问的源重发。八轮中实际到达对端的查询来自每轮 5–12 个源，十二个 Browser 最终均解析两个实例。时间从发送端 Browser 探针启动起算。50% 是两侧各自的配置值，样本结果保留每轮实际计数和未完成状态。
+
+仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、不同双向丢包率、相关或突发双向丢包、长时间双向丢包的恢复、其他并发规模、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
 
 复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至十二个附加地址分别运行五至十三查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
@@ -306,7 +319,7 @@ moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192
 
 隔离链路复用上面构建的探针。需有 Linux iproute2、veth、netem 和创建网络命名空间的权限。脚本创建并清理专用命名空间，只在虚拟接口上应用队列规则。报告位于 `.tools/tc-link.json`。可用 `--five`、`--six`、`--seven`、`--eight`、`--nine`、`--ten`、`--eleven`、`--twelve` 选择查询器数量，省略时运行单查询器链路实验。
 
-使用 `--response` 可运行单查询器的响应方向实验，输出位于 `.tools/tc-response-link.json`。 `--retry` 运行生产 Browser 自动重试实验，报告为 `.tools/tc-retry-link.json`。`--random-response` 运行随机响应丢包实验，报告为 `.tools/tc-random-response-link.json`。 `--multi-response` 运行十二查询器的响应方向丢包、恢复和延迟实验，报告为 `.tools/tc-multi-response-link.json`。 `--advanced-response` 先运行十二个 Browser 的随机响应丢包实验，再运行报文级与生产 Browser 的响应乱序实验，报告为 `.tools/tc-advanced-response-link.json`。 `--random-query` 可运行单查询器查询方向随机丢包实验，报告为 `.tools/tc-random-query-link.json`。 `--query-retry` 和 `--multi-query-retry` 分别运行单个与十二个 Browser 的查询方向随机丢包实验，报告为 `.tools/tc-query-retry-link.json` 和 `.tools/tc-multi-query-retry-link.json`。
+使用 `--response` 可运行单查询器的响应方向实验，输出位于 `.tools/tc-response-link.json`。 `--retry` 运行生产 Browser 自动重试实验，报告为 `.tools/tc-retry-link.json`。`--random-response` 运行随机响应丢包实验，报告为 `.tools/tc-random-response-link.json`。 `--multi-response` 运行十二查询器的响应方向丢包、恢复和延迟实验，报告为 `.tools/tc-multi-response-link.json`。 `--advanced-response` 先运行十二个 Browser 的随机响应丢包实验，再运行报文级与生产 Browser 的响应乱序实验，报告为 `.tools/tc-advanced-response-link.json`。 `--random-query` 可运行单查询器查询方向随机丢包实验，报告为 `.tools/tc-random-query-link.json`。 `--query-retry` 和 `--multi-query-retry` 分别运行单个与十二个 Browser 的查询方向随机丢包实验，报告为 `.tools/tc-query-retry-link.json` 和 `.tools/tc-multi-query-retry-link.json`。 `--bidirectional-retry` 与 `--multi-bidirectional-retry` 分别运行单个与十二个 Browser 的双向随机丢包实验，报告为 `.tools/tc-bidirectional-retry-link.json` 和 `.tools/tc-multi-bidirectional-retry-link.json`。
 
 ```sh
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --twelve
@@ -316,6 +329,8 @@ sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --random-query
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --query-retry
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-query-retry
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --bidirectional-retry
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-retry
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-response
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --advanced-response
 ```

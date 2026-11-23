@@ -1,0 +1,2802 @@
+{
+  "source_run": "https://github.com/mik1e80/MoonDiscover/actions/runs/45186492892",
+  "source_job": "https://github.com/mik1e80/MoonDiscover/actions/runs/45186492892/job/137733347577",
+  "single_browser": {
+    "source_commit": "9cb18a6f4ec5f3328438ed4eed1457f588919a75",
+    "scenario": "one Browser with isolated veth bidirectional random loss",
+    "kernel": "7.0.0-1020-azure",
+    "zeroconf_version": "0.148.0",
+    "baseline": {
+      "send_order": [
+        0
+      ],
+      "sent_ms": [
+        0
+      ],
+      "zeroconf": {
+        "known_ptr_ms": 69,
+        "unknown_ptr_ms": 69,
+        "first_ptr_ms": 69,
+        "known_ptr_omitted_with_unknown_observed": false,
+        "first_ptr_before_tail": null,
+        "first_ptr_in_400_to_500_ms": false
+      },
+      "queriers": [
+        {
+          "source_ipv4": "192.0.2.9",
+          "zeroconf": {
+            "known_ptr_ms": 69,
+            "unknown_ptr_ms": 69,
+            "first_ptr_ms": 69,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      ]
+    },
+    "arms": [
+      {
+        "trial": 1,
+        "browsers": {
+          "origin_ms": 36928,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "71",
+                "1074",
+                "3078"
+              ],
+              "resolved_ms": 3113
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 11517413421910671000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 11517413421910671000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 82,
+          "packets": 1,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": true,
+        "peer": {
+          "origin_ms": 36915,
+          "query_packets": 1,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "3091"
+              ]
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 3442113211434800600,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 2,
+        "browsers": {
+          "origin_ms": 41187,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "71",
+                "1075",
+                "3078",
+                "7082"
+              ],
+              "resolved_ms": null
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 17216969954201710000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 17216969954201710000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 4,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": false,
+        "peer": {
+          "origin_ms": 41175,
+          "query_packets": 0,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": []
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 13836612278030336000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 3,
+        "browsers": {
+          "origin_ms": 50136,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "71",
+                "1071",
+                "3074",
+                "7075"
+              ],
+              "resolved_ms": null
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 8435260270787860000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 82,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 8435260270787860000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 246,
+          "packets": 3,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": false,
+        "peer": {
+          "origin_ms": 50125,
+          "query_packets": 3,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "82",
+                "1082",
+                "3085"
+              ]
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 2624130799205224000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 3,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 4,
+        "browsers": {
+          "origin_ms": 59081,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "71",
+                "1074"
+              ],
+              "resolved_ms": 1140
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 1573198580911054800,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 1573198580911054800,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 82,
+          "packets": 1,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": true,
+        "peer": {
+          "origin_ms": 59069,
+          "query_packets": 1,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1086"
+              ]
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 9478218666506584000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 5,
+        "browsers": {
+          "origin_ms": 61371,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "71",
+                "1071",
+                "3073"
+              ],
+              "resolved_ms": 3195
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 4510237415288930000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 4510237415288930000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 164,
+          "packets": 2,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": true,
+        "peer": {
+          "origin_ms": 61359,
+          "query_packets": 2,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1083",
+                "3085"
+              ]
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 16150871721731940000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 6,
+        "browsers": {
+          "origin_ms": 65713,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "71",
+                "1074"
+              ],
+              "resolved_ms": 1120
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 10663972834070161000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 10663972834070161000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 82,
+          "packets": 1,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": true,
+        "peer": {
+          "origin_ms": 65701,
+          "query_packets": 1,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1086"
+              ]
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 15893694179086838000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 7,
+        "browsers": {
+          "origin_ms": 67981,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "70",
+                "1070",
+                "3072",
+                "7075"
+              ],
+              "resolved_ms": null
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 10027816966582262000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 10027816966582262000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 4,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": false,
+        "peer": {
+          "origin_ms": 67967,
+          "query_packets": 0,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": []
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 6415360072765311000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 8,
+        "browsers": {
+          "origin_ms": 76929,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "71",
+                "1075",
+                "3076",
+                "7077"
+              ],
+              "resolved_ms": null
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 16411068490098498000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 16411068490098498000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 164,
+          "packets": 2,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": false,
+        "peer": {
+          "origin_ms": 76917,
+          "query_packets": 2,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1087",
+                "3088"
+              ]
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 1879749362483495400,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      }
+    ]
+  },
+  "twelve_browsers": {
+    "source_commit": "9cb18a6f4ec5f3328438ed4eed1457f588919a75",
+    "scenario": "twelve Browsers with isolated veth bidirectional random loss",
+    "kernel": "7.0.0-1020-azure",
+    "zeroconf_version": "0.148.0",
+    "baseline": {
+      "send_order": [
+        0
+      ],
+      "sent_ms": [
+        0
+      ],
+      "zeroconf": {
+        "known_ptr_ms": 109,
+        "unknown_ptr_ms": 109,
+        "first_ptr_ms": 109,
+        "known_ptr_omitted_with_unknown_observed": false,
+        "first_ptr_before_tail": null,
+        "first_ptr_in_400_to_500_ms": false
+      },
+      "queriers": [
+        {
+          "source_ipv4": "192.0.2.9",
+          "zeroconf": {
+            "known_ptr_ms": 109,
+            "unknown_ptr_ms": 109,
+            "first_ptr_ms": 109,
+            "known_ptr_omitted_with_unknown_observed": false,
+            "first_ptr_before_tail": null,
+            "first_ptr_in_400_to_500_ms": false
+          }
+        }
+      ]
+    },
+    "arms": [
+      {
+        "trial": 1,
+        "browsers": {
+          "origin_ms": 92789,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "25",
+                "1028"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1028",
+                "2031"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1028",
+                "2031"
+              ],
+              "resolved_ms": 2124
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1028",
+                "2031"
+              ],
+              "resolved_ms": 2124
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 1509040606919685400,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 82,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 1509040606919685400,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 902,
+          "packets": 11,
+          "drops": 13,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": false,
+        "peer": {
+          "origin_ms": 92776,
+          "query_packets": 11,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1046",
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1046",
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1046"
+              ]
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1047",
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "1047"
+              ]
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "38"
+              ]
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "2044"
+              ]
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": []
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 7375715649356571000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 510,
+          "packets": 2,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 2,
+        "browsers": {
+          "origin_ms": 96073,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "26",
+                "1027"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1027",
+                "2031"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1027",
+                "2031"
+              ],
+              "resolved_ms": 2057
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1027",
+                "2031"
+              ],
+              "resolved_ms": 2057
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 5005681642732897000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 82,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 5005681642732897000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 984,
+          "packets": 12,
+          "drops": 12,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": false,
+        "peer": {
+          "origin_ms": 96060,
+          "query_packets": 12,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1045"
+              ]
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1045"
+              ]
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1045",
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "39",
+                "1040"
+              ]
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1040",
+                "2043"
+              ]
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1040",
+                "2043"
+              ]
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": []
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 5049064683636383000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 3,
+        "browsers": {
+          "origin_ms": 99277,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1033",
+                "2035"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1033",
+                "2035"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1033",
+                "2035"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1033",
+                "2035"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1033",
+                "2035"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "1033",
+                "2035"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1033",
+                "2035"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1033",
+                "2035"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "26",
+                "1027"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1027",
+                "2030"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1027",
+                "2030"
+              ],
+              "resolved_ms": 2087
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1027",
+                "2030"
+              ],
+              "resolved_ms": 2087
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 13937074820678138000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 82,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 13937074820678138000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 1148,
+          "packets": 14,
+          "drops": 10,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": false,
+        "peer": {
+          "origin_ms": 99265,
+          "query_packets": 14,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1044"
+              ]
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1044"
+              ]
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1044",
+                "2047"
+              ]
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "2047"
+              ]
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1044"
+              ]
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "2047"
+              ]
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "2047"
+              ]
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1045",
+                "2047"
+              ]
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "38"
+              ]
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "2042"
+              ]
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1039"
+              ]
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "2042"
+              ]
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 10650058625581097000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 4,
+        "browsers": {
+          "origin_ms": 102509,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1034",
+                "2037"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "26",
+                "1028"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1028",
+                "2031"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1028",
+                "2031"
+              ],
+              "resolved_ms": 2063
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1028",
+                "2031"
+              ],
+              "resolved_ms": 2063
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 6363534684262703000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 82,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 6363534684262703000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 1066,
+          "packets": 13,
+          "drops": 11,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": false,
+        "peer": {
+          "origin_ms": 102497,
+          "query_packets": 13,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1046"
+              ]
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1046"
+              ]
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "1046",
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1046"
+              ]
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1046",
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "38",
+                "1040"
+              ]
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1040",
+                "2043"
+              ]
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1040",
+                "2043"
+              ]
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": []
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 15004746320572682000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 5,
+        "browsers": {
+          "origin_ms": 105720,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1033"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1033"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1033"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1033"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1033"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "1033"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1033"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1033"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "26",
+                "1027"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1027"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1027"
+              ],
+              "resolved_ms": 1124
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1027"
+              ],
+              "resolved_ms": 1124
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 2938634486146331600,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 2938634486146331600,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 410,
+          "packets": 5,
+          "drops": 8,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": true,
+        "peer": {
+          "origin_ms": 105708,
+          "query_packets": 5,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1044"
+              ]
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1044"
+              ]
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "1039"
+              ]
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1039"
+              ]
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1039"
+              ]
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": []
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 9111394907249529000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 6,
+        "browsers": {
+          "origin_ms": 107991,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1033",
+                "2036"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "26",
+                "1027",
+                "3028"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1027",
+                "2030"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1027",
+                "2030"
+              ],
+              "resolved_ms": 3125
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1027",
+                "2030"
+              ],
+              "resolved_ms": 3125
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 7177048579462263000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 7177048579462263000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 1066,
+          "packets": 13,
+          "drops": 12,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": true,
+        "peer": {
+          "origin_ms": 107979,
+          "query_packets": 13,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1044"
+              ]
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "2048"
+              ]
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1045",
+                "2048"
+              ]
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1045"
+              ]
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1045"
+              ]
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1045"
+              ]
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1045",
+                "2048"
+              ]
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "3040"
+              ]
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1039",
+                "2042"
+              ]
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1039"
+              ]
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 15174190506093775000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 7,
+        "browsers": {
+          "origin_ms": 112264,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "25",
+                "1027"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1027",
+                "2031"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1027",
+                "2031"
+              ],
+              "resolved_ms": 2119
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1027",
+                "2031"
+              ],
+              "resolved_ms": 2119
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 1267432311380345300,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 82,
+          "packets": 1,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 1267432311380345300,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 902,
+          "packets": 11,
+          "drops": 13,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": false,
+        "peer": {
+          "origin_ms": 112252,
+          "query_packets": 11,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1044"
+              ]
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1044",
+                "2048"
+              ]
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "2048"
+              ]
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "2049"
+              ]
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "37",
+                "1039"
+              ]
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "2043"
+              ]
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1039",
+                "2043"
+              ]
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 15236431586101334000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 2,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "trial": 8,
+        "browsers": {
+          "origin_ms": 115528,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": [
+                "1033",
+                "2037"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "25",
+                "1027",
+                "3030"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": [
+                "1027",
+                "2031"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1027",
+                "2031"
+              ],
+              "resolved_ms": 3097
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1027",
+                "2031"
+              ],
+              "resolved_ms": 3097
+            }
+          ]
+        },
+        "first_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 18293505090764145000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 0,
+          "packets": 0,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "final_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 18293505090764145000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 1230,
+          "packets": 15,
+          "drops": 10,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        },
+        "all_resolved_after_initial_block_and_retransmission": true,
+        "peer": {
+          "origin_ms": 115516,
+          "query_packets": 15,
+          "queriers": [
+            {
+              "source": "192.0.2.9",
+              "qm_ms": [
+                "2048"
+              ]
+            },
+            {
+              "source": "192.0.2.11",
+              "qm_ms": [
+                "1044"
+              ]
+            },
+            {
+              "source": "192.0.2.12",
+              "qm_ms": [
+                "1045"
+              ]
+            },
+            {
+              "source": "192.0.2.13",
+              "qm_ms": [
+                "1045",
+                "2048"
+              ]
+            },
+            {
+              "source": "192.0.2.14",
+              "qm_ms": [
+                "1045",
+                "2048"
+              ]
+            },
+            {
+              "source": "192.0.2.15",
+              "qm_ms": [
+                "2048"
+              ]
+            },
+            {
+              "source": "192.0.2.16",
+              "qm_ms": [
+                "1045"
+              ]
+            },
+            {
+              "source": "192.0.2.17",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.18",
+              "qm_ms": [
+                "1039",
+                "3042"
+              ]
+            },
+            {
+              "source": "192.0.2.19",
+              "qm_ms": []
+            },
+            {
+              "source": "192.0.2.20",
+              "qm_ms": [
+                "1039",
+                "2043"
+              ]
+            },
+            {
+              "source": "192.0.2.21",
+              "qm_ms": [
+                "1039",
+                "2043"
+              ]
+            }
+          ]
+        },
+        "response_netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "loss-random": {
+              "loss": 0.5,
+              "correlation": 0
+            },
+            "seed": 8094494411609954000,
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 255,
+          "packets": 1,
+          "drops": 1,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      }
+    ]
+  }
+}
