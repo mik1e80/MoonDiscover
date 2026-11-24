@@ -52,7 +52,8 @@ def observe_tc_timers(responder, primary_ip, ready):
 
 
 if __name__ == "__main__":
-    ip, ready = sys.argv[1:]
+    ip, ready, *duration = sys.argv[1:]
+    lifetime = int(duration[0]) if duration else 90
     service = "_md-tcproof._tcp.local."
     with Zeroconf(interfaces=[ip], ip_version=IPVersion.V4Only) as responder:
         for label in ("zc-known", "zc-unknown"):
@@ -63,4 +64,4 @@ if __name__ == "__main__":
                             other_ttl=4500)
             )
         observe_tc_timers(responder, ip, ready)
-        time.sleep(90)
+        time.sleep(lifetime)

@@ -1,5 +1,8 @@
 ///|
-async fn link_multi_retry(addresses : Array[String]) -> Unit {
+async fn link_multi_retry(
+  addresses : Array[String],
+  window_ms~ : Int64 = 7800L,
+) -> Unit {
   let ips = addresses.map(extended_address)
   let monitor = @native.MulticastSocket::open(ips[0])
   defer monitor.close()
@@ -21,7 +24,7 @@ async fn link_multi_retry(addresses : Array[String]) -> Unit {
   for browser in browsers {
     let _ = browser.browse(service)
   }
-  while @native.monotonic_ms() - start < 7800L {
+  while @native.monotonic_ms() - start < window_ms {
     for browser in browsers {
       let _ = browser.poll(timeout_ms=0)
     }
@@ -80,6 +83,7 @@ async fn link_retry_peer(
   ready : String,
   done : String,
   sources : Array[String],
+  window_ms~ : Int64 = 9500L,
 ) -> Unit {
   let ips = sources.map(extended_address)
   let socket = @native.MulticastSocket::open(extended_address(address))
@@ -89,7 +93,7 @@ async fn link_retry_peer(
   let start = @native.monotonic_ms()
   let mut total = 0
   @fs.write_file(ready, "")
-  while @native.monotonic_ms() - start < 9500L {
+  while @native.monotonic_ms() - start < window_ms {
     if socket.receive(timeout_ms=10) is Some(packet) &&
       packet.interface_index == socket.interface_index &&
       packet.source_port == 5353 &&

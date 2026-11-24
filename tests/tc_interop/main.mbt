@@ -69,6 +69,20 @@ fn observation(
 ///|
 async fn main {
   let args = @env.args()
+  if args.length() == 3 && args[1] == "--link-retry-30s" {
+    link_multi_retry(args[2:].to_owned(), window_ms=30000L)
+    return
+  }
+  if args.length() == 6 && args[1] == "--link-retry-peer-30s" {
+    link_retry_peer(
+      args[2],
+      args[3],
+      args[4],
+      args[5:].to_owned(),
+      window_ms=32000L,
+    )
+    return
+  }
   if (args.length() == 3 || args.length() == 14) &&
     args[1] == "--link-multi-retry" {
     link_multi_retry(args[2:].to_owned())
