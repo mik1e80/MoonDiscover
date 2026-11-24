@@ -218,34 +218,34 @@ async fn response_queue() -> Json {
   netem_queue(@json.parse(response_tc(["-j", "-s", "qdisc", "show", "dev", "mdrx"])))
 }
 
-async fn release_bursts() -> Json {
-  // Keep both directions blocked for at least 500 ms after observing loss.
-  @async.sleep(500)
+async fn release_bursts(hold_ms : Int) -> Json {
+  @async.sleep(hold_ms)
   let query = query_queue()
   guard query is { "packets": Number(0, ..), "drops": Number(drops, ..), .. } && drops > 0.0 else {
     fail("no query was dropped during the overlapping outage: " + query.stringify())
   }
   let _ = tc(["qdisc", "change", "dev", "mdtx", "parent", "1:3", "handle", "20:", "netem", "loss", "0%"])
   let mut response = Json::null()
-  for _ in 0..<110 {
+  let checks = if hold_ms > 500 { 420 } else { 110 }
+  for _ in 0..<checks {
     response = response_queue()
     if response is { "drops": Number(drops, ..), .. } && drops > 0.0 { break }
     @async.sleep(20)
   }
-  @async.sleep(500)
+  @async.sleep(hold_ms)
   response = response_queue()
   guard response is { "packets": Number(0, ..), "drops": Number(drops, ..), .. } && drops > 0.0 else {
     fail("no response was dropped during the outage: " + response.stringify())
   }
   let _ = response_tc(["qdisc", "change", "dev", "mdrx", "parent", "1:3", "handle", "20:", "netem", "loss", "0%"])
-  Json::object({ "query_before_reopen": query, "response_before_reopen": response })
+  Json::object({ "hold_after_loss_ms": Json(hold_ms), "query_before_reopen": query, "response_before_reopen": response })
 }
 
-async fn observe_retry(binary : String, additional : Array[String], trial : Int, queue : async () -> Json, long_window? : Bool = false, burst? : Bool = false) -> Json {
+async fn observe_retry(binary : String, additional : Array[String], trial : Int, queue : async () -> Json, window_seconds? : Int = 0, burst_hold_ms? : Int = 0) -> Json {
   let (observed, first, phases) = @async.with_task_group(group => {
     let path = ".tools/tc-link-multi-retry.log"
     let error_log = ".tools/tc-link-multi-retry-error.log"
-    let mode = if long_window { "--link-retry-30s" } else { "--link-multi-retry" }
+    let mode = if window_seconds == 0 { "--link-multi-retry" } else { "--link-retry-\{window_seconds}s" }
     let args = [mode, sender_ip]
     for ip in additional { args.push(ip) }
     let out = @process.redirect_to_file(path)
@@ -259,7 +259,7 @@ async fn observe_retry(binary : String, additional : Array[String], trial : Int,
       if child.try_wait() is Some(_) { break }
       @async.sleep(15)
     }
-    let phases = if burst { release_bursts() } else { Json::null() }
+    let phases = if burst_hold_ms > 0 { release_bursts(burst_hold_ms) } else { Json::null() }
     guard child.wait() == 0 else { fail("multi-Browser probe failed: " + @fs.read_file(error_log).text()) }
     (@fs.read_file(path).json(), first, phases)
   })
@@ -275,9 +275,10 @@ async fn observe_retry(binary : String, additional : Array[String], trial : Int,
     queriers.all(q => q is { "resolved_ms": Number(_, ..), .. })
   let result = Json::object({
     "trial": Json(trial), "browsers": observed, "first_netem": first, "final_netem": final_queue,
+    "observation_window_ms": Json(if window_seconds == 0 { 7800 } else { window_seconds * 1000 }),
     "all_resolved_after_initial_block_and_retransmission": Json(lagged),
   })
-  if burst && result is Object(fields) { fields["burst"] = phases }
+  if burst_hold_ms > 0 && result is Object(fields) { fields["burst"] = phases }
   result
 }
 
@@ -288,17 +289,17 @@ async fn measure_multi_retry(binary : String, additional : Array[String], trial 
   observe_retry(binary, additional, trial, response_queue)
 }
 
-async fn measure_query_retry(binary : String, additional : Array[String], trial : Int, long_window? : Bool = false, burst? : Bool = false) -> Json {
+async fn measure_query_retry(binary : String, additional : Array[String], trial : Int, window_seconds? : Int = 0, burst_hold_ms? : Int = 0) -> Json {
   let _ = tc(["qdisc", "add", "dev", "mdtx", "root", "handle", "1:", "prio"])
   defer (ignore(tc(["qdisc", "del", "dev", "mdtx", "root"])))
-  attach_query_loss("192.0.2.0/27", rate=if burst { "100%" } else { "50%" })
+  attach_query_loss("192.0.2.0/27", rate=if burst_hold_ms > 0 { "100%" } else { "50%" })
   let ready = ".tools/tc-retry-peer-ready"
   let done = ".tools/tc-retry-peer-done"
   for marker in [ready, done] {
     if @fs.exists(marker) { @fs.remove(marker) }
   }
   let (result, peer) = @async.with_task_group(group => {
-    let mode = if long_window { "--link-retry-peer-30s" } else { "--link-retry-peer" }
+    let mode = if window_seconds == 0 { "--link-retry-peer" } else { "--link-retry-peer-\{window_seconds}s" }
     let args = [mode, receiver_ip, ready, done, sender_ip]
     for ip in additional { args.push(ip) }
     let log = ".tools/tc-link-retry-peer.log"
@@ -308,7 +309,7 @@ async fn measure_query_retry(binary : String, additional : Array[String], trial 
     let monitor = @process.spawn(group, "ip", in_namespace(receiver, binary, args), stdout=out, stderr=err, no_wait=true)
     defer monitor.cancel()
     wait_ready(ready, monitor, error_log, 100)
-    let result = observe_retry(binary, additional, trial, query_queue, long_window~, burst~)
+    let result = observe_retry(binary, additional, trial, query_queue, window_seconds~, burst_hold_ms~)
     @fs.write_file(done, "")
     guard monitor.wait() == 0 else { fail("query monitor failed: " + @fs.read_file(error_log).text()) }
     (result, @fs.read_file(log).json())
@@ -322,11 +323,11 @@ async fn measure_query_retry(binary : String, additional : Array[String], trial 
   result
 }
 
-async fn measure_bidirectional_retry(binary : String, additional : Array[String], trial : Int, long_window? : Bool = false, burst? : Bool = false) -> Json {
+async fn measure_bidirectional_retry(binary : String, additional : Array[String], trial : Int, window_seconds? : Int = 0, burst_hold_ms? : Int = 0) -> Json {
   let _ = response_tc(["qdisc", "add", "dev", "mdrx", "root", "handle", "1:", "prio"])
   defer (ignore(response_tc(["qdisc", "del", "dev", "mdrx", "root"])))
-  attach_response_netem("loss", if burst { "100%" } else { "50%" })
-  let result = measure_query_retry(binary, additional, trial, long_window~, burst~)
+  attach_response_netem("loss", if burst_hold_ms > 0 { "100%" } else { "50%" })
+  let result = measure_query_retry(binary, additional, trial, window_seconds~, burst_hold_ms~)
   let response = response_queue()
   guard result is Object(fields) &&
     result is { "browsers": { "queriers": Array(queriers), .. }, .. } &&
@@ -509,12 +510,20 @@ async fn main {
   let retry = args.get(3) == Some("--retry")
   let random = args.get(3) == Some("--random-response")
   let random_query = args.get(3) == Some("--random-query")
-  let long_window = args.get(3) == Some("--bidirectional-30s")
-  let burst = args.get(3) == Some("--multi-bidirectional-burst")
-  let bidirectional = long_window || burst || args.get(3) is Some("--bidirectional-retry" | "--multi-bidirectional-retry")
+  let mode = args.get(3)
+  let long_burst = mode == Some("--multi-bidirectional-burst-5s")
+  let extended_random = mode is Some("--bidirectional-30s" | "--bidirectional-60s")
+  let burst = long_burst || mode == Some("--multi-bidirectional-burst")
+  let window_seconds = match mode {
+    Some("--bidirectional-60s") => 60
+    Some("--bidirectional-30s" | "--multi-bidirectional-burst-5s") => 30
+    _ => 0
+  }
+  let burst_hold_ms = if long_burst { 5000 } else if burst { 500 } else { 0 }
+  let bidirectional = extended_random || burst || args.get(3) is Some("--bidirectional-retry" | "--multi-bidirectional-retry")
   let query_retry = bidirectional || args.get(3) is Some("--query-retry" | "--multi-query-retry")
   let last_octet = match args.get(3) {
-    None | Some("--response") | Some("--retry") | Some("--random-response") | Some("--random-query") | Some("--query-retry") | Some("--bidirectional-retry") | Some("--bidirectional-30s") => 10
+    None | Some("--response") | Some("--retry") | Some("--random-response") | Some("--random-query") | Some("--query-retry") | Some("--bidirectional-retry") | Some("--bidirectional-30s") | Some("--bidirectional-60s") => 10
     Some("--five") => 14
     Some("--six") => 15
     Some("--seven") => 16
@@ -522,11 +531,11 @@ async fn main {
     Some("--nine") => 18
     Some("--ten") => 19
     Some("--eleven") => 20
-    Some("--twelve") | Some("--multi-response") | Some("--advanced-response") | Some("--multi-query-retry") | Some("--multi-bidirectional-retry") | Some("--multi-bidirectional-burst") => 21
+    Some("--twelve") | Some("--multi-response") | Some("--advanced-response") | Some("--multi-query-retry") | Some("--multi-bidirectional-retry") | Some("--multi-bidirectional-burst") | Some("--multi-bidirectional-burst-5s") => 21
     _ => 0
   }
   guard args.length() >= 3 && args.length() <= 4 && last_octet >= 10 else {
-    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--response|--multi-response|--advanced-response|--retry|--random-response|--random-query|--query-retry|--multi-query-retry|--bidirectional-retry|--multi-bidirectional-retry|--bidirectional-30s|--multi-bidirectional-burst|--five|--six|--seven|--eight|--nine|--ten|--eleven|--twelve]")
+    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--response|--multi-response|--advanced-response|--retry|--random-response|--random-query|--query-retry|--multi-query-retry|--bidirectional-retry|--multi-bidirectional-retry|--bidirectional-30s|--bidirectional-60s|--multi-bidirectional-burst|--multi-bidirectional-burst-5s|--five|--six|--seven|--eight|--nine|--ten|--eleven|--twelve]")
   }
   let additional : Array[String] = []
   for i in 11..=last_octet { additional.push("192.0.2.\{i}") }
@@ -551,7 +560,9 @@ async fn main {
     let log = ".tools/tc-link-publisher.log"
     let output = @process.redirect_to_file(log)
     let publisher_args = ["tests/interop/tc_publisher.py", receiver_ip, marker]
-    if long_window { publisher_args.push("300") }
+    if window_seconds == 60 { publisher_args.push("550") }
+    else if extended_random { publisher_args.push("300") }
+    else if long_burst { publisher_args.push("120") }
     let publisher = @process.spawn(group, "ip", in_namespace(receiver, python, publisher_args), stdout=output, stderr=output, no_wait=true)
     defer publisher.cancel()
     wait_ready(marker, publisher, log, 1000)
@@ -566,13 +577,13 @@ async fn main {
       for trial in 1..=trials {
         @async.sleep(1100)
         let result = if bidirectional {
-          measure_bidirectional_retry(binary, additional, trial, long_window~, burst~)
+          measure_bidirectional_retry(binary, additional, trial, window_seconds~, burst_hold_ms~)
         } else {
           measure_query_retry(binary, additional, trial)
         }
         arms.push(result)
       }
-      guard long_window || arms.any(a => a is { "all_resolved_after_initial_block_and_retransmission": true, .. }) else {
+      guard extended_random || arms.any(a => a is { "all_resolved_after_initial_block_and_retransmission": true, .. }) else {
         fail("no observed recovery after initial query loss: " + Json(arms).stringify())
       }
       if bidirectional {
@@ -626,8 +637,10 @@ async fn main {
   }
   let report = Json::object({
     "source_commit": Json(args[2]),
-    "scenario": if long_window {
-      "one Browser with isolated veth bidirectional random loss over 30 seconds"
+    "scenario": if extended_random {
+      "one Browser with isolated veth bidirectional random loss over \{window_seconds} seconds"
+    } else if long_burst {
+      "twelve Browsers with overlapping bidirectional bursts held 5 seconds"
     } else if burst {
       "twelve Browsers with overlapping bidirectional bursts"
     } else if bidirectional {
@@ -657,8 +670,10 @@ async fn main {
     fields["response_reorder"] = Json::array(reordered)
     fields["browser_response_reorder"] = Json::array(browser_reordered)
   }
-  let path = if long_window {
-    ".tools/tc-bidirectional-30s.json"
+  let path = if extended_random {
+    ".tools/tc-bidirectional-\{window_seconds}s.json"
+  } else if long_burst {
+    ".tools/tc-multi-bidirectional-burst-5s.json"
   } else if burst {
     ".tools/tc-multi-bidirectional-burst.json"
   } else if bidirectional {
