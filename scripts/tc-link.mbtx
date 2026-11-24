@@ -226,7 +226,7 @@ async fn release_bursts(hold_ms : Int) -> Json {
   }
   let _ = tc(["qdisc", "change", "dev", "mdtx", "parent", "1:3", "handle", "20:", "netem", "loss", "0%"])
   let mut response = Json::null()
-  let checks = if hold_ms > 500 { 420 } else { 110 }
+  let checks = if hold_ms >= 10000 { 650 } else if hold_ms > 500 { 420 } else { 110 }
   for _ in 0..<checks {
     response = response_queue()
     if response is { "drops": Number(drops, ..), .. } && drops > 0.0 { break }
@@ -511,19 +511,20 @@ async fn main {
   let random = args.get(3) == Some("--random-response")
   let random_query = args.get(3) == Some("--random-query")
   let mode = args.get(3)
-  let long_burst = mode == Some("--multi-bidirectional-burst-5s")
-  let extended_random = mode is Some("--bidirectional-30s" | "--bidirectional-60s")
+  let long_burst = mode is Some("--multi-bidirectional-burst-5s" | "--multi-bidirectional-burst-10s")
+  let extended_random = mode is Some("--bidirectional-30s" | "--bidirectional-60s" | "--bidirectional-120s")
   let burst = long_burst || mode == Some("--multi-bidirectional-burst")
   let window_seconds = match mode {
-    Some("--bidirectional-60s") => 60
+    Some("--bidirectional-120s") => 120
+    Some("--bidirectional-60s" | "--multi-bidirectional-burst-10s") => 60
     Some("--bidirectional-30s" | "--multi-bidirectional-burst-5s") => 30
     _ => 0
   }
-  let burst_hold_ms = if long_burst { 5000 } else if burst { 500 } else { 0 }
+  let burst_hold_ms = if mode == Some("--multi-bidirectional-burst-10s") { 10000 } else if long_burst { 5000 } else if burst { 500 } else { 0 }
   let bidirectional = extended_random || burst || args.get(3) is Some("--bidirectional-retry" | "--multi-bidirectional-retry")
   let query_retry = bidirectional || args.get(3) is Some("--query-retry" | "--multi-query-retry")
   let last_octet = match args.get(3) {
-    None | Some("--response") | Some("--retry") | Some("--random-response") | Some("--random-query") | Some("--query-retry") | Some("--bidirectional-retry") | Some("--bidirectional-30s") | Some("--bidirectional-60s") => 10
+    None | Some("--response") | Some("--retry") | Some("--random-response") | Some("--random-query") | Some("--query-retry") | Some("--bidirectional-retry") | Some("--bidirectional-30s") | Some("--bidirectional-60s") | Some("--bidirectional-120s") => 10
     Some("--five") => 14
     Some("--six") => 15
     Some("--seven") => 16
@@ -531,11 +532,11 @@ async fn main {
     Some("--nine") => 18
     Some("--ten") => 19
     Some("--eleven") => 20
-    Some("--twelve") | Some("--multi-response") | Some("--advanced-response") | Some("--multi-query-retry") | Some("--multi-bidirectional-retry") | Some("--multi-bidirectional-burst") | Some("--multi-bidirectional-burst-5s") => 21
+    Some("--twelve") | Some("--multi-response") | Some("--advanced-response") | Some("--multi-query-retry") | Some("--multi-bidirectional-retry") | Some("--multi-bidirectional-burst") | Some("--multi-bidirectional-burst-5s") | Some("--multi-bidirectional-burst-10s") => 21
     _ => 0
   }
   guard args.length() >= 3 && args.length() <= 4 && last_octet >= 10 else {
-    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--response|--multi-response|--advanced-response|--retry|--random-response|--random-query|--query-retry|--multi-query-retry|--bidirectional-retry|--multi-bidirectional-retry|--bidirectional-30s|--bidirectional-60s|--multi-bidirectional-burst|--multi-bidirectional-burst-5s|--five|--six|--seven|--eight|--nine|--ten|--eleven|--twelve]")
+    fail("usage: tc-link.mbtx <zeroconf-python> <source-commit> [--response|--multi-response|--advanced-response|--retry|--random-response|--random-query|--query-retry|--multi-query-retry|--bidirectional-retry|--multi-bidirectional-retry|--bidirectional-30s|--bidirectional-60s|--bidirectional-120s|--multi-bidirectional-burst|--multi-bidirectional-burst-5s|--multi-bidirectional-burst-10s|--five|--six|--seven|--eight|--nine|--ten|--eleven|--twelve]")
   }
   let additional : Array[String] = []
   for i in 11..=last_octet { additional.push("192.0.2.\{i}") }
@@ -560,7 +561,9 @@ async fn main {
     let log = ".tools/tc-link-publisher.log"
     let output = @process.redirect_to_file(log)
     let publisher_args = ["tests/interop/tc_publisher.py", receiver_ip, marker]
-    if window_seconds == 60 { publisher_args.push("550") }
+    if window_seconds == 120 { publisher_args.push("1050") }
+    else if window_seconds == 60 && long_burst { publisher_args.push("220") }
+    else if window_seconds == 60 { publisher_args.push("550") }
     else if extended_random { publisher_args.push("300") }
     else if long_burst { publisher_args.push("120") }
     let publisher = @process.spawn(group, "ip", in_namespace(receiver, python, publisher_args), stdout=output, stderr=output, no_wait=true)
@@ -640,7 +643,7 @@ async fn main {
     "scenario": if extended_random {
       "one Browser with isolated veth bidirectional random loss over \{window_seconds} seconds"
     } else if long_burst {
-      "twelve Browsers with overlapping bidirectional bursts held 5 seconds"
+      "twelve Browsers with overlapping bidirectional bursts held \{burst_hold_ms / 1000} seconds"
     } else if burst {
       "twelve Browsers with overlapping bidirectional bursts"
     } else if bidirectional {
@@ -673,7 +676,7 @@ async fn main {
   let path = if extended_random {
     ".tools/tc-bidirectional-\{window_seconds}s.json"
   } else if long_burst {
-    ".tools/tc-multi-bidirectional-burst-5s.json"
+    ".tools/tc-multi-bidirectional-burst-\{burst_hold_ms / 1000}s.json"
   } else if burst {
     ".tools/tc-multi-bidirectional-burst.json"
   } else if bidirectional {
