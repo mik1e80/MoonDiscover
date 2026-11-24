@@ -415,7 +415,7 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 
 ## 验证与文档
 
-Avahi 与 python-zeroconf 的 Linux 同机 IPv4 组播实验覆盖立即 TC 续包、连续 TC 重新计时，以及两个至十三个查询器。隔离虚拟链路上用单个及五至十二个查询器验证 python-zeroconf 遇到指定 TC 续包丢失或迟到时的回包。另用单查询器验证响应方向连续两次丢包、恢复后重新查询、固定延迟和随机丢包，并实测生产 Browser 在两次响应丢失后的自动重试。十二查询器叠加响应方向故障时也已实测丢包、恢复后重新查询和固定延迟。另有十二个生产 Browser 在随机响应丢包下的重试和恢复证据，以及生产 Browser 在 PTR 与 SRV、TXT、IPv4 地址分包乱序时的缓存和聚合验证。另验证单查询器的查询方向随机丢包，以及单个和十二个生产 Browser 在该故障下的重试和恢复。双向各配置 50% 随机丢包时也验证了两种规模的重试，单 Browser 有四轮未在观测窗口内完成解析。单 Browser 的 30s 复测以及十二 Browser 的重叠突发丢包实验均有逐轮记录。实际结果、实验条件与跨设备待验证项见 [TC 互通实验](docs/tc-interop.md)。
+Avahi 与 python-zeroconf 的 Linux 同机 IPv4 组播实验覆盖立即 TC 续包、连续 TC 重新计时，以及两个至十三个查询器。隔离虚拟链路上用单个及五至十二个查询器验证 python-zeroconf 遇到指定 TC 续包丢失或迟到时的回包。另用单查询器验证响应方向连续两次丢包、恢复后重新查询、固定延迟和随机丢包，并实测生产 Browser 在两次响应丢失后的自动重试。十二查询器叠加响应方向故障时也已实测丢包、恢复后重新查询和固定延迟。另有十二个生产 Browser 在随机响应丢包下的重试和恢复证据，以及生产 Browser 在 PTR 与 SRV、TXT、IPv4 地址分包乱序时的缓存和聚合验证。另验证单查询器的查询方向随机丢包，以及单个和十二个生产 Browser 在该故障下的重试和恢复。双向各配置 50% 随机丢包时也验证了两种规模的重试，单 Browser 有四轮未在观测窗口内完成解析。单 Browser 的 30s 复测以及十二 Browser 的重叠突发丢包实验均有逐轮记录。60s 单 Browser 复测确认了 30s 后自动重试和恢复的样本，十二 Browser 也完成了 5s 重叠突发丢包恢复实验。实际结果、实验条件与跨设备待验证项见 [TC 互通实验](docs/tc-interop.md)。
 
 [库接入与 CLI](docs/usage.md) · [模型](docs/model.md) · [0.3.0 预发布验收](docs/release-acceptance-0.3.0.md) · [维护路线](docs/maintenance-roadmap-2026.md) · [安全报告](SECURITY.md)
 

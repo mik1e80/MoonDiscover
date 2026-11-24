@@ -320,7 +320,19 @@ A 三轮分别在 34ms、34ms、20ms 观察到 Avahi 回包，均早于末包。
 
 三轮在解除故障前每轮均丢弃一份查询和一份响应。恢复后每轮有 24 份查询到达响应器，放行的响应数分别为 2、1、1。三轮的每个 Browser 都至少发出两次普通 QM，并在 3090–3120ms 内完整解析两实例。时间从各轮发送端探针启动起算。[逐轮数据](evidence/linux-tc-browser-30s-bidirectional-burst-20261124.json)
 
-仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、不同双向丢包率、其他突发持续时间和相关丢包模型、超过 30s 的恢复、其他并发规模、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+## 单 Browser 双向随机丢包 60 秒复测
+
+2026-11-24（北京时间），同一 Linux VM 内分别对查询和响应方向配置 50% 随机丢包。单个生产 Browser 每轮只订阅一次，完整解析两个实例即结束，未完成时观测至 60s。内核放行的查询数与对端实收数逐轮一致。[逐轮数据](evidence/linux-tc-browser-60s-bidirectional-burst-20261124.json) · [Linux 专项](https://github.com/mik1e80/MoonDiscover/actions/runs/45405462046/job/138484855755)
+
+八轮中五轮在 30s 内解析完成，耗时 97–7108ms。另三轮均在 31074–31084ms 自动发出第六次普通 QM，其中两轮分别在 31150ms 和 31155ms 完整解析。剩余一轮有三份查询通过，对端的三份响应均被丢弃，直至 60s 仍未完成。八轮合计查询放行 18 份、丢弃 10 份，响应放行 7 份、丢弃 11 份。这批样本独立于 30s 复测。
+
+## 十二个 Browser 的 5 秒重叠突发丢包
+
+两侧起初都设置为 100% 丢包。确认查询方向已丢包后，保持至少 5s 再恢复该方向。确认响应方向实际丢包后，再保持至少 5s 才恢复响应方向。每轮至多观察 30s，计时从发送端探针启动起算。
+
+三轮查询方向各丢弃 36 份、放行 13 份，对端逐轮实收 13 份。响应方向分别丢弃 3、3、2 份，恢复后每轮放行一份。十二个 Browser 每轮都至少发出四次普通 QM，并在 15063–15115ms 完整解析两个实例。[逐轮数据](evidence/linux-tc-browser-60s-bidirectional-burst-20261124.json)
+
+仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、不同双向丢包率、其他突发持续时间和相关丢包模型、超过 60s 的恢复、其他并发规模、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
 
 复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至十二个附加地址分别运行五至十三查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
@@ -331,7 +343,7 @@ moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192
 
 隔离链路复用上面构建的探针。需有 Linux iproute2、veth、netem 和创建网络命名空间的权限。脚本创建并清理专用命名空间，只在虚拟接口上应用队列规则。报告位于 `.tools/tc-link.json`。可用 `--five`、`--six`、`--seven`、`--eight`、`--nine`、`--ten`、`--eleven`、`--twelve` 选择查询器数量，省略时运行单查询器链路实验。
 
-使用 `--response` 可运行单查询器的响应方向实验，输出位于 `.tools/tc-response-link.json`。 `--retry` 运行生产 Browser 自动重试实验，报告为 `.tools/tc-retry-link.json`。`--random-response` 运行随机响应丢包实验，报告为 `.tools/tc-random-response-link.json`。 `--multi-response` 运行十二查询器的响应方向丢包、恢复和延迟实验，报告为 `.tools/tc-multi-response-link.json`。 `--advanced-response` 先运行十二个 Browser 的随机响应丢包实验，再运行报文级与生产 Browser 的响应乱序实验，报告为 `.tools/tc-advanced-response-link.json`。 `--random-query` 可运行单查询器查询方向随机丢包实验，报告为 `.tools/tc-random-query-link.json`。 `--query-retry` 和 `--multi-query-retry` 分别运行单个与十二个 Browser 的查询方向随机丢包实验，报告为 `.tools/tc-query-retry-link.json` 和 `.tools/tc-multi-query-retry-link.json`。 `--bidirectional-retry` 与 `--multi-bidirectional-retry` 分别运行单个与十二个 Browser 的双向随机丢包实验，报告为 `.tools/tc-bidirectional-retry-link.json` 和 `.tools/tc-multi-bidirectional-retry-link.json`。 `--bidirectional-30s` 运行单 Browser 30s 复测，`--multi-bidirectional-burst` 运行十二个 Browser 的重叠突发丢包实验。报告为 `.tools/tc-bidirectional-30s.json` 与 `.tools/tc-multi-bidirectional-burst.json`。
+使用 `--response` 可运行单查询器的响应方向实验，输出位于 `.tools/tc-response-link.json`。 `--retry` 运行生产 Browser 自动重试实验，报告为 `.tools/tc-retry-link.json`。`--random-response` 运行随机响应丢包实验，报告为 `.tools/tc-random-response-link.json`。 `--multi-response` 运行十二查询器的响应方向丢包、恢复和延迟实验，报告为 `.tools/tc-multi-response-link.json`。 `--advanced-response` 先运行十二个 Browser 的随机响应丢包实验，再运行报文级与生产 Browser 的响应乱序实验，报告为 `.tools/tc-advanced-response-link.json`。 `--random-query` 可运行单查询器查询方向随机丢包实验，报告为 `.tools/tc-random-query-link.json`。 `--query-retry` 和 `--multi-query-retry` 分别运行单个与十二个 Browser 的查询方向随机丢包实验，报告为 `.tools/tc-query-retry-link.json` 和 `.tools/tc-multi-query-retry-link.json`。 `--bidirectional-retry` 与 `--multi-bidirectional-retry` 分别运行单个与十二个 Browser 的双向随机丢包实验，报告为 `.tools/tc-bidirectional-retry-link.json` 和 `.tools/tc-multi-bidirectional-retry-link.json`。 `--bidirectional-30s` 运行单 Browser 30s 复测，`--multi-bidirectional-burst` 运行十二个 Browser 的重叠突发丢包实验。报告为 `.tools/tc-bidirectional-30s.json` 与 `.tools/tc-multi-bidirectional-burst.json`。 `--bidirectional-60s` 运行单 Browser 60s 复测，`--multi-bidirectional-burst-5s` 运行两个方向分别在确认丢包后至少保持 5s 的十二 Browser 实验。报告为 `.tools/tc-bidirectional-60s.json` 与 `.tools/tc-multi-bidirectional-burst-5s.json`。
 
 ```sh
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --twelve
@@ -345,6 +357,8 @@ sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-retry
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --bidirectional-30s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --bidirectional-60s
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst-5s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-response
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --advanced-response
 ```
