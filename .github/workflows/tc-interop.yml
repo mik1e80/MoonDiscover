@@ -31,9 +31,9 @@ jobs:
             single: --bidirectional-retry
             multiple: --multi-bidirectional-retry
           - name: bidirectional-extended
-            timeout: 175
-            single: --bidirectional-960s
-            multiple: --multi-bidirectional-burst-80s
+            timeout: 350
+            single: --bidirectional-1920s
+            multiple: --multi-bidirectional-burst-160s
     steps:
       - uses: actions/checkout@v5
       - name: Install the pinned toolchain and independent responder
@@ -71,8 +71,8 @@ jobs:
           path: |
             .tools/tc-bidirectional-retry-link.json
             .tools/tc-multi-bidirectional-retry-link.json
-            .tools/tc-bidirectional-960s.json
-            .tools/tc-multi-bidirectional-burst-80s.json
+            .tools/tc-bidirectional-1920s.json
+            .tools/tc-multi-bidirectional-burst-160s.json
             .tools/tc-*.log
           include-hidden-files: true
   tc-interop:
