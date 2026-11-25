@@ -21,17 +21,19 @@ jobs:
   bidirectional-loss:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
-    timeout-minutes: 24
+    timeout-minutes: ${{ matrix.timeout }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: bidirectional-loss
+            timeout: 24
             single: --bidirectional-retry
             multiple: --multi-bidirectional-retry
           - name: bidirectional-extended
-            single: --bidirectional-120s
-            multiple: --multi-bidirectional-burst-10s
+            timeout: 42
+            single: --bidirectional-240s
+            multiple: --multi-bidirectional-burst-20s
     steps:
       - uses: actions/checkout@v5
       - name: Install the pinned toolchain and independent responder
@@ -62,8 +64,8 @@ jobs:
           path: |
             .tools/tc-bidirectional-retry-link.json
             .tools/tc-multi-bidirectional-retry-link.json
-            .tools/tc-bidirectional-120s.json
-            .tools/tc-multi-bidirectional-burst-10s.json
+            .tools/tc-bidirectional-240s.json
+            .tools/tc-multi-bidirectional-burst-20s.json
             .tools/tc-*.log
           include-hidden-files: true
   tc-interop:

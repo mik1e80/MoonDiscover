@@ -70,9 +70,15 @@ fn observation(
 async fn main {
   let args = @env.args()
   if args.get(1)
-    is Some("--link-retry-30s" | "--link-retry-60s" | "--link-retry-120s") &&
+    is Some(
+      "--link-retry-30s"
+      | "--link-retry-60s"
+      | "--link-retry-120s"
+      | "--link-retry-240s"
+    ) &&
     (args.length() == 3 || args.length() == 14) {
     let window = match args[1] {
+      "--link-retry-240s" => 240000L
       "--link-retry-120s" => 120000L
       "--link-retry-60s" => 60000L
       _ => 30000L
@@ -85,9 +91,11 @@ async fn main {
       "--link-retry-peer-30s"
       | "--link-retry-peer-60s"
       | "--link-retry-peer-120s"
+      | "--link-retry-peer-240s"
     ) &&
     (args.length() == 6 || args.length() == 17) {
     let window = match args[1] {
+      "--link-retry-peer-240s" => 242000L
       "--link-retry-peer-120s" => 122000L
       "--link-retry-peer-60s" => 62000L
       _ => 32000L
