@@ -76,9 +76,11 @@ async fn main {
       | "--link-retry-120s"
       | "--link-retry-240s"
       | "--link-retry-480s"
+      | "--link-retry-960s"
     ) &&
     (args.length() == 3 || args.length() == 14) {
     let window = match args[1] {
+      "--link-retry-960s" => 960000L
       "--link-retry-480s" => 480000L
       "--link-retry-240s" => 240000L
       "--link-retry-120s" => 120000L
@@ -95,9 +97,11 @@ async fn main {
       | "--link-retry-peer-120s"
       | "--link-retry-peer-240s"
       | "--link-retry-peer-480s"
+      | "--link-retry-peer-960s"
     ) &&
     (args.length() == 6 || args.length() == 17) {
     let window = match args[1] {
+      "--link-retry-peer-960s" => 962000L
       "--link-retry-peer-480s" => 482000L
       "--link-retry-peer-240s" => 242000L
       "--link-retry-peer-120s" => 122000L

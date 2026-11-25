@@ -31,9 +31,9 @@ jobs:
             single: --bidirectional-retry
             multiple: --multi-bidirectional-retry
           - name: bidirectional-extended
-            timeout: 90
-            single: --bidirectional-480s
-            multiple: --multi-bidirectional-burst-40s
+            timeout: 175
+            single: --bidirectional-960s
+            multiple: --multi-bidirectional-burst-80s
     steps:
       - uses: actions/checkout@v5
       - name: Install the pinned toolchain and independent responder
@@ -46,15 +46,22 @@ jobs:
           .venv/bin/pip install -r tests/interop/requirements.txt
           command -v ip
           command -v tc
-      - name: Run single-Browser then twelve-Browser bidirectional loss
+      - name: Build the focused Browser probe
         shell: bash
-        env:
-          SINGLE_MODE: ${{ matrix.single }}
-          MULTI_MODE: ${{ matrix.multiple }}
         run: |
           moon update
           moon build tests/tc_interop --target native
+      - name: Measure single-Browser bidirectional loss
+        shell: bash
+        env:
+          SINGLE_MODE: ${{ matrix.single }}
+        run: |
           sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" "$SINGLE_MODE"
+      - name: Measure twelve-Browser bidirectional loss
+        shell: bash
+        env:
+          MULTI_MODE: ${{ matrix.multiple }}
+        run: |
           sudo --preserve-env=HOME,PATH "$HOME/.moon/bin/moon" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" "$MULTI_MODE"
       - name: Retain bidirectional loss observations
         if: always()
@@ -64,8 +71,8 @@ jobs:
           path: |
             .tools/tc-bidirectional-retry-link.json
             .tools/tc-multi-bidirectional-retry-link.json
-            .tools/tc-bidirectional-480s.json
-            .tools/tc-multi-bidirectional-burst-40s.json
+            .tools/tc-bidirectional-960s.json
+            .tools/tc-multi-bidirectional-burst-80s.json
             .tools/tc-*.log
           include-hidden-files: true
   tc-interop:
