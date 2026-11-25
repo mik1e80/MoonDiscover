@@ -356,7 +356,21 @@ A 三轮分别在 34ms、34ms、20ms 观察到 Avahi 回包，均早于末包。
 
 三轮中，每轮开放前均丢弃 60 份查询和 2 份响应。开放后均有 13 份查询到达对端，有 1 份组播响应放行。每个 Browser 发出 6–7 次普通 QM。三轮均为 12/12 完整解析两个实例，分别在 63.122、63.068、63.144 秒完成。耗时从每轮发送端探针启动起算。[逐轮数据](evidence/linux-tc-browser-240s-bidirectional-burst-20261125.json)
 
-仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、不同双向丢包率、其他突发持续时间和相关丢包模型、持续未解析至 240 秒及之后的恢复、其他并发规模、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+## 单 Browser 双向随机丢包 480 秒复测
+
+2026-11-25（北京时间），在同一 Linux VM 的隔离 IPv4 veth 链路上，对查询和响应方向各配置 50% 随机丢包。对端为 python-zeroconf 0.148.0。生产 Browser 每轮订阅一次，完整解析两个实例即结束该轮，否则观察至 480 秒。每轮的查询放行数均与对端实收数一致。[逐轮数据](evidence/linux-tc-browser-480s-bidirectional-burst-20261125.json) · [Linux 专项](https://github.com/mik1e80/MoonDiscover/actions/runs/45559848869/job/139020664366)
+
+八轮独立随机样本中，七轮在 0.118–31.195 秒内完整解析。第 1 轮在 255.089 秒自动发出第九次普通组播查询（QM），该轮有 4 份查询到达对端，4 份响应全部被丢弃，到 480 秒仍未解析。八轮合计放行 19 份查询、丢弃 10 份，放行 7 份响应、丢弃 12 份。
+
+另做一轮固定种子验证，查询方向使用种子 22，响应方向使用 393。两个方向全程保持 50% 配置。第 5 次查询放行，其响应丢弃。第 9 次查询在 255.085 秒发出并收到响应，Browser 于 255.172 秒完整解析。该轮放行 2 份查询和 1 份响应，分别丢弃 7 份和 1 份。种子按 Linux netem 的随机序列预先选定，结果单独报告。[netem 实现](https://github.com/torvalds/linux/blob/v6.17/net/sched/sch_netem.c#L277)
+
+## 十二个 Browser 的 40 秒重叠突发丢包
+
+查询和响应方向起初均配置 100% 丢包。确认查询被丢弃后，保持至少 40 秒再开放查询方向。确认响应被丢弃后，再保持至少 40 秒才开放响应方向。十二个独立 IPv4 源各订阅一次，每轮最多观察 240 秒。
+
+三轮中，每轮开放前均丢弃 72 份查询和 2 份响应。开放后每轮有 13 份查询到达对端，放行 1 份组播响应。每个 Browser 共发出 7–8 次普通 QM。三轮均为 12/12 完整解析两个实例，分别在 127.136、127.132、127.149 秒完成。耗时从每轮发送端探针启动起算。[逐轮数据](evidence/linux-tc-browser-480s-bidirectional-burst-20261125.json)
+
+仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、不同双向丢包率、其他突发持续时间和相关丢包模型、无预选种子的独立随机样本在 240 秒后的完整解析、持续未解析至 480 秒之后的恢复、其他并发规模、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
 
 复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至十二个附加地址分别运行五至十三查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
@@ -372,6 +386,8 @@ moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192
 `--bidirectional-120s` 运行单 Browser 120 秒复测，`--multi-bidirectional-burst-10s` 运行两个方向分别在确认丢包后至少保持 10 秒的十二 Browser 实验。报告为 `.tools/tc-bidirectional-120s.json` 与 `.tools/tc-multi-bidirectional-burst-10s.json`。
 
 `--bidirectional-240s` 运行单 Browser 240 秒复测，`--multi-bidirectional-burst-20s` 运行十二个 Browser 的双向突发丢包实验，两个方向各在确认丢包后再保持至少 20 秒。报告为 `.tools/tc-bidirectional-240s.json` 与 `.tools/tc-multi-bidirectional-burst-20s.json`。
+
+`--bidirectional-480s` 运行单 Browser 八轮随机样本和一轮固定丢包种子的补充实验。两个方向各配置 50% 丢包。 `--multi-bidirectional-burst-40s` 运行十二个 Browser 的双向突发丢包实验，两个方向各在确认丢包后再保持至少 40 秒。报告为 `.tools/tc-bidirectional-480s.json` 与 `.tools/tc-multi-bidirectional-burst-40s.json`。
 
 ```sh
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --twelve
@@ -391,6 +407,8 @@ sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst-10s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --bidirectional-240s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst-20s
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --bidirectional-480s
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst-40s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-response
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --advanced-response
 ```
