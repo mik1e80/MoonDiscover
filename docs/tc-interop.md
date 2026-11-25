@@ -344,7 +344,19 @@ A 三轮分别在 34ms、34ms、20ms 观察到 Avahi 回包，均早于末包。
 
 三轮中每轮开放前均丢弃 48 份查询和 2 份响应，开放后均有 13 份查询到达对端，放行 1 份组播响应。每个 Browser 发出 5–6 次普通 QM，三轮均为 12/12 完整解析两个实例，耗时分别为 31.095、31.130、31.069 秒，均从发送端探针启动起算。[逐轮数据](evidence/linux-tc-browser-120s-bidirectional-burst-20261125.json)
 
-仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、不同双向丢包率、其他突发持续时间和相关丢包模型、超过 120s 的恢复、其他并发规模、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+## 单 Browser 双向随机丢包 240 秒复测
+
+2026-11-25（北京时间），在同一 Linux VM 的隔离 IPv4 veth 链路上，对查询和响应方向各配置 50% 随机丢包。对端为 python-zeroconf 0.148.0。生产 Browser 每轮只订阅一次，完整解析两个实例即结束该轮，未完成时最多观察 240 秒。对端实收查询数与内核放行数逐轮一致。[逐轮数据](evidence/linux-tc-browser-240s-bidirectional-burst-20261125.json) · [Linux 专项](https://github.com/mik1e80/MoonDiscover/actions/runs/45558082991/job/139014897548)
+
+八轮均完整解析。第 1 轮在 127.089 秒自动发出第八次普通组播查询（QM），在 127.161 秒完整解析。该轮放行 3 份查询、丢弃 5 份，放行 1 份响应、丢弃 2 份。其他七轮在 0.148–15.148 秒完成。八轮合计放行 11 份查询、丢弃 10 份，放行 8 份响应、丢弃 3 份。50% 是每个方向的配置值，实测计数来自这八轮独立于此前复测的新样本。所有轮次均在 128 秒前完成，持续未解析到 240 秒时的行为仍需单独验证。
+
+## 十二个 Browser 的 20 秒重叠突发丢包
+
+两个方向起初均配置 100% 丢包。确认首份查询被丢弃后，保持至少 20 秒才开放查询方向。确认响应方向已丢包后，再保持至少 20 秒才开放响应方向。十二个独立 IPv4 源各订阅一次，每轮最多观察 120 秒。
+
+三轮中，每轮开放前均丢弃 60 份查询和 2 份响应。开放后均有 13 份查询到达对端，有 1 份组播响应放行。每个 Browser 发出 6–7 次普通 QM。三轮均为 12/12 完整解析两个实例，分别在 63.122、63.068、63.144 秒完成。耗时从每轮发送端探针启动起算。[逐轮数据](evidence/linux-tc-browser-240s-bidirectional-burst-20261125.json)
+
+仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、不同双向丢包率、其他突发持续时间和相关丢包模型、持续未解析至 240 秒及之后的恢复、其他并发规模、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
 
 复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至十二个附加地址分别运行五至十三查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
@@ -358,6 +370,8 @@ moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192
 使用 `--response` 可运行单查询器的响应方向实验，输出位于 `.tools/tc-response-link.json`。 `--retry` 运行生产 Browser 自动重试实验，报告为 `.tools/tc-retry-link.json`。`--random-response` 运行随机响应丢包实验，报告为 `.tools/tc-random-response-link.json`。 `--multi-response` 运行十二查询器的响应方向丢包、恢复和延迟实验，报告为 `.tools/tc-multi-response-link.json`。 `--advanced-response` 先运行十二个 Browser 的随机响应丢包实验，再运行报文级与生产 Browser 的响应乱序实验，报告为 `.tools/tc-advanced-response-link.json`。 `--random-query` 可运行单查询器查询方向随机丢包实验，报告为 `.tools/tc-random-query-link.json`。 `--query-retry` 和 `--multi-query-retry` 分别运行单个与十二个 Browser 的查询方向随机丢包实验，报告为 `.tools/tc-query-retry-link.json` 和 `.tools/tc-multi-query-retry-link.json`。 `--bidirectional-retry` 与 `--multi-bidirectional-retry` 分别运行单个与十二个 Browser 的双向随机丢包实验，报告为 `.tools/tc-bidirectional-retry-link.json` 和 `.tools/tc-multi-bidirectional-retry-link.json`。 `--bidirectional-30s` 运行单 Browser 30s 复测，`--multi-bidirectional-burst` 运行十二个 Browser 的重叠突发丢包实验。报告为 `.tools/tc-bidirectional-30s.json` 与 `.tools/tc-multi-bidirectional-burst.json`。 `--bidirectional-60s` 运行单 Browser 60s 复测，`--multi-bidirectional-burst-5s` 运行两个方向分别在确认丢包后至少保持 5s 的十二 Browser 实验。报告为 `.tools/tc-bidirectional-60s.json` 与 `.tools/tc-multi-bidirectional-burst-5s.json`。
 
 `--bidirectional-120s` 运行单 Browser 120 秒复测，`--multi-bidirectional-burst-10s` 运行两个方向分别在确认丢包后至少保持 10 秒的十二 Browser 实验。报告为 `.tools/tc-bidirectional-120s.json` 与 `.tools/tc-multi-bidirectional-burst-10s.json`。
+
+`--bidirectional-240s` 运行单 Browser 240 秒复测，`--multi-bidirectional-burst-20s` 运行十二个 Browser 的双向突发丢包实验，两个方向各在确认丢包后再保持至少 20 秒。报告为 `.tools/tc-bidirectional-240s.json` 与 `.tools/tc-multi-bidirectional-burst-20s.json`。
 
 ```sh
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --twelve
@@ -375,6 +389,8 @@ sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst-5s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --bidirectional-120s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst-10s
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --bidirectional-240s
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst-20s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-response
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --advanced-response
 ```
