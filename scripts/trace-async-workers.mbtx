@@ -1,0 +1,88 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/shell",
+  "moonbitlang/core/env",
+}
+----
+
+// Use a disposable registry consumer so no dependency used by the long run is patched.
+async fn main {
+  let args = @env.args()
+  guard args.length() == 3 else { fail("usage: trace-async-workers.mbtx <new-sibling-workspace> <moon-exe>") }
+  let root = @fs.realpath(".")
+  let moon = @fs.realpath(args[2])
+  @fs.mkdir(args[1])
+  let workspace = @fs.realpath(args[1])
+  guard workspace != root && !workspace.has_prefix(root + "/") && !workspace.has_prefix(root + "\\") else {
+    fail("use a disposable workspace outside the source checkout")
+  }
+  for dir in ["tests/live_soak", "tests/resource_soak", ".tools"] {
+    @fs.mkdir(workspace + "/" + dir, recursive=true)
+  }
+  @fs.write_file(workspace + "/moon.mod",
+    "name = \"local/md-async-trace\"\npreferred_target = \"native\"\nimport {\n  \"mik1e80/dnssd@0.3.0\",\n  \"moonbitlang/async@0.22.5\",\n}\n",
+  )
+  for file in ["tests/live_soak/moon.pkg", "tests/live_soak/main.mbt", "tests/live_soak/metrics.c",
+    "tests/live_soak/handle_snapshots.mbt", "tests/live_soak/handle_cycles.mbt", "tests/live_soak/hourly_reopen.mbt",
+    "tests/resource_soak/resource.c"] {
+    @fs.write_file(workspace + "/" + file, @fs.read_file(file).text())
+  }
+  @shell.Cmd(moon, ["check", "tests/live_soak", "--target", "native"], cwd=workspace).output(timeout_ms=180000).check()
+  let path = workspace + "/.mooncakes/moonbitlang/async/src/internal/event_loop/thread_pool.c"
+  let original = @fs.read_file(path).text().replace_all(old="\r\n", new="\n")
+  let header = "#include <stddef.h>"
+  let event = "  self->event = CreateEventA(NULL, FALSE, FALSE, NULL);"
+  let thread = "    &worker_loop,\n    worker,\n    0,\n    0\n  );"
+  for anchor in [header, event, thread] {
+    guard original.split(anchor).count() == 2 else { fail("unexpected pinned async source layout") }
+  }
+  let trace =
+    #|#include <stdio.h>
+    #|static SRWLOCK md_trace_lock = SRWLOCK_INIT;
+    #|__declspec(noinline)
+    #|static void md_trace_allocation(const char *kind, const char *caller,
+    #|    HANDLE handle, DWORD thread_id, const void *allocation_function) {
+    #|  if (!handle) return;
+    #|  void *frames[12];
+    #|  USHORT count = CaptureStackBackTrace(1, 12, frames, NULL);
+    #|  if (!count) return;
+    #|  DWORD64 base = 0;
+    #|  PRUNTIME_FUNCTION entry = RtlLookupFunctionEntry((DWORD64)frames[0], &base, NULL);
+    #|  int matches = entry && base + entry->BeginAddress == (DWORD64)allocation_function;
+    #|  AcquireSRWLockExclusive(&md_trace_lock);
+    #|  fprintf(stderr, "md-worker %s %llu %lu %s frames=%u caller_matches=%d caller_offset=%llu",
+    #|    kind, (unsigned long long)(uintptr_t)handle, (unsigned long)thread_id, caller,
+    #|    (unsigned)count, matches,
+    #|    matches ? (unsigned long long)((DWORD64)frames[0] - (DWORD64)allocation_function) : 0);
+    #|  for (USHORT i = 0; i < count; ++i) {
+    #|    HMODULE module = NULL;
+    #|    char path[MAX_PATH];
+    #|    if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+    #|        GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCSTR)frames[i], &module) ||
+    #|        !GetModuleFileNameA(module, path, MAX_PATH)) {
+    #|      fprintf(stderr, " unknown");
+    #|      continue;
+    #|    }
+    #|    path[MAX_PATH - 1] = 0;
+    #|    const char *name = path;
+    #|    for (const char *p = path; *p; ++p) if (*p == '\\') name = p + 1;
+    #|    fprintf(stderr, " %s+0x%llx", name, (unsigned long long)((uintptr_t)frames[i] - (uintptr_t)module));
+    #|  }
+    #|  fputc('\n', stderr);
+    #|  ReleaseSRWLockExclusive(&md_trace_lock);
+    #|}
+  let instrumented = original
+    .replace_all(old=header, new=header + "\n" + trace)
+    .replace_all(old=event, new=event + "\n  md_trace_allocation(\"Event\", __func__, self->event, GetCurrentThreadId(), (const void *)&worker_loop);")
+    .replace_all(old=thread, new=thread + "\n  md_trace_allocation(\"Thread\", __func__, worker->id, GetThreadId(worker->id), (const void *)&moonbitlang_async_spawn_worker);")
+  @fs.write_file(path, instrumented)
+  let built = @shell.Cmd(moon, ["build", "tests/live_soak", "--target", "native", "--frozen"], cwd=workspace).output(timeout_ms=180000, max_output_bytes=30000)
+  guard built.exit_code() == 0 else { fail(built.stderr() + built.stdout()) }
+  let probe = workspace + "/_build/native/debug/build/tests/live_soak/live_soak.exe"
+  let result = @shell.Cmd(probe, ["--fs-control"], cwd=workspace).output(timeout_ms=20000)
+  result.check()
+  @fs.write_file(workspace + "/.tools/async-worker-allocations.txt", result.stderr())
+  println(result.stderr())
+}

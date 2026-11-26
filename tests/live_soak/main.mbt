@@ -66,6 +66,17 @@ async fn main {
     fs_worker_control()
     return
   }
+  if args.length() == 6 && args[2] == "--hourly" {
+    let address = @socket.Addr::parse(args[1] + ":0")
+    guard !address.is_ipv6() else { fail("IPv4 required") }
+    hourly_reopen(
+      address.ip(),
+      @dnssd.DnsName::parse(args[3]),
+      @string.parse_int(args[4]),
+      @string.parse_int(args[5]),
+    )
+    return
+  }
   if args.length() == 5 && args[2] == "--cycles" {
     let address = @socket.Addr::parse(args[1] + ":0")
     guard !address.is_ipv6() else { fail("IPv4 required") }
