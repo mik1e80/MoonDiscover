@@ -62,6 +62,10 @@ fn sample_process(
 ///|
 async fn main {
   let args = @env.args()
+  if args.length() == 2 && args[1] == "--fs-control" {
+    fs_worker_control()
+    return
+  }
   if args.length() == 5 && args[2] == "--cycles" {
     let address = @socket.Addr::parse(args[1] + ":0")
     guard !address.is_ipv6() else { fail("IPv4 required") }

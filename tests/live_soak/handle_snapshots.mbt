@@ -27,3 +27,22 @@ async fn snapshot_phase(
   })
   @fs.write_file(path, Json::object(phases).stringify(indent=2))
 }
+
+///|
+async fn fs_worker_control() -> Unit {
+  let path = ".tools/live-soak-fs-control.json"
+  let phases : Map[String, Json] = Map([])
+  let _ = handle_snapshot()
+  @fs.write_file(".tools/live-soak-fs-control-warmup.txt", "warmup")
+  @async.sleep(100)
+  snapshot_phase(phases, "warm_baseline", path~)
+  @async.with_task_group(group => {
+    for i in 1..<=3 {
+      group.spawn_bg(() => {
+        @fs.write_file(".tools/live-soak-fs-control-\{i}.txt", "control")
+      })
+    }
+  })
+  @async.sleep(1000)
+  snapshot_phase(phases, "after_three_concurrent_writes", path~)
+}
