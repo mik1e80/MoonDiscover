@@ -4,7 +4,7 @@
 
 MoonDiscover 是面向 MoonBit 应用开发者的 IPv4 mDNS 查询端与 DNS-SD 服务浏览、解析库，模块名 `mik1e80/dnssd`，采用 [Apache-2.0](LICENSE) 许可。应用只需知道约定的服务类型，例如 `_http._tcp.local.`，就可以查询实例、目标主机、端口、TXT 属性和 IP 地址，减少手工填写与写死端点的需要。
 
-项目包含纯 MoonBit 协议核心、Native IPv4 组播适配层、命令行工具，以及录制和离线回放功能。注册表发布版为 **0.2.0**，开发版 **0.3.0-dev** 在此基础上增加受限 mDNS NSEC、查询恢复和输入资源保护。安装方式、平台及协议验收范围按版本分别说明。
+项目包含纯 MoonBit 协议核心、Native IPv4 组播适配层、命令行工具，以及录制和离线回放功能。**0.3.0** 在 0.2.0 的基础上增加受限 mDNS NSEC、查询恢复和输入资源保护。安装方式、平台及协议验收范围按版本分别说明。
 
 **发现结果未经身份认证。** 名称、TXT、SRV 和地址都可能由同链路设备伪造；连接前执行自己的地址/端口许可和 TLS、配对等认证策略。来源白名单也不是身份认证。[安全模型](docs/security-model.md)说明输入、文件和连接的责任边界。
 
@@ -51,9 +51,9 @@ flowchart LR
 
 ## 版本选择
 
-状态更新：**2026-11-20**。`0.2.0` 已发布至 Mooncakes。main 为 **0.3.0-dev（未发布）**，具备受限 NSEC 和此前的来源、资源保护与恢复改进。下面比较已发布版本。[开发版验证](docs/verification.md) · [变更记录](CHANGELOG.md) · [0.2.0 独立安装验证](docs/release-0.2.0.md)
+**0.3.0** 提供受限 mDNS NSEC、负缓存、查询抑制和到期恢复，并包含此前的来源、资源保护和恢复改进。下表保留 0.1.0 与 0.2.0 的版本对照。[0.3.0 验收与发布记录](docs/release-acceptance-0.3.0.md) · [变更记录](CHANGELOG.md)
 
-2026-11-06 又补充了[高频输入保护](docs/resource-protection.md)、查询轮换、版本化视图、广告端点筛选、来源观察、[独立进程回放预算](docs/replay-isolation.md)及三类状态变异测试。最新证据和未完成验证见[第四轮落实记录](docs/security-review-20261106.md)；这些能力仍未发布到 Mooncakes。
+2026-11-06 又补充了[高频输入保护](docs/resource-protection.md)、查询轮换、版本化视图、广告端点筛选、来源观察、[独立进程回放预算](docs/replay-isolation.md)及三类状态变异测试。最新证据和未完成验证见[第四轮落实记录](docs/security-review-20261106.md)。这些改进已纳入 0.3.0。
 
 | 项目 | Mooncakes `0.1.0` | Mooncakes `0.2.0` |
 | --- | --- | --- |
@@ -71,14 +71,14 @@ flowchart LR
 
 `v0.2.0` 固定到 `aaf6ced`，[新 Release](https://github.com/mik1e80/MoonDiscover/releases/tag/v0.2.0) 的模块 ZIP 与 Mooncakes 下载归档一致。新工程的注册表消费、新 API、Native 构建/开关及 187 个安装文件核对均通过，详见[发布记录](docs/evidence/release-0.2.0-20261101.json)。
 
-新接入建议固定 `0.2.0`；继续使用 `0.1.0` 时，应了解表中的旧版本边界。源码集成应固定提交。下面仓库内的构建和 CLI 命令面向当前 main，不能由安装旧包推断已取得这些修复。差异见 [CHANGELOG](CHANGELOG.md) 和 [支持矩阵](docs/SCOPE.md)。
+新接入使用 `0.3.0`。旧版与当前源码的能力差异见 [CHANGELOG](CHANGELOG.md) 和 [支持矩阵](docs/SCOPE.md)。验收入口见[十一月项目验收对照](docs/submission.md)。
 
 ## 安装与构建
 
 ### 在已有 MoonBit 工程中安装发布包
 
 ```text
-moon add mik1e80/dnssd@0.2.0
+moon add mik1e80/dnssd@0.3.0
 ```
 
 | 导入入口 | 用途 | 环境要求 |
@@ -344,7 +344,7 @@ python -m http.server 8000 --bind 127.0.0.1 --directory .tools/browser-replay
 
 ### 查询端协议职责与否定响应
 
-开发版 **0.3.0-dev** 面向本地开发工具、桌面设备面板及按约定类型查找服务的应用。核心职责包括 IPv4 QM 查询和重传、Known-Answer 与有界分包、PTR/SRV/TXT/A/AAAA 聚合、子类型、TTL/goodbye/cache-flush、生命周期事件，以及 NSEC 否定响应的接收、负缓存、查询抑制和过期恢复。Native 负责实际收发，CLI 提供操作入口，JS 示例提供离线回放。
+**0.3.0** 面向本地开发工具、桌面设备面板及按约定类型查找服务的应用。核心职责包括 IPv4 QM 查询和重传、Known-Answer 与有界分包、PTR/SRV/TXT/A/AAAA 聚合、子类型、TTL/goodbye/cache-flush、生命周期事件，以及 NSEC 否定响应的接收、负缓存、查询抑制和过期恢复。Native 负责实际收发，CLI 提供操作入口，JS 示例提供离线回放。
 
 受限 NSEC 使用窗口 0、1–32 字节位图，接受不同的 Next Domain Name，单条忽略扩展或畸形记录。负证据按 scope/name/IN/type 隔离并受 TTL 和容量限制，正向记录优先，共享 PTR 继续查询。只有 A 仍可满足地址要求。明确否定 TXT 按空属性处理，未获答复仍为未知。SRV 或地址不足时快照保持部分状态。应用通过 `Engine.is_negative(scope, name, type)` 或 `Browser.is_negative(name, type)` 检查当前否定证据。详见 [否定响应](docs/negative-response.md)。
 

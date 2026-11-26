@@ -4,7 +4,7 @@
 
 1. browse 接受 `_service._tcp.local.`、`_service._udp.local.` 或一个 subtype 标签加 `_sub` 的选择性浏览。基础服务标识采用本实现的字母/数字/连字符和长度校验；不自动枚举类型或访问广域 DNS。实例名由一个原始字节标签加基础类型组成，标签内的点不拆分。
 2. browse 由对应 PTR 建立成员资格；子类型 PTR 必须指向同一基础类型实例。只有基础 PTR 不满足子类型浏览。resolve 直接观察已知实例，无需 PTR，但至少有 SRV 或 TXT 证据后才产生 Seen。相同 scope、基础类型和实例只公开一个身份。
-3. complete=true 需要有效 SRV 目标和端口、至少一个 A 或 AAAA，以及语义一致的 TXT 属性。按 RFC 6763 §6.1，0.3.0-dev 将有效 NSEC 明确否定 TXT 视为空属性，语义等同零长度 TXT 和只含单个空字符串的 TXT。两种正向空形式可保留原始字节。未经确认的缺失为 `txt`，最新批次互异为 `ambiguous_txt`。其他 missing 为 `srv`、`unavailable_srv`、`addresses`。端点可用性和身份由应用验证。
+3. complete=true 需要有效 SRV 目标和端口、至少一个 A 或 AAAA，以及语义一致的 TXT 属性。按 RFC 6763 §6.1，0.3.0 将有效 NSEC 明确否定 TXT 视为空属性，语义等同零长度 TXT 和只含单个空字符串的 TXT。两种正向空形式可保留原始字节。未经确认的缺失为 `txt`，最新批次互异为 `ambiguous_txt`。其他 missing 为 `srv`、`unavailable_srv`、`addresses`。端点可用性和身份由应用验证。
 4. SRV 汇集同 scope 未过期 RRSet，包括跨响应包、一秒 flush/goodbye 宽限和分包救回；排序和固定 seed 规则见 [SRV 契约](srv-selection.md)。平面 target/port/addresses 对应首选候选，首选缺地址时不自动跳到备用。每个候选保存它自己的地址；应用负责连接失败后的尝试、超时和认证。
 5. A 和 AAAA 保留为 4/16 字节地址数组并排序。多个实例可共享主机地址；撤销一个 PTR 不删除其他实例。地址变化、SRV 候选或 TXT 内容变化会触发相应 Updated/Unavailable/Resolved，TTL 刷新不单独触发内容事件。AAAA 解码和显示不代表 IPv6 组播、地址作用域管理或 IPv6 连接支持。
 6. remaining_ttl_ms 取成员证据、所选 SRV、所选主机全部已接纳地址及 TXT 属性证据中的最小到期时间。由否定证据产生的空属性使用 NSEC 到期时间。不同空形式的最新正向记录同时有效时取较晚的 TXT 到期。缓存 TTL=0 goodbye 保留一秒，可被重公告救回。TXT 使用最新到达批次，SRV 使用完整 RRSet。

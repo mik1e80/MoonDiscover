@@ -43,15 +43,53 @@ fn main raise {
   println("consumer_native_ok")
 }
 """
-NSEC_CORE_CHECK = """  let host = @dnssd.DnsName::parse("consumer.local.")
-  let record : @dnssd.Record = {
-    name: host, rr_type: 47, rr_class: 1, ttl: 1U, cache_flush: true,
+NSEC_CORE_CHECK = """  let engine = @dnssd.Engine::new(seed=7U)
+  let instance = @dnssd.DnsName::parse("Demo._http._tcp.local.")
+  let host = @dnssd.DnsName::parse("consumer.local.")
+  let _ = engine.browse(service, "consumer", 0)
+  let ptr : @dnssd.Record = {
+    name: service, rr_type: 12, rr_class: 1, ttl: 120U, cache_flush: false,
+    section: @dnssd.Section::Answer, data: @dnssd.RData::Ptr(instance),
+  }
+  let srv : @dnssd.Record = {
+    ..ptr, name: instance, rr_type: 33, cache_flush: true,
+    section: @dnssd.Section::Additional, data: @dnssd.RData::Srv(0, 0, 8080, host),
+  }
+  let txt : @dnssd.Record = {
+    ..srv, rr_type: 16, data: @dnssd.RData::Txt(@dnssd.TxtRecord::from_entries([b"demo=yes"])),
+  }
+  let address : @dnssd.Record = {
+    ..srv, name: host, rr_type: 1, data: @dnssd.RData::A(b"\\x7f\\x00\\x00\\x01"),
+  }
+  let nsec : @dnssd.Record = {
+    name: host, rr_type: 47, rr_class: 1, ttl: 2U, cache_flush: true,
     section: @dnssd.Section::Additional, data: @dnssd.RData::Nsec(host, b"\\x40"),
   }
-  engine.ingest_message({id: 0, flags: 0x8400, questions: [], records: [record]}, "consumer", 120)
+  engine.ingest_message({id: 0, flags: 0x8400, questions: [], records: [ptr, srv, txt, address, nsec]}, "consumer", 0)
   guard engine.is_negative("consumer", host, 28) else { fail("missing public NSEC evidence") }
-  engine.advance(1120)
+  guard engine.snapshots()[0].complete else { fail("IPv4 service should remain complete") }
+  let mut saw_ptr = false
+  for now in [120L, 1999L] {
+    engine.advance(now)
+    while engine.poll_outbound() is Some(outbound) {
+      let packet = @dnssd.decode_packet(outbound.bytes)
+      guard !packet.questions.any(q => q.rr_type == 28 && q.name.same_name(host)) else {
+        fail("AAAA sent before negative TTL expired")
+      }
+      saw_ptr = saw_ptr || packet.questions.any(q => q.rr_type == 12 && q.name.same_name(service))
+    }
+  }
+  guard saw_ptr && engine.is_negative("consumer", host, 28) else { fail("live negative state suppressed other query types or expired early") }
+  engine.advance(2000)
   guard !engine.is_negative("consumer", host, 28) else { fail("stale public NSEC evidence") }
+  engine.advance(2120)
+  let mut resumed = false
+  while engine.poll_outbound() is Some(outbound) {
+    let packet = @dnssd.decode_packet(outbound.bytes)
+    resumed = resumed || packet.questions.any(q => q.rr_type == 28 && q.name.same_name(host))
+  }
+  guard resumed else { fail("no AAAA emitted after NSEC expiration") }
+  println("nsec_aaaa_suppressed_before_2000_ms_and_resumed_by_2120_ms")
 """
 SEMVER = re.compile(r"(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?\Z")
 
@@ -158,7 +196,9 @@ def main():
         else:
             cwd, prefix = consumer, ""
         run(cwd, "--version")
-        run(cwd, "run", prefix + "cmd/core", "--target", "js", expected="consumer_core_ok")
+        core_result = run(cwd, "run", prefix + "cmd/core", "--target", "js", expected="consumer_core_ok")
+        if check_nsec and "nsec_aaaa_suppressed_before_2000_ms_and_resumed_by_2120_ms" not in core_result.stdout.splitlines():
+            raise RuntimeError("consumer did not verify suppression and recovery from NSEC")
         report["checks"]["core_public_api"] = True
         report["checks"]["nsec_public_api"] = True if check_nsec else None
         run(cwd, "build", prefix + "cmd/native", "--target", "native")

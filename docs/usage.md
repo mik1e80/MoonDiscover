@@ -1,6 +1,6 @@
 # 库接入与命令行
 
-在 MoonBit 工程执行 `moon add mik1e80/dnssd@0.2.0` 可安装已发布版。需要 NSEC、端点筛选或版本化事件时，固定使用具备对应能力的 0.3.0-dev 源码提交。构建和可运行示例见 [README](../README.md#安装与构建)。
+在 MoonBit 工程执行 `moon add mik1e80/dnssd@0.3.0` 可安装含受限 NSEC、端点筛选和版本化事件的版本。构建和可运行示例见 [README](../README.md#安装与构建)。
 
 纯核心由调用方提供网络报文、不会倒退的毫秒时间和 scope。按已知本地服务类型调用 browse，或按绝对实例名调用 resolve，保存返回的订阅 ID。推进时间后取尽待发数据包，读取事件和快照。每个链路和网络代次使用独立 scope。取消订阅用原 ID，结束时关闭 Engine。
 

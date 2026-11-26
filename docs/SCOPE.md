@@ -1,6 +1,6 @@
 # 已发布版本与 main 支持状态
 
-状态日期：2026-11-18。`0.1.0` 对应 `v0.1.0` / `2b922d6`；`0.2.0` 对应 `v0.2.0` / `aaf6ced`，均已发布至 Mooncakes。main 为 **0.3.0-dev（未发布）**，新增 NSEC 查询端整改并包含此前来源/TTL、预算和恢复修复。下面旧版对照表描述已发布 0.2.0 的基础；main 的新增项另列，不回填发布归档。[0.2.0 发布证据](release-0.2.0.md)。
+状态日期：2026-11-26。`0.1.0` 对应 `v0.1.0` / `2b922d6`，`0.2.0` 对应 `v0.2.0` / `aaf6ced`。`0.3.0` 交付受限 NSEC、来源与 TTL 策略、预算和查询恢复。旧版本和 0.3.0 的证据分别保留。[0.2.0 发布证据](release-0.2.0.md) · [0.3.0 验收](release-acceptance-0.3.0.md)。
 
 | 能力 | 已发布 0.1.0 | 已发布 0.2.0 |
 | --- | --- | --- |
@@ -15,7 +15,7 @@
 | 层 | 当前实现 | 证据与边界 |
 | --- | --- | --- |
 | 模型与 wire | 原始标签字节、可逆名称文本、二进制 TXT、PTR/SRV/TXT/A/AAAA、未知 RR 有界跳过、QM 编码 | JS 轻量用例与独立 zeroconf 报文；不是完整 DNS codec |
-| 缓存 | 范围隔离、重复刷新、TTL、goodbye、cache-flush 宽限、容量失败原子性；NSEC 独立负缓存 | 0.3.0-dev 新增，按名称/类型/scope/IN 隔离，详见 negative-response.md |
+| 缓存 | 范围隔离、重复刷新、TTL、goodbye、cache-flush 宽限、容量失败原子性；NSEC 独立负缓存 | 0.3.0 新增，按名称/类型/scope/IN 隔离，详见 negative-response.md |
 | 聚合与事件 | PTR→SRV 候选/TXT/地址；部分/完整快照；生命周期事件 | SRV 按优先级及确定性加权顺序提供候选；TXT 冲突仍保守处理 |
 | 查询与解析 | QM 抖动与退避、依赖查询、TTL 刷新、有界多包 Known-Answer、子类型；指定实例解析、超时、取消 | 已有 Linux 实际 UDP+独立解析器、Avahi 子类型专项；不是所有 responder 抑制/等待行为的证明 |
 | 核心后端 | 系统无关的 Engine 与 Replay | JS 冒烟通过；部分引擎用例在 Wasm/Native 通过，未全量运行所有后端 |
@@ -41,7 +41,7 @@ Supported = 所列子项已实现且有对应验证；Partial = 有限行为或�
 | 三目标变异、组合容量与 Replay 总量/进程预算 | Supported（所列测试范围） | Wire/Cache/Engine、有界最小化、有限覆盖率观察、独立进程限制；非覆盖引导 fuzz 或安全审计 |
 | 高频输入、压力查询轮换与版本化视图 | Supported（稳定集合） | 实时全局/来源/核心令牌桶；每秒轮换容量窗口；异步旧事件按 epoch/sequence 丢弃。任意持续变化无无条件公平延迟保证 |
 | 第二物理设备、Bonjour、长时间实网压力 | Untested | 不用同机/同 VM/核心资源循环替代 |
-| 受限 NSEC 解码、负缓存与同机实时恢复 | Supported（0.3.0-dev） | 仅限 RFC 6762 的窗口 0 与项目接收范围。扩展窗口、DNSSEC 和跨设备场景分别看 [否定响应证据](negative-response.md) |
+| 受限 NSEC 解码、负缓存与同机实时恢复 | Supported（0.3.0） | 仅限 RFC 6762 的窗口 0 与项目接收范围。扩展窗口、DNSSEC 和跨设备场景分别看 [否定响应证据](negative-response.md) |
 | RFC 6762 §7.3 跨查询器重复问题抑制 | Partial | 同 scope 单问题 IN QM 的普通任务可短暂延期一次，要求 Known-Answer 子集。刷新、TC 及多问题不参与，待补跨物理设备验证 |
 | IPv6 组播、发布者、跨子网反射 | Unsupported | 不属于本期查询端角色 |
 

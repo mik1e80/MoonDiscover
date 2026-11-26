@@ -1,8 +1,27 @@
 # MoonDiscover 项目说明
 
-2026-11-18 整改：用户反馈报名被驳回，要求补充查询端必要行为、NSEC 与否定响应案例。main 已进入 0.3.0-dev；以 [README](../README.md)、[NSEC 契约](negative-response.md)及[RFC 对照](rfc-conformance.md)为最新范围。下文历史基线不作为本轮全部验收完成声明。此前十一月材料：[一页申报书](proposal-november-2026.md)、[固定基线与新增贡献](november-baseline.md)。
+**申报状态（2026-11-26）**　11 月黑客松报名已通过初审（参赛者确认），当前准备终验。以下对照申报书的「核心功能及边界」和「测试与完成标准」，证据指向可公开复核的仓库内容。
 
-仓库：[mik1e80/MoonDiscover](https://github.com/mik1e80/MoonDiscover)。模块名：`mik1e80/dnssd`。许可：Apache-2.0。状态：2026-11-01，已发布 0.1.0；当前 0.2.0 包含下述新功能和修复，发布执行记录见 release-0.2.0.md。本项目尚未报名，用户计划报名 11 月赛。所有能力按版本与证据区分，不宣称完整 RFC 或所有平台验收。
+## 初审功能与交付证据
+
+| 申报功能 | 可复核的实现与证据 |
+| --- | --- |
+| DNS 报文处理 | [Wire 实现](../src/wire)与[协议条款对照](rfc-conformance.md)。覆盖名称压缩、二进制 TXT 和受限 NSEC。 |
+| 按类型浏览与子类型 | [Avahi 子类型专项](specialized-interop.md)，包含实际组播与子类型过滤。 |
+| 实例解析 | [解析契约](dnssd-resolution-contract.md)，按 SRV、TXT 和地址判断完整状态。 |
+| SRV 候选管理 | [SRV 选择契约](srv-selection.md)，含优先级、固定种子权重和跨包汇集。 |
+| TTL、goodbye、cache-flush 和容量 | [缓存语义](cache-semantics.md)和[缓存回归](../src/cache)。 |
+| 受限 NSEC、负缓存与到期恢复 | [NSEC 契约及回归](negative-response.md)和[0.3.0 验收](release-acceptance-0.3.0.md)。 |
+| 查询调度和 Known-Answer | [TC 互通及丢包实验](tc-interop.md)，记录定向丢包、自动重发及未恢复轮次。 |
+| 生命周期与版本化视图 | [行为契约](behavior-contract.md)与[事件示例](../examples/watch_events)。 |
+| Native 网络与 CLI | [README 的构建和命令](../README.md#安装与构建)与[安全模型](security-model.md)。 |
+| 录制与离线回放 | [离线演示](../examples/browser_replay)与[回放资源预算](replay-isolation.md)。 |
+
+**验收版本与边界。** `0.3.0` 对应指定 IPv4 接口的 QM 查询端。IPv6 组播、发布者、DNSSEC/NSEC3、通用单播 DNS、跨子网和接口自动迁移不在交付范围。Bonjour、第二台物理设备、长时间真实局域网压力及未完成的组合故障场景仍待验证。详见[支持范围](SCOPE.md)。
+
+以下保留历史证据。新增贡献起点见[十一月基线](november-baseline.md)。
+
+仓库：[mik1e80/MoonDiscover](https://github.com/mik1e80/MoonDiscover)，模块 `mik1e80/dnssd`，Apache-2.0。项目方向为原创 MoonBit 局域网服务发现基础组件。
 
 ## 解决的问题
 

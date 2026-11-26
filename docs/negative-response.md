@@ -1,6 +1,6 @@
 # NSEC 查询端与否定响应契约
 
-2026-11-18，0.3.0-dev，未发布。NSEC 是最终查询端目标内的必要行为，不能再作为未来可选项排除。规范依据：[RFC 6762 §6.1](https://www.rfc-editor.org/rfc/rfc6762.html#section-6.1)、[RFC 4034 §4.1](https://www.rfc-editor.org/rfc/rfc4034.html#section-4.1)。不是 DNSSEC 验证，不信任未认证的链路发布者身份。
+0.3.0 查询端交付范围。NSEC 是最终查询端目标内的必要行为，不能再作为未来可选项排除。规范依据：[RFC 6762 §6.1](https://www.rfc-editor.org/rfc/rfc6762.html#section-6.1)、[RFC 4034 §4.1](https://www.rfc-editor.org/rfc/rfc4034.html#section-4.1)。不是 DNSSEC 验证，不信任未认证的链路发布者身份。
 
 ## 处理链
 
@@ -33,4 +33,4 @@ Linux 新独立发布者专项已通过：[CI 44249939017](https://github.com/mi
 
 独立来源：现有 `fixtures/zeroconf-0.148.0-response.hex` 是独立 zeroconf 的实际抓包，SHA 和来源不变，现已检查 NSEC 位图。该报文的 owner 是服务实例，位图包含 AAAA；不能将它谎称为 host 的 IPv4-only 实验。新增 `tests/nsec_probe` 检查独立发布者经 Native 收到的 trace，要求存在 NSEC 且实际形成否定状态；脚本失败不能标为通过。2026-11-18 本机独立 zeroconf 0.148.0 实际组播通过八项发现/回放检查，抓包含 9 条 NSEC、6 次有效负证据观测，见 [Windows 报告](evidence/windows-nsec-20261118.json)和[原实验报告](evidence/windows-live-20261118.json)。负状态在同一录制的 Replay 内复核，不是第二个独立解析器。
 
-轻量命令：`moon test src/wire src/cache src/engine src/replay --target js --filter 'smoke:*'`。Linux Avahi 常规专项仍为 `moon run scripts/protocol-live.mbtx -- avahi`；NSEC 改用 `moon run scripts/nsec-live.mbtx -- <fixed-zeroconf-python> <interface-ipv4>`，以独立 zeroconf 实际 UDP 和强制 trace 断言验收。首次 Avahi 地址发布实验没收到预期 NSEC（CI 44249456403），没有放宽为成功；已更换发布者并保留普通 Avahi 用例。第二物理设备、物理时间到期后发布者变更、长时间压力尚无新证据。部分验收未满足时不声称八类完整实网互操作或完整查询端 RFC 合规，也不发布稳定 0.3.0。
+轻量命令：`moon test src/wire src/cache src/engine src/replay --target js --filter 'smoke:*'`。Linux Avahi 常规专项仍为 `moon run scripts/protocol-live.mbtx -- avahi`；NSEC 改用 `moon run scripts/nsec-live.mbtx -- <fixed-zeroconf-python> <interface-ipv4>`，以独立 zeroconf 实际 UDP 和强制 trace 断言验收。首次 Avahi 地址发布实验没收到预期 NSEC（CI 44249456403），没有放宽为成功；已更换发布者并保留普通 Avahi 用例。第二物理设备、物理时间到期后发布者变更、长时间压力尚无新证据。部分验收未满足时不声称八类完整实网互操作或完整查询端 RFC 合规。0.3.0 已覆盖的实验和未验证项分别记录。

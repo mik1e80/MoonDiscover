@@ -1,6 +1,6 @@
 # RFC 条款与实现对照
 
-状态：2026-11-20，main / 0.3.0-dev（未发布）。本表按 IPv4 QM 查询端角色记录已实现条款和仍有差异的建议。历史安全证据见[第四轮验证](security-review-20261106.md)，当前证据见[预发布验收](release-acceptance-0.3.0.md)。
+状态：2026-11-26，0.3.0。本表按 IPv4 QM 查询端角色记录已实现条款和仍有差异的建议。历史安全证据见[第四轮验证](security-review-20261106.md)，当前证据见[发布验收](release-acceptance-0.3.0.md)。
 
 状态统一使用 Supported（对应子项已实现且有证据）、Partial（有限行为/有简化）、Unsupported（未实现）、Untested（缺少所列环境的验证）。状态仅修饰该行的范围，不代表整份 RFC。
 

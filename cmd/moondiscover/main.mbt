@@ -1,4 +1,7 @@
 ///|
+let version = "0.3.0"
+
+///|
 async fn write_line(text : String) -> Unit {
   @stdio.stdout.write(text + "\n")
 }
@@ -24,7 +27,7 @@ async fn read_trace(path : String) -> String {
 ///|
 async fn usage() -> Unit {
   write_line(
-    "MoonDiscover 0.2.1-dev\n  browse --interface IPV4 --service _http._tcp.local. [--duration-ms 5000] [--record trace.jsonl] [--allow-source CIDR,CIDR] [--require-ttl 255]\n  resolve --interface IPV4 --instance 'Demo._http._tcp.local.' [--duration-ms 5000] [--record trace.jsonl] [--allow-source CIDR,CIDR] [--require-ttl 255]\n  doctor --interface IPV4\n  replay --file trace.jsonl [--seed 1]\n  redact --file trace.jsonl [--seed 1]\nRedact exports lossy event summaries, not a replay trace. Names support DNS presentation escaping. JSONL is written to stdout.",
+    "MoonDiscover \{version}\n  browse --interface IPV4 --service _http._tcp.local. [--duration-ms 5000] [--record trace.jsonl] [--allow-source CIDR,CIDR] [--require-ttl 255]\n  resolve --interface IPV4 --instance 'Demo._http._tcp.local.' [--duration-ms 5000] [--record trace.jsonl] [--allow-source CIDR,CIDR] [--require-ttl 255]\n  doctor --interface IPV4\n  replay --file trace.jsonl [--seed 1]\n  redact --file trace.jsonl [--seed 1]\nRedact exports lossy event summaries, not a replay trace. Names support DNS presentation escaping. JSONL is written to stdout.",
   )
 }
 
@@ -132,7 +135,7 @@ async fn run_command(args : Array[String]) -> Unit {
     return
   }
   if args[1] == "--version" {
-    write_line("0.2.1-dev")
+    write_line(version)
     return
   }
   let options = options(args)
