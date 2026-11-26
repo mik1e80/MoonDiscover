@@ -14,6 +14,8 @@ Engine 在收包和到期时重建问题集合，取消有效否定类型的待�
 
 ## 八类验收案例
 
+2026-11-26，仓库外工程用 Mooncakes 0.3.0 在 Windows 同机 IPv4 组播验证。同机受控的 1 秒 NSEC 响应发出后 1125ms 恢复 AAAA，并接纳随后发送的正向记录。见[注册表 Native 验收](release-acceptance-0.3.0.md#2026-11-26-注册表-native-同机验收)。
+
 2026-11-20 补充同机 IPv4 组播实验。初始响应的 Additional 含 1 秒 NSEC，生产 Browser 抑制 AAAA，随后按系统单调时间恢复出站查询。测试端只有观测到查询才发布 AAAA，最后检查快照接纳。该实验使用受控短 TTL。独立 zeroconf 收包是下述另一条证据。运行方式、平台和其他剩余验证见 [0.3.0 预发布验收](release-acceptance-0.3.0.md)。
 
 同日扩展 nsec-live.mbtx，用固定版本的 zeroconf DNSIncoming 与本库逐条比对同一实网 trace 中的 NSEC TTL 和全部置位类型，随后单独验证 Replay 是否形成负证据。比对结果和早期仅记录收包的报告分开归档。

@@ -1,0 +1,251 @@
+{
+  "module": "mik1e80/dnssd",
+  "version": "0.3.0",
+  "released_source_commit": "fb3df9fa0e59c28d279ded9ef54e52c124d082d7",
+  "first_probe_harness_commit": "949f63c347954ae46e1644fe6bf32fd22a4e344d",
+  "observed_beijing_date": "2026-11-26",
+  "platform": "Microsoft Windows 10.0.26200",
+  "archive_sha256": "96f0d3cb889eb66f7db66e4bcc2cc859d7cb7a79ab26a4be25a789cb947cb60f",
+  "installed_files_matching_archive": 341,
+  "workspace_source_mapping_absent": true,
+  "nsec": {
+    "passed": true,
+    "ttl_seconds": 1,
+    "first_aaaa_ms_after_send": "1125",
+    "additional_nsec_admitted": true,
+    "positive_after_query": true,
+    "limits": "same-host IPv4 multicast, controlled fixture, independent outgoing question parser",
+    "attempts": [
+      {
+        "execution": "restricted",
+        "passed": false,
+        "failure": "timed out waiting for negative expiry and the subsequent AAAA result",
+        "timeout_ms": 4500
+      },
+      {
+        "execution": "host_network",
+        "passed": true
+      }
+    ]
+  },
+  "soak_1h": {
+    "passed": false,
+    "requested_seconds": 3600,
+    "loop_reached_teardown": true,
+    "exact_elapsed_ms": null,
+    "service_type": "_md-tcproof._tcp.local.",
+    "publisher": "python-zeroconf 0.148.0",
+    "browsers": 2,
+    "instances_per_browser": 2,
+    "periodic_samples": [
+      {
+        "services": 0,
+        "complete_services": 0,
+        "cached_records": 0,
+        "query_jobs": 1,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 16,
+        "rss_bytes": 10833920,
+        "handles_or_fds": 159,
+        "network_errors": 0,
+        "events": 0,
+        "second_browser": {
+          "services": 0,
+          "complete_services": 0,
+          "cached_records": 0,
+          "query_jobs": 1,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 9,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 600000,
+        "rss_bytes": 11726848,
+        "handles_or_fds": 163,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 9,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 9,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 1200000,
+        "rss_bytes": 11862016,
+        "handles_or_fds": 163,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 9,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 9,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 1800000,
+        "rss_bytes": 11821056,
+        "handles_or_fds": 161,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 9,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 8,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 2400000,
+        "rss_bytes": 11833344,
+        "handles_or_fds": 163,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 8,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 8,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 3000000,
+        "rss_bytes": 11829248,
+        "handles_or_fds": 163,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 8,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      }
+    ],
+    "warmup_handles": 157,
+    "handles_after_both_closed": 161,
+    "handle_check_passed": false,
+    "cached_records_after_close": 0,
+    "final_rss_bytes": null,
+    "failure": "handle equality failed before the original probe wrote its final summary; the last periodic sample was at 3000000 ms"
+  },
+  "short_control": {
+    "passed": true,
+    "requested_seconds": 15,
+    "actual_ms": 15000,
+    "samples": [
+      {
+        "services": 0,
+        "complete_services": 0,
+        "cached_records": 0,
+        "query_jobs": 1,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 0,
+        "rss_bytes": 10006528,
+        "handles_or_fds": 153,
+        "network_errors": 0,
+        "events": 0,
+        "second_browser": {
+          "services": 0,
+          "complete_services": 0,
+          "cached_records": 0,
+          "query_jobs": 1,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 7,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 15000,
+        "rss_bytes": 10330112,
+        "handles_or_fds": 153,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 7,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      }
+    ],
+    "service_type": "_md-tcproof._tcp.local.",
+    "minimum_complete_services_per_browser": 2,
+    "warmup_rss_bytes": 9961472,
+    "warmup_handles_or_fds": 151,
+    "max_poll_gap_ms": 32,
+    "final_rss_bytes": 10330112,
+    "final_handles_or_fds": 151,
+    "closed_both": true,
+    "cached_records_after_close": 0,
+    "handle_baseline_matched": true,
+    "recovery": "transport errors fail this observation; this test does not claim automatic migration or cross-device verification"
+  }
+}

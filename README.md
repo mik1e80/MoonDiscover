@@ -392,7 +392,7 @@ main 自定义 `query_packets` 包预算时数量上限为 `max_packets * 256 - 
 | JS 核心/离线浏览器 | 核心冒烟、独立消费、回放和页面回调 | 不等于浏览器实时局域网扫描 |
 | 其他环境 | 部分核心用例曾在 Wasm/Native 运行，详见验证记录 | 没有全后端验收，不承诺 macOS/Bonjour 或所有设备兼容 |
 
-第二设备、Bonjour、长时间实网运行尚无证据。子类型与多包 Known-Answer 已有专项核心验收；Known-Answer 还通过独立测试解析器检查 Engine 实际生成的完整报文，另有 Linux UDP 与 Avahi 子类型专项证据。专项范围与原始报告见[专题验证](docs/specialized-interop.md)。50/200/500 个合成服务已有三轮单机性能观察，数据范围见[报告](docs/performance.md)，不构成通用性能或峰值资源保证。
+已发布 0.3.0 在同机 IPv4 组播验证了 NSEC 到期后恢复查询。双 Browser 的 1 小时同机实测结束后，进程句柄比预热多 4 个。第二设备、Bonjour、6 小时和多主机压力仍待验证。[实测](docs/release-acceptance-0.3.0.md#2026-11-26-注册表-native-同机验收)。子类型与多包 Known-Answer 已有专项核心验收；Known-Answer 还通过独立测试解析器检查 Engine 实际生成的完整报文，另有 Linux UDP 与 Avahi 子类型专项证据。专项范围与原始报告见[专题验证](docs/specialized-interop.md)。50/200/500 个合成服务已有三轮单机性能观察，数据范围见[报告](docs/performance.md)，不构成通用性能或峰值资源保证。
 
 ## 常见问题
 

@@ -17,7 +17,7 @@
 | Native 网络与 CLI | [README 的构建和命令](../README.md#安装与构建)与[安全模型](security-model.md)。 |
 | 录制与离线回放 | [离线演示](../examples/browser_replay)与[回放资源预算](replay-isolation.md)。 |
 
-**验收版本与边界。** `0.3.0` 对应指定 IPv4 接口的 QM 查询端。IPv6 组播、发布者、DNSSEC/NSEC3、通用单播 DNS、跨子网和接口自动迁移不在交付范围。Bonjour、第二台物理设备、长时间真实局域网压力及未完成的组合故障场景仍待验证。详见[支持范围](SCOPE.md)。
+**验收版本与边界。** `0.3.0` 对应指定 IPv4 接口的 QM 查询端。IPv6 组播、发布者、DNSSEC/NSEC3、通用单播 DNS、跨子网和接口自动迁移不在交付范围。Bonjour、第二台物理设备、6 小时、多主机实网压力、1 小时关闭后句柄偏差的归属与累积性及未完成的组合故障场景仍待验证。详见[支持范围](SCOPE.md)。
 
 以下保留历史证据。新增贡献起点见[十一月基线](november-baseline.md)。
 
