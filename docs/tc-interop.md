@@ -384,7 +384,21 @@ A 三轮分别在 34ms、34ms、20ms 观察到 Avahi 回包，均早于末包。
 
 三轮在开放前均丢弃 84 份查询，分别丢弃 3、2、2 份响应。开放后每轮有 13 份查询到达对端，放行 1 份组播响应。每个 Browser 共发出 8–9 次普通 QM。三轮均为 12/12 完整解析两个实例，分别在 255.074、255.076、255.131 秒完成。耗时从每轮发送端探针启动起算。[逐轮数据](evidence/linux-tc-browser-960s-bidirectional-burst-20261125.json)
 
-仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、不同双向丢包率、其他突发持续时间和相关丢包模型、独立随机样本在 240 秒后（含 480 秒后）的完整解析、超过 960 秒的恢复、其他并发规模、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+## 单 Browser 双向随机丢包 1920 秒复测
+
+2026-11-25（北京时间），在同一 GitHub Actions Linux VM 的隔离 IPv4 veth 链路上，查询和响应方向各配置 50% 随机丢包。对端为 python-zeroconf 0.148.0。生产 Browser 每轮订阅一次，完整解析两个实例即结束该轮，否则观察至 1920 秒。各轮的查询放行数均与对端实收数一致。[逐轮数据](evidence/linux-tc-browser-1920s-bidirectional-burst-20261125.json) · [Linux 专项](https://github.com/mik1e80/MoonDiscover/actions/runs/45623224446/job/139236571769)
+
+八轮独立随机样本中，七轮在 0.098–255.115 秒完整解析，包括第 6 轮在 255.115 秒恢复。第 1 轮在 1023.085 秒自动发出第十一次普通组播查询（QM）。该轮有 2 份查询到达对端，两份响应均被丢弃，到 1920 秒仍未完整解析。八轮合计放行 13 份查询、丢弃 18 份，放行 7 份响应、丢弃 6 份。
+
+固定种子补充轮使用查询种子 3514、响应种子 393，两个方向全程各配置 50% 丢包。第 5 次查询放行，其响应被丢弃。第 11 次查询在 1023.092 秒发出并收到响应，Browser 于 1023.138 秒完整解析。该轮放行 2 份查询和 1 份响应，分别丢弃 9 份和 1 份。种子按 Linux netem 的随机序列预先选定，结果单独报告。[netem 实现](https://github.com/torvalds/linux/blob/v6.17/net/sched/sch_netem.c#L277)
+
+## 十二个 Browser 的 160 秒重叠突发丢包
+
+查询和响应方向起初均配置 100% 丢包。确认查询被丢弃后，保持至少 160 秒才开放查询方向。确认响应被丢弃后，再保持至少 160 秒才开放响应方向。十二个独立 IPv4 源各订阅一次，每轮最多观察 960 秒。
+
+三轮在开放前均丢弃 96 份查询，分别丢弃 2、3、2 份响应。开放后每轮有 13 份查询到达对端，放行 1 份组播响应。每个 Browser 共发出 9–10 次普通 QM。三轮均为 12/12 完整解析两个实例，全员完成时间分别为 511.122、511.118、511.171 秒。耗时从每轮发送端探针启动起算。[逐轮数据](evidence/linux-tc-browser-1920s-bidirectional-burst-20261125.json)
+
+仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、不同双向丢包率、其他突发持续时间和相关丢包模型、独立随机样本在 960 秒后的完整解析、超过 1920 秒的恢复、其他并发规模、乱序与 TTL 到期或 goodbye 叠加、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
 
 复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至十二个附加地址分别运行五至十三查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
@@ -404,6 +418,8 @@ moon run scripts/tc-interop.mbtx -- .venv/bin/python 192.0.2.242 192.0.2.243 192
 `--bidirectional-480s` 运行单 Browser 八轮随机样本和一轮固定丢包种子的补充实验。两个方向各配置 50% 丢包。 `--multi-bidirectional-burst-40s` 运行十二个 Browser 的双向突发丢包实验，两个方向各在确认丢包后再保持至少 40 秒。报告为 `.tools/tc-bidirectional-480s.json` 与 `.tools/tc-multi-bidirectional-burst-40s.json`。
 
 `--bidirectional-960s` 运行单 Browser 的八轮独立随机样本和一轮固定种子补充实验，查询与响应方向各配置 50% 丢包。`--multi-bidirectional-burst-80s` 运行十二个 Browser 的双向突发丢包实验，两个方向各在确认丢包后再保持至少 80 秒。报告为 `.tools/tc-bidirectional-960s.json` 与 `.tools/tc-multi-bidirectional-burst-80s.json`。
+
+`--bidirectional-1920s` 运行单 Browser 的八轮独立随机样本和一轮固定种子补充实验，查询与响应方向各配置 50% 丢包。`--multi-bidirectional-burst-160s` 运行十二个 Browser 的双向突发丢包实验，两个方向各在确认丢包后再保持至少 160 秒。报告为 `.tools/tc-bidirectional-1920s.json` 与 `.tools/tc-multi-bidirectional-burst-160s.json`。
 
 ```sh
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --twelve
@@ -427,6 +443,8 @@ sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst-40s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --bidirectional-960s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst-80s
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --bidirectional-1920s
+sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-bidirectional-burst-160s
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --multi-response
 sudo --preserve-env=HOME,PATH "$(command -v moon)" run scripts/tc-link.mbtx -- .venv/bin/python "$(git rev-parse HEAD)" --advanced-response
 ```
