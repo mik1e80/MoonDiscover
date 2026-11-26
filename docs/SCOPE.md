@@ -40,7 +40,7 @@ Supported = 所列子项已实现且有对应验证；Partial = 有限行为或�
 | 接口失效后手动关闭/重建 | Supported | Linux 隔离网络命名空间验证；无自动迁移或同地址换网识别 |
 | 三目标变异、组合容量与 Replay 总量/进程预算 | Supported（所列测试范围） | Wire/Cache/Engine、有界最小化、有限覆盖率观察、独立进程限制；非覆盖引导 fuzz 或安全审计 |
 | 高频输入、压力查询轮换与版本化视图 | Supported（稳定集合） | 实时全局/来源/核心令牌桶；每秒轮换容量窗口；异步旧事件按 epoch/sequence 丢弃。任意持续变化无无条件公平延迟保证 |
-| 同机双 Browser 资源观察 | Partial | 已发布 0.3.0，1 小时完成运行，关闭后句柄比预热多 4 个，15 秒对照未再出现偏差。[证据](release-acceptance-0.3.0.md#2026-11-26-注册表-native-同机验收) |
+| 同机双 Browser 资源观察 | Partial | 0.3.0 满 1 小时关闭后，两只随 Browser 打开的 `File` 句柄均释放，进程仍比预热多两对 `Thread` / `Event`。50 轮启停的后 25 轮总数稳定。[证据](release-acceptance-0.3.0.md#2026-11-26-windows-句柄复核) |
 | 第二物理设备、Bonjour、6 小时或多主机实网压力 | Untested | 不用同机/同 VM/核心资源循环替代 |
 | 受限 NSEC 解码、负缓存与同机实时恢复 | Supported（0.3.0） | 仅限 RFC 6762 的窗口 0 与项目接收范围。扩展窗口、DNSSEC 和跨设备场景分别看 [否定响应证据](negative-response.md) |
 | RFC 6762 §7.3 跨查询器重复问题抑制 | Partial | 同 scope 单问题 IN QM 的普通任务可短暂延期一次，要求 Known-Answer 子集。刷新、TC 及多问题不参与，待补跨物理设备验证 |

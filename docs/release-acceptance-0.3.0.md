@@ -33,6 +33,31 @@
 
 **关闭后句柄检查未通过。** 两个 Browser 的缓存清零，进程句柄为 161 个，预热基线为 157 个。旧探针在写终点报告前退出，保留到第 50 分钟的采样和关闭断言中的计数。用同一 `0.3.0` 安装、相同负载补跑 15 秒，两者均完成解析且关闭后句柄回到新进程的基线 151 个。短对照未复现，差额的归属、是否会累积及能否稳定复现仍待确认。探针现会在退出前写入终点测量。[原始观测数据](evidence/registry-native-0.3.0-20261126.json)
 
+## 2026-11-26 Windows 句柄复核
+
+继续使用同一个从 Mooncakes 安装 `0.3.0` 的独立项目、同机 IPv4 及固定的独立发布者。复跑耗时 3600000ms，最大轮询间隔 125ms。第 10 分钟到终点的每次采样中，两个 Browser 各解析两个实例，进程有 157 个活跃句柄。工作集在这些采样中为 2.88–4.27 MiB。工作集受 Windows 驻留页策略影响，按本轮样本报告。
+
+| 观测阶段 | 进程句柄 | 与 151 个预热基线相比 |
+| --- | ---: | --- |
+| 两个 Browser 刚打开 | 153 | 新增两个 `File`，分别随各自的 Browser 关闭而消失 |
+| 1 小时结束，关闭前 | 157 | 两个 `File`，加两个 `Thread`、两个 `Event` |
+| 关闭第一个后 | 156 | 剩一个 `File`，两个 `Thread`、两个 `Event` |
+| 两个都已关闭，立即及等待 1 秒后 | 155 | 两个 `Thread`、两个 `Event`。缓存清零，严格进程总数断言仍失败 |
+
+随后在一个新的诊断进程内连续开关 50 对 Browser，每轮两者都各解析两个实例，关闭后缓存均为零。预热 149 个句柄；第 1–25 轮关闭并静置 100ms 后为 151，第 26–50 轮为 153。第一轮和最后一轮关闭后的快照均无本轮打开的两个 `File` 句柄。最后 25 轮保持 153，尚未验证多轮小时级运行下的累积性。
+
+不创建 Browser 的对照中，并发执行三次异步文件写入后，进程由 122 增至 126，新增类型同样是两个 `Thread` 和两个 `Event`。`moonbitlang/async 0.22.5` 的 Windows 工作线程各持有一个唤醒事件，完成任务后的空闲线程会保留在事件循环内，事件循环清理时释放。对照与实现均支持空闲工作线程是总数偏差的解释。当前没有这四个对象各自的分配调用栈。观测未发现 Browser 打开的文件句柄留存，因此保留严格总数断言和诊断记录，生产库未修改。[原始采样及分类](evidence/windows-browser-handles-0.3.0-20261126.json) · [Microsoft 进程快照文档](https://learn.microsoft.com/en-us/windows/win32/api/processsnapshot/ns-processsnapshot-pss_handle_entry)
+
+在上文的 `soak` 命令最后追加 `--handle-types` 采集 Windows 快照。按顺序完成长测后，在同一独立安装上执行循环实验。异步文件写入对照使用只运行探针的单独进程。
+
+```powershell
+.\scripts\moon.ps1 run scripts/registry-native-acceptance.mbtx -- cycles ../moondiscover-registry-native .tools/moon/bin/moon.exe .venv/Scripts/python.exe 50
+.\scripts\moon.ps1 build tests/live_soak --target native --frozen
+.\_build\native\debug\build\tests\live_soak\live_soak.exe --fs-control
+```
+
+发布源码 `fb3df9f` 的轻量 CI 和 Avahi 专项通过。TC 专项首次未满足恢复断言：8 轮中 7 轮解析，唯一首包丢失的一轮在 7.8 秒内的 4 次查询全部丢失。单独复跑失败作业后，首包丢失的 6 轮都重试并解析，8 轮均完整解析。两次结果均保留。[轻量 CI](https://github.com/mik1e80/MoonDiscover/actions/runs/45757868524) · [Avahi 专项](https://github.com/mik1e80/MoonDiscover/actions/runs/45757800864) · [TC 首轮](https://github.com/mik1e80/MoonDiscover/actions/runs/45757800889/job/139700439654) · [TC 复跑](https://github.com/mik1e80/MoonDiscover/actions/runs/45757800889/job/139849551763)
+
 ## 开发阶段与专项实测
 
 | 项目 | 当前可复现证据 |
@@ -64,4 +89,4 @@ RFC 6762 §7.3 受限路径新增跨 scope、子集、TTL、TC、反复输入与
 
 双向各配置 50% 随机丢包时，单个与十二个生产 Browser 各跑八轮，两种规模均观测到自动重发。7.8s 内，单 Browser 四轮解析完成，四轮无完整解析。十二 Browser 八轮均完成。单 Browser 延长至 30s 另测八轮，七轮完整解析，一轮到期未完成。十二 Browser 的重叠双向突发丢包三轮均完整解析。60s 单 Browser 复测中三轮在 30s 后仍自动重发，两轮约 31.15s 完成，一轮到 60s 仍未完成。十二 Browser 的 5s 重叠突发三轮均完成。120s 单 Browser 复测中三轮在约 63 秒自动重发，一轮在 63.190 秒完成，两轮到期仍未完成。十二 Browser 的 10 秒重叠突发丢包三轮均为 12/12 完整解析。240s 单 Browser 复测八轮均完成，一轮在 127.089 秒重发并于 127.161 秒完整解析。十二 Browser 的 20 秒重叠突发丢包三轮均为 12/12 完整解析。480s 单 Browser 复测中，独立随机样本八轮有七轮完整解析，一轮在约 255 秒重发后到期仍未解析。固定种子补充轮在 255.172 秒完整解析。十二 Browser 的 40 秒重叠突发丢包三轮均为 12/12 完整解析。960s 单 Browser 复测中，独立随机样本八轮有七轮完整解析，一轮在 511.094 秒自动重试后到期仍未解析。固定种子补充轮在 511.123 秒完整解析。十二 Browser 的 80 秒重叠突发丢包三轮均为 12/12 完整解析。1920s 单 Browser 复测中，独立随机样本八轮有七轮完整解析，一轮在 1023.085 秒自动重试后到期仍未解析。固定种子补充轮在 1023.138 秒完整解析。十二 Browser 的 160 秒重叠突发丢包三轮均为 12/12 完整解析。其他丢包率、突发持续时间、独立随机样本中 960 秒后的完整解析及 1920 秒后的恢复仍待验证。[双向实测报告](tc-interop.md#browser-在双向随机丢包下的重试与解析)
 
-第二台物理设备、Bonjour、小时级关闭后句柄偏差、6 小时观察、多主机局域网压力和上文列出的组合与恢复场景仍待验证。
+第二台物理设备、Bonjour、多个小时级运行周期中的句柄趋势、6 小时观察、多主机局域网压力和上文列出的组合与恢复场景仍待验证。

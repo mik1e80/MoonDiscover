@@ -1,0 +1,1441 @@
+{
+  "recorded_beijing_date": "2026-11-26",
+  "module": "mik1e80/dnssd",
+  "registry_version": "0.3.0",
+  "released_source": "fb3df9fa0e59c28d279ded9ef54e52c124d082d7",
+  "harness_commit": "c45447051becc3caa4afddc5bcfa0393e53d3144",
+  "platform": "Microsoft Windows 10.0.26200",
+  "controls": {
+    "no_browser_async_filesystem": {
+      "dependency": "moonbitlang/async@0.22.5",
+      "concurrent_writes": 3,
+      "warm": 122,
+      "after": 126,
+      "added": [
+        [
+          456,
+          "Event"
+        ],
+        [
+          484,
+          "Thread"
+        ],
+        [
+          492,
+          "Thread"
+        ],
+        [
+          496,
+          "Event"
+        ]
+      ],
+      "removed": []
+    }
+  },
+  "one_hour_soak": {
+    "passed": false,
+    "requested_seconds": 3600,
+    "actual_ms": 3600000,
+    "samples": [
+      {
+        "services": 0,
+        "complete_services": 0,
+        "cached_records": 0,
+        "query_jobs": 1,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 0,
+        "rss_bytes": 10260480,
+        "handles_or_fds": 153,
+        "network_errors": 0,
+        "events": 0,
+        "second_browser": {
+          "services": 0,
+          "complete_services": 0,
+          "cached_records": 0,
+          "query_jobs": 1,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 8,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 600000,
+        "rss_bytes": 3018752,
+        "handles_or_fds": 157,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 8,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 8,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 1200000,
+        "rss_bytes": 4145152,
+        "handles_or_fds": 157,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 8,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 9,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 1800000,
+        "rss_bytes": 4354048,
+        "handles_or_fds": 157,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 9,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 8,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 2400000,
+        "rss_bytes": 4358144,
+        "handles_or_fds": 157,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 8,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 9,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 3000000,
+        "rss_bytes": 4349952,
+        "handles_or_fds": 157,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 9,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      },
+      {
+        "services": 2,
+        "complete_services": 2,
+        "cached_records": 8,
+        "query_jobs": 7,
+        "dropped_events": 0,
+        "rate_dropped": 0,
+        "interface_index": 43,
+        "at_ms": 3600000,
+        "rss_bytes": 4481024,
+        "handles_or_fds": 157,
+        "network_errors": 0,
+        "events": 8,
+        "second_browser": {
+          "services": 2,
+          "complete_services": 2,
+          "cached_records": 8,
+          "query_jobs": 7,
+          "dropped_events": 0,
+          "rate_dropped": 0,
+          "interface_index": 43
+        }
+      }
+    ],
+    "service_type": "_md-tcproof._tcp.local.",
+    "minimum_complete_services_per_browser": 2,
+    "warmup_rss_bytes": 10084352,
+    "warmup_handles_or_fds": 151,
+    "max_poll_gap_ms": 125,
+    "final_rss_bytes": 4759552,
+    "final_handles_or_fds": 155,
+    "closed_both": true,
+    "cached_records_after_close": 0,
+    "handle_baseline_matched": false,
+    "recovery": "transport errors fail this observation; this test does not claim automatic migration or cross-device verification"
+  },
+  "one_hour_snapshots": {
+    "warm_baseline": {
+      "count_before": 151,
+      "count_after": 151,
+      "types": {
+        "File": 9,
+        "Event": 22,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 3
+      },
+      "added": [],
+      "removed": []
+    },
+    "pair_open": {
+      "count_before": 153,
+      "count_after": 153,
+      "types": {
+        "File": 11,
+        "Event": 22,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 3
+      },
+      "added": [
+        [
+          552,
+          "File"
+        ],
+        [
+          556,
+          "File"
+        ]
+      ],
+      "removed": []
+    },
+    "loaded": {
+      "count_before": 153,
+      "count_after": 153,
+      "types": {
+        "File": 11,
+        "Event": 22,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 3
+      },
+      "added": [
+        [
+          552,
+          "File"
+        ],
+        [
+          556,
+          "File"
+        ]
+      ],
+      "removed": []
+    },
+    "before_close": {
+      "count_before": 157,
+      "count_after": 157,
+      "types": {
+        "File": 11,
+        "Event": 24,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 5
+      },
+      "added": [
+        [
+          552,
+          "File"
+        ],
+        [
+          556,
+          "File"
+        ],
+        [
+          632,
+          "Thread"
+        ],
+        [
+          696,
+          "Thread"
+        ],
+        [
+          728,
+          "Event"
+        ],
+        [
+          756,
+          "Event"
+        ]
+      ],
+      "removed": []
+    },
+    "first_closed": {
+      "count_before": 156,
+      "count_after": 156,
+      "types": {
+        "File": 10,
+        "Event": 24,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 5
+      },
+      "added": [
+        [
+          556,
+          "File"
+        ],
+        [
+          632,
+          "Thread"
+        ],
+        [
+          696,
+          "Thread"
+        ],
+        [
+          728,
+          "Event"
+        ],
+        [
+          756,
+          "Event"
+        ]
+      ],
+      "removed": []
+    },
+    "both_closed": {
+      "count_before": 155,
+      "count_after": 155,
+      "types": {
+        "File": 9,
+        "Event": 24,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 5
+      },
+      "added": [
+        [
+          632,
+          "Thread"
+        ],
+        [
+          696,
+          "Thread"
+        ],
+        [
+          728,
+          "Event"
+        ],
+        [
+          756,
+          "Event"
+        ]
+      ],
+      "removed": []
+    },
+    "settled_1s": {
+      "count_before": 155,
+      "count_after": 155,
+      "types": {
+        "File": 9,
+        "Event": 24,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 5
+      },
+      "added": [
+        [
+          632,
+          "Thread"
+        ],
+        [
+          696,
+          "Thread"
+        ],
+        [
+          728,
+          "Event"
+        ],
+        [
+          756,
+          "Event"
+        ]
+      ],
+      "removed": []
+    }
+  },
+  "same_process_cycles": {
+    "rounds": 50,
+    "samples": [
+      {
+        "round": 1,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 2,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 3,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 4,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 5,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 6,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 7,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 8,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 9,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 10,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 11,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 12,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 13,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 14,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 15,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 16,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 17,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 18,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 19,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 20,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 21,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 22,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 23,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 24,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 25,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 151,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 26,
+        "before_open": 151,
+        "while_loaded": 153,
+        "after_close": 151,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 27,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 28,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 29,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 30,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 31,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 32,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 33,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 34,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 35,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 36,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 37,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 38,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 39,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 40,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 41,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 42,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 43,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 44,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 45,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 46,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 47,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 48,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 49,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      },
+      {
+        "round": 50,
+        "before_open": 153,
+        "while_loaded": 155,
+        "after_close": 153,
+        "settled_after_100ms": 153,
+        "cache_after_close": 0,
+        "complete_instances": [
+          2,
+          2
+        ]
+      }
+    ]
+  },
+  "cycle_snapshots": {
+    "warm_baseline": {
+      "count_before": 149,
+      "count_after": 149,
+      "types": {
+        "File": 9,
+        "Event": 21,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 2
+      },
+      "added": [],
+      "removed": []
+    },
+    "cycle_1_loaded": {
+      "count_before": 153,
+      "count_after": 153,
+      "types": {
+        "File": 11,
+        "Event": 22,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 3
+      },
+      "added": [
+        [
+          584,
+          "File"
+        ],
+        [
+          596,
+          "Thread"
+        ],
+        [
+          612,
+          "Event"
+        ],
+        [
+          616,
+          "File"
+        ]
+      ],
+      "removed": []
+    },
+    "cycle_1_closed": {
+      "count_before": 151,
+      "count_after": 151,
+      "types": {
+        "File": 9,
+        "Event": 22,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 3
+      },
+      "added": [
+        [
+          596,
+          "Thread"
+        ],
+        [
+          612,
+          "Event"
+        ]
+      ],
+      "removed": []
+    },
+    "cycle_50_loaded": {
+      "count_before": 155,
+      "count_after": 155,
+      "types": {
+        "File": 11,
+        "Event": 23,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 4
+      },
+      "added": [
+        [
+          596,
+          "Thread"
+        ],
+        [
+          612,
+          "Event"
+        ],
+        [
+          616,
+          "Thread"
+        ],
+        [
+          644,
+          "Event"
+        ],
+        [
+          668,
+          "File"
+        ],
+        [
+          720,
+          "File"
+        ]
+      ],
+      "removed": []
+    },
+    "cycle_50_closed": {
+      "count_before": 153,
+      "count_after": 153,
+      "types": {
+        "File": 9,
+        "Event": 23,
+        "Key": 13,
+        "WaitCompletionPacket": 9,
+        "IRTimer": 6,
+        "TpWorkerFactory": 3,
+        "IoCompletion": 5,
+        "Unknown": 64,
+        "Directory": 2,
+        "SchedulerSharedData": 1,
+        "ALPC Port": 4,
+        "Mutant": 1,
+        "Semaphore": 6,
+        "WindowStation": 2,
+        "Desktop": 1,
+        "Thread": 4
+      },
+      "added": [
+        [
+          596,
+          "Thread"
+        ],
+        [
+          612,
+          "Event"
+        ],
+        [
+          616,
+          "Thread"
+        ],
+        [
+          644,
+          "Event"
+        ]
+      ],
+      "removed": []
+    }
+  },
+  "release_tc": {
+    "run": 45757800889,
+    "first_job": 139700439654,
+    "rerun_job": 139849551763,
+    "first_attempt_query_trials": [
+      {
+        "trial": 1,
+        "initial_pass": 0,
+        "initial_drop": 1,
+        "passed": 0,
+        "dropped": 4,
+        "queries_ms": [
+          "73",
+          "1072",
+          "3074",
+          "7075"
+        ],
+        "resolved_ms": null
+      },
+      {
+        "trial": 2,
+        "initial_pass": 1,
+        "initial_drop": 0,
+        "passed": 1,
+        "dropped": 0,
+        "queries_ms": [
+          "73"
+        ],
+        "resolved_ms": 103
+      },
+      {
+        "trial": 3,
+        "initial_pass": 1,
+        "initial_drop": 0,
+        "passed": 1,
+        "dropped": 0,
+        "queries_ms": [
+          "72"
+        ],
+        "resolved_ms": 113
+      },
+      {
+        "trial": 4,
+        "initial_pass": 1,
+        "initial_drop": 0,
+        "passed": 1,
+        "dropped": 0,
+        "queries_ms": [
+          "72"
+        ],
+        "resolved_ms": 178
+      },
+      {
+        "trial": 5,
+        "initial_pass": 1,
+        "initial_drop": 0,
+        "passed": 1,
+        "dropped": 0,
+        "queries_ms": [
+          "71"
+        ],
+        "resolved_ms": 143
+      },
+      {
+        "trial": 6,
+        "initial_pass": 1,
+        "initial_drop": 0,
+        "passed": 1,
+        "dropped": 0,
+        "queries_ms": [
+          "72"
+        ],
+        "resolved_ms": 189
+      },
+      {
+        "trial": 7,
+        "initial_pass": 1,
+        "initial_drop": 0,
+        "passed": 1,
+        "dropped": 0,
+        "queries_ms": [
+          "71"
+        ],
+        "resolved_ms": 148
+      },
+      {
+        "trial": 8,
+        "initial_pass": 1,
+        "initial_drop": 0,
+        "passed": 1,
+        "dropped": 0,
+        "queries_ms": [
+          "71"
+        ],
+        "resolved_ms": 117
+      }
+    ],
+    "second_attempt_query_trials": [
+      {
+        "trial": 1,
+        "initial_pass": 0,
+        "initial_drop": 1,
+        "passed": 1,
+        "dropped": 2,
+        "resolved_ms": 3137
+      },
+      {
+        "trial": 2,
+        "initial_pass": 0,
+        "initial_drop": 1,
+        "passed": 1,
+        "dropped": 2,
+        "resolved_ms": 3165
+      },
+      {
+        "trial": 3,
+        "initial_pass": 0,
+        "initial_drop": 1,
+        "passed": 1,
+        "dropped": 1,
+        "resolved_ms": 1163
+      },
+      {
+        "trial": 4,
+        "initial_pass": 0,
+        "initial_drop": 1,
+        "passed": 1,
+        "dropped": 3,
+        "resolved_ms": 7124
+      },
+      {
+        "trial": 5,
+        "initial_pass": 1,
+        "initial_drop": 0,
+        "passed": 1,
+        "dropped": 0,
+        "resolved_ms": 117
+      },
+      {
+        "trial": 6,
+        "initial_pass": 0,
+        "initial_drop": 1,
+        "passed": 1,
+        "dropped": 2,
+        "resolved_ms": 3112
+      },
+      {
+        "trial": 7,
+        "initial_pass": 1,
+        "initial_drop": 0,
+        "passed": 1,
+        "dropped": 0,
+        "resolved_ms": 112
+      },
+      {
+        "trial": 8,
+        "initial_pass": 0,
+        "initial_drop": 1,
+        "passed": 1,
+        "dropped": 1,
+        "resolved_ms": 1183
+      }
+    ]
+  }
+}
