@@ -1,0 +1,120 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/process",
+  "moonbitlang/async@0.22.5/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+  "moonbitlang/core/string",
+}
+----
+
+async fn run_command(program : String, args : Array[String], cwd : String, timeout_ms? : Int = 300000) -> String {
+  let result = @shell.Cmd(program, args, cwd~).output(timeout_ms~, max_output_bytes=30000)
+  guard result.exit_code() == 0 else {
+    fail(program + " failed: " + result.stderr() + "\n" + result.stdout())
+  }
+  result.stdout().trim().to_owned()
+}
+
+async fn copy_probe(root : String, workspace : String, path : String) -> Unit {
+  @fs.write_file(workspace + "/" + path, @fs.read_file(root + "/" + path).text())
+}
+
+async fn verify_workspace(root : String, workspace : String) -> Unit {
+  guard workspace != root && !workspace.has_prefix(root + "/") && !workspace.has_prefix(root + "\\") else {
+    fail("use a workspace outside the source checkout")
+  }
+  let mut directory = workspace
+  for ;; {
+    guard !@fs.exists(directory + "/moon.work") else {
+      fail("registry validation must not inherit a workspace source mapping")
+    }
+    let parent = @fs.realpath(directory + "/..")
+    if parent == directory { break }
+    directory = parent
+  }
+}
+
+async fn main {
+  let args = @env.args()
+  guard (args.length() == 4 && args[1] == "nsec") ||
+    (args.length() == 6 && args[1] == "soak") else {
+    fail("usage: registry-native-acceptance.mbtx nsec <new-sibling-workspace> <moon-exe> | soak <prepared-workspace> <moon-exe> <zeroconf-python> <seconds>")
+  }
+  let root = @fs.realpath(".")
+  let moon = @fs.realpath(args[3])
+  if args[1] == "nsec" {
+    @fs.mkdir(args[2])
+    let workspace = @fs.realpath(args[2])
+    verify_workspace(root, workspace)
+    @fs.write_file(workspace + "/moon.mod",
+      "name = \"local/moondiscover-registry-acceptance\"\nversion = \"0.0.0\"\npreferred_target = \"native\"\nimport {\n  \"mik1e80/dnssd@0.3.0\",\n  \"moonbitlang/async@0.22.5\",\n}\n",
+    )
+    for dir in ["tests/native_ttl", "tests/protocol_live", "tests/live_soak", "tests/resource_soak", ".tools"] {
+      @fs.mkdir(workspace + "/" + dir, recursive=true)
+    }
+    for path in ["tests/native_ttl/moon.pkg", "tests/native_ttl/main.mbt", "tests/native_ttl/ttl.c", "tests/protocol_live/nsec_expiry.mbt"] {
+      copy_probe(root, workspace, path)
+    }
+    let config =
+      #|import {
+      #|  "mik1e80/dnssd/src/native",
+      #|  "mik1e80/dnssd/src/model",
+      #|  "mik1e80/dnssd/src/wire",
+      #|  "mik1e80/dnssd/tests/protocol_probe" @probe,
+      #|  "moonbitlang/async/socket",
+      #|  "moonbitlang/core/env",
+      #|}
+      #|supported_targets = "native"
+      #|pkgtype(kind: "executable")
+    @fs.write_file(workspace + "/tests/protocol_live/moon.pkg", config)
+    let entry =
+      #|fn main raise {
+      #|  let args = @env.args()
+      #|  guard args.length() == 2 else { fail("IPv4 required") }
+      #|  let address = @socket.Addr::parse(args[1] + ":0")
+      #|  guard !address.is_ipv6() else { fail("IPv4 required") }
+      #|  println(nsec_expiry_checks(address.ip()).stringify())
+      #|}
+    @fs.write_file(workspace + "/tests/protocol_live/main.mbt", entry)
+    let _ = run_command(moon, ["build", "tests/native_ttl", "tests/protocol_live", "--target", "native"], workspace)
+    let base = workspace + "/_build/native/debug/build/tests/"
+    let route = @json.parse(run_command(base + "native_ttl/native_ttl.exe", ["--interface"], workspace))
+    guard route is { "interface_ipv4": String(ip), .. } else { fail("no IPv4 multicast interface") }
+    let nsec = @json.parse(run_command(base + "protocol_live/protocol_live.exe", [ip], workspace))
+    guard nsec is { "passed": true, .. } else { fail("NSEC experiment did not pass") }
+    @fs.write_file(workspace + "/.tools/ipv4.txt", ip)
+    @fs.write_file(workspace + "/.tools/registry-nsec-live.json", nsec.stringify(indent=2) + "\n")
+    println(nsec.stringify())
+    return
+  }
+  let workspace = @fs.realpath(args[2])
+  verify_workspace(root, workspace)
+  let seconds = @string.parse_int(args[5])
+  guard seconds > 0 && seconds <= 21600 else { fail("duration outside 1..21600 seconds") }
+  let ip = @fs.read_file(workspace + "/.tools/ipv4.txt").text().trim().to_owned()
+  let python = @fs.realpath(args[4])
+  for path in ["tests/live_soak/moon.pkg", "tests/live_soak/main.mbt", "tests/live_soak/metrics.c", "tests/resource_soak/resource.c"] {
+    copy_probe(root, workspace, path)
+  }
+  let _ = run_command(moon, ["build", "tests/live_soak", "--target", "native"], workspace)
+  let ready = workspace + "/.tools/registry-publisher-ready"
+  guard !@fs.exists(ready) else { fail("publisher marker already exists") }
+  @async.with_task_group(group => {
+    let log = @process.redirect_to_file(workspace + "/.tools/registry-publisher.log")
+    let publisher = @process.spawn(group, python, [root + "/tests/interop/tc_publisher.py", ip, ready, (seconds + 60).to_string()], stdout=log, stderr=log, no_wait=true)
+    defer publisher.cancel()
+    for _ in 0..<200 {
+      if @fs.exists(ready) { break }
+      guard publisher.try_wait() is None else { fail("publisher exited before readiness") }
+      @async.sleep(100)
+    }
+    guard @fs.exists(ready) else { fail("publisher did not become ready") }
+    defer @fs.remove(ready)
+    println(run_command(workspace + "/_build/native/debug/build/tests/live_soak/live_soak.exe",
+      [ip, args[5], "_md-tcproof._tcp.local.", "2"], workspace, timeout_ms=(seconds + 30) * 1000))
+    guard publisher.try_wait() is None else { fail("publisher exited during the soak") }
+  })
+}
