@@ -125,15 +125,15 @@ async fn main {
   samples.push(sample_process(first, second, elapsed, events, expected))
   first.close()
   second.close()
-  assert_eq(
-    first.engine_stats().cached_records + second.engine_stats().cached_records,
-    0,
-  )
-  assert_eq(handles(), initial_handles)
+  let closed_records = first.engine_stats().cached_records +
+    second.engine_stats().cached_records
+  let final_handles = handles()
   let final_rss = rss()
-  guard final_rss > 0L else { fail("final RSS unavailable") }
+  let passed = closed_records == 0 &&
+    final_handles == initial_handles &&
+    final_rss > 0L
   let report = Json::object({
-    "passed": Json(true),
+    "passed": Json(passed),
     "requested_seconds": Json(seconds),
     "actual_ms": Json(elapsed.to_double()),
     "samples": Json(samples),
@@ -143,12 +143,19 @@ async fn main {
     "warmup_handles_or_fds": Json(initial_handles.to_double()),
     "max_poll_gap_ms": Json(max_poll_gap.to_double()),
     "final_rss_bytes": Json(final_rss.to_double()),
-    "final_handles_or_fds": Json(handles().to_double()),
+    "final_handles_or_fds": Json(final_handles.to_double()),
     "closed_both": Json(true),
+    "cached_records_after_close": Json(closed_records),
+    "handle_baseline_matched": Json(final_handles == initial_handles),
     "recovery": Json(
       "transport errors fail this observation; this test does not claim automatic migration or cross-device verification",
     ),
   })
   @fs.write_file(".tools/live-soak-report.json", report.stringify(indent=2))
   println(report.stringify())
+  guard passed else {
+    fail(
+      "failed resource cleanup or final measurement; see live-soak-report.json",
+    )
+  }
 }
