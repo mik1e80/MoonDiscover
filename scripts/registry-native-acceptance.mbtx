@@ -40,8 +40,9 @@ async fn verify_workspace(root : String, workspace : String) -> Unit {
 async fn main {
   let args = @env.args()
   guard (args.length() == 4 && args[1] == "nsec") ||
-    (args.length() == 6 && args[1] == "soak") else {
-    fail("usage: registry-native-acceptance.mbtx nsec <new-sibling-workspace> <moon-exe> | soak <prepared-workspace> <moon-exe> <zeroconf-python> <seconds>")
+    ((args.length() == 6 || (args.length() == 7 && args[6] == "--handle-types")) && args[1] == "soak") ||
+    (args.length() == 6 && args[1] == "cycles") else {
+    fail("usage: registry-native-acceptance.mbtx nsec <new-sibling-workspace> <moon-exe> | soak <prepared-workspace> <moon-exe> <zeroconf-python> <seconds> [--handle-types] | cycles <prepared-workspace> <moon-exe> <zeroconf-python> <rounds>")
   }
   let root = @fs.realpath(".")
   let moon = @fs.realpath(args[3])
@@ -92,11 +93,13 @@ async fn main {
   }
   let workspace = @fs.realpath(args[2])
   verify_workspace(root, workspace)
-  let seconds = @string.parse_int(args[5])
-  guard seconds > 0 && seconds <= 21600 else { fail("duration outside 1..21600 seconds") }
+  let amount = @string.parse_int(args[5])
+  let cycles = args[1] == "cycles"
+  guard amount > 0 && amount <= (if cycles { 100 } else { 21600 }) else { fail("runtime or cycle count out of range") }
+  let max_seconds = if cycles { amount * 6 } else { amount }
   let ip = @fs.read_file(workspace + "/.tools/ipv4.txt").text().trim().to_owned()
   let python = @fs.realpath(args[4])
-  for path in ["tests/live_soak/moon.pkg", "tests/live_soak/main.mbt", "tests/live_soak/metrics.c", "tests/resource_soak/resource.c"] {
+  for path in ["tests/live_soak/moon.pkg", "tests/live_soak/main.mbt", "tests/live_soak/handle_snapshots.mbt", "tests/live_soak/handle_cycles.mbt", "tests/live_soak/metrics.c", "tests/resource_soak/resource.c"] {
     copy_probe(root, workspace, path)
   }
   let _ = run_command(moon, ["build", "tests/live_soak", "--target", "native"], workspace)
@@ -104,7 +107,7 @@ async fn main {
   guard !@fs.exists(ready) else { fail("publisher marker already exists") }
   @async.with_task_group(group => {
     let log = @process.redirect_to_file(workspace + "/.tools/registry-publisher.log")
-    let publisher = @process.spawn(group, python, [root + "/tests/interop/tc_publisher.py", ip, ready, (seconds + 60).to_string()], stdout=log, stderr=log, no_wait=true)
+    let publisher = @process.spawn(group, python, [root + "/tests/interop/tc_publisher.py", ip, ready, (max_seconds + 60).to_string()], stdout=log, stderr=log, no_wait=true)
     defer publisher.cancel()
     for _ in 0..<200 {
       if @fs.exists(ready) { break }
@@ -113,8 +116,14 @@ async fn main {
     }
     guard @fs.exists(ready) else { fail("publisher did not become ready") }
     defer @fs.remove(ready)
+    let probe_args = if cycles {
+      [ip, "--cycles", "_md-tcproof._tcp.local.", args[5]]
+    } else {
+      [ip, args[5], "_md-tcproof._tcp.local.", "2"]
+    }
+    if args.length() == 7 { probe_args.push(args[6]) }
     println(run_command(workspace + "/_build/native/debug/build/tests/live_soak/live_soak.exe",
-      [ip, args[5], "_md-tcproof._tcp.local.", "2"], workspace, timeout_ms=(seconds + 30) * 1000))
+      probe_args, workspace, timeout_ms=(max_seconds + 30) * 1000))
     guard publisher.try_wait() is None else { fail("publisher exited during the soak") }
   })
 }

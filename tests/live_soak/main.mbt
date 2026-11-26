@@ -62,9 +62,20 @@ fn sample_process(
 ///|
 async fn main {
   let args = @env.args()
-  guard args.length() == 3 || args.length() == 5 else {
+  if args.length() == 5 && args[2] == "--cycles" {
+    let address = @socket.Addr::parse(args[1] + ":0")
+    guard !address.is_ipv6() else { fail("IPv4 required") }
+    handle_cycles(
+      address.ip(),
+      @dnssd.DnsName::parse(args[3]),
+      @string.parse_int(args[4]),
+    )
+    return
+  }
+  let trace_handles = args.length() == 6 && args[5] == "--handle-types"
+  guard args.length() == 3 || args.length() == 5 || trace_handles else {
     fail(
-      "usage: live_soak <active-ipv4> <seconds 1..21600> [<service-type> <minimum-complete-services>]",
+      "usage: live_soak <active-ipv4> <seconds 1..21600> [<service-type> <minimum-complete-services> [--handle-types]] | live_soak <active-ipv4> --cycles <service-type> <rounds>",
     )
   }
   let seconds = @string.parse_int(args[2])
@@ -75,6 +86,10 @@ async fn main {
   @fs.write_file(
     ".tools/live-soak-report.json", "{\"passed\":false,\"status\":\"started\"}",
   )
+  let phases : Map[String, Json] = Map([])
+  if trace_handles {
+    let _ = handle_snapshot()
+  }
   let warmup = @native.Browser::open(ip)
   let _ = warmup.poll(timeout_ms=0)
   warmup.close()
@@ -85,19 +100,25 @@ async fn main {
   guard initial_handles > 0L && initial_rss > 0L else {
     fail("resource baseline unavailable")
   }
+  if trace_handles {
+    snapshot_phase(phases, "warm_baseline")
+  }
   let samples : Array[Json] = []
   let first = @native.Browser::open(ip)
   let second = @native.Browser::open(ip)
   defer first.close()
   defer second.close()
+  if trace_handles {
+    snapshot_phase(phases, "pair_open")
+  }
   let service = @dnssd.DnsName::parse(
-    if args.length() == 5 {
+    if args.length() >= 5 {
       args[3]
     } else {
       "_mdprobe._tcp.local."
     },
   )
-  let expected = if args.length() == 5 { @string.parse_int(args[4]) } else { 0 }
+  let expected = if args.length() >= 5 { @string.parse_int(args[4]) } else { 0 }
   guard expected >= 0 else { fail("negative fixture service count") }
   let _ = first.browse(service)
   let _ = second.browse(service)
@@ -111,6 +132,9 @@ async fn main {
     let elapsed = @native.monotonic_ms() - origin
     max_poll_gap = max_poll_gap.max(elapsed - last_poll)
     last_poll = elapsed
+    if trace_handles && elapsed >= 10000L && !phases.contains("loaded") {
+      snapshot_phase(phases, "loaded")
+    }
     if elapsed >= sample_at {
       samples.push(sample_process(first, second, elapsed, events, expected))
       @fs.write_file(
@@ -123,12 +147,23 @@ async fn main {
   }
   let elapsed = @native.monotonic_ms() - origin
   samples.push(sample_process(first, second, elapsed, events, expected))
+  if trace_handles {
+    snapshot_phase(phases, "before_close")
+  }
   first.close()
+  if trace_handles {
+    snapshot_phase(phases, "first_closed")
+  }
   second.close()
   let closed_records = first.engine_stats().cached_records +
     second.engine_stats().cached_records
   let final_handles = handles()
   let final_rss = rss()
+  if trace_handles {
+    snapshot_phase(phases, "both_closed")
+    @async.sleep(1000)
+    snapshot_phase(phases, "settled_1s")
+  }
   let passed = closed_records == 0 &&
     final_handles == initial_handles &&
     final_rss > 0L
