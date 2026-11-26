@@ -21,6 +21,8 @@
 
 以下保留历史证据。新增贡献起点见[十一月基线](november-baseline.md)。
 
+终验交付包为 [GitHub v0.3.0](https://github.com/mik1e80/MoonDiscover/releases/tag/v0.3.0) / [Mooncakes 0.3.0](https://mooncakes.io/docs/mik1e80/dnssd)。独立项目安装实验确认 NSEC 负缓存到期后恢复 AAAA 查询，详见[发布与注册表验收](release-acceptance-0.3.0.md#2026-11-26-发布与注册表独立验收)。
+
 仓库：[mik1e80/MoonDiscover](https://github.com/mik1e80/MoonDiscover)，模块 `mik1e80/dnssd`，Apache-2.0。项目方向为原创 MoonBit 局域网服务发现基础组件。
 
 ## 解决的问题

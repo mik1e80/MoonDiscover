@@ -1,0 +1,69 @@
+{
+  "version": "0.3.0",
+  "module": "mik1e80/dnssd",
+  "recorded_date_beijing": "2026-11-26",
+  "source_commit": "fb3df9fa0e59c28d279ded9ef54e52c124d082d7",
+  "source_dirty_at_publication": false,
+  "publication": {
+    "status": "200 OK",
+    "exit_code": 0,
+    "extracted_package_check": true
+  },
+  "github_release": {
+    "id": 458971789,
+    "tag_name": "v0.3.0",
+    "target_commitish": "fb3df9fa0e59c28d279ded9ef54e52c124d082d7",
+    "html_url": "https://github.com/mik1e80/MoonDiscover/releases/tag/v0.3.0"
+  },
+  "github_asset": {
+    "id": 794372799,
+    "digest": "sha256:96f0d3cb889eb66f7db66e4bcc2cc859d7cb7a79ab26a4be25a789cb947cb60f",
+    "size": 1536224,
+    "name": "mik1e80-dnssd-0.3.0.zip",
+    "browser_download_url": "https://github.com/mik1e80/MoonDiscover/releases/download/v0.3.0/mik1e80-dnssd-0.3.0.zip"
+  },
+  "archive": {
+    "sha256": "96f0d3cb889eb66f7db66e4bcc2cc859d7cb7a79ab26a4be25a789cb947cb60f",
+    "bytes": 1536224,
+    "files": 341,
+    "download_matches_publication": true,
+    "installed_files_matching_archive": 341,
+    "required_files": [
+      "LICENSE",
+      "THIRD_PARTY_NOTICES",
+      "README.md",
+      "moon.mod"
+    ]
+  },
+  "consumer": {
+    "registry_version": "0.3.0",
+    "workspace_source_override_absent": true,
+    "started_at": "2026-11-26T12:50:40.952235+08:00",
+    "finished_at": "2026-11-26T12:51:11.16917+08:00",
+    "checks": {
+      "core_public_api": true,
+      "native_public_api_build": true,
+      "native_socket_open_close": null,
+      "nsec_public_api": true
+    },
+    "core_stdout": "nsec_aaaa_suppressed_before_2000_ms_and_resumed_by_2120_ms\nconsumer_core_ok",
+    "clock": "injected",
+    "negative_ttl_ms": 2000,
+    "checked_suppressed_at_ms": [
+      120,
+      1999
+    ],
+    "negative_expired_at_ms": 2000,
+    "aaaa_query_observed_by_ms": 2120
+  },
+  "local_checks": {
+    "nsec_selected_js": {
+      "passed": 9,
+      "failed": 0
+    },
+    "native_check_deny_warn": true,
+    "cli_help_version": "0.3.0",
+    "cli_version": "0.3.0",
+    "cli_smoke": true
+  }
+}

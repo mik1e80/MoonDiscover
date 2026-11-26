@@ -2,6 +2,21 @@
 
 本页保留开发阶段实测，并记录 0.3.0 的交付验证。
 
+## 2026-11-26 发布与注册表独立验收
+
+`mik1e80/dnssd@0.3.0` 已发布至 [Mooncakes](https://mooncakes.io/docs/mik1e80/dnssd)。[GitHub v0.3.0](https://github.com/mik1e80/MoonDiscover/releases/tag/v0.3.0) 固定到源提交 `fb3df9fa0e59c28d279ded9ef54e52c124d082d7`。Mooncakes 上传返回 200，下载归档及 GitHub 附件的 SHA-256 相同，独立安装的 341 个文件均与归档内容匹配。归档包含 LICENSE、THIRD_PARTY_NOTICES、README.md 和 moon.mod。[发布与实测数据](evidence/release-0.3.0-20261126.json)
+
+| 项目 | 实测结果 |
+| --- | --- |
+| 定向回归 | Wire、Cache、Engine 的 9 项 NSEC 测试通过，Native 严格检查、格式和接口检查通过。 |
+| CLI | Native 构建及冒烟通过，`--help` 和 `--version` 与模块的 0.3.0 一致。 |
+| 独立消费 | 新建仓库外工程，安装精确 0.3.0，未使用 `moon.work` 或本地源码映射。JS 公共 API 运行通过，Native 公共入口构建成功。 |
+| NSEC 抑制与恢复 | 注入 2 秒 TTL 的 Additional NSEC。虚拟时间 120ms 和 1999ms 解码出站报文均无目标 AAAA，PTR 仍发出。2000ms 断言负缓存到期，至 2120ms 解码到目标 AAAA 查询。IPv4 服务快照在否定有效时仍完整。 |
+
+复现时用仓库固定工具链先执行 `moon update`，再运行 `python tests/interop/consumer_smoke.py --mode registry --version 0.3.0`。该命令默认创建仓库外的临时工程。首次发布后的安装尝试使用了旧索引，刷新后在新目录成功。
+
+本次注册表验证使用注入时钟。独立工程构建了 Native 入口，同机真实组播的 NSEC 到期证据见下文历史实测。第二台实体设备、Bonjour、长时间真实局域网压力和其他未覆盖的组合故障仍待验证。
+
 | 项目 | 当前可复现证据 |
 | --- | --- |
 | 模型、Wire、Cache、Engine、Replay | 79 项定向 JS smoke。含跨报文正向优先、scope 隔离、明确否定 TXT 的空属性、负缓存到期及刷新、异常位图、Additional 和回放 |
