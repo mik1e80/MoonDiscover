@@ -19,3 +19,17 @@ test "smoke: trace config restores full UInt32 seed and rejects mismatches" {
   }
   assert_true(mismatch)
 }
+
+///|
+test "smoke: replay keeps the JSON nesting budget" {
+  let config = "{\"kind\":\"config\",\"format\":1,\"seed\":1,\"at_ms\":0,\"extra\":" +
+    "[".repeat(20) +
+    "0" +
+    "]".repeat(20) +
+    "}"
+  let result = try? @replay.Replay::from_config(config)
+  assert_true(result is Err(@json.DepthLimitExceeded))
+  let replay = @replay.Replay::new(seed=1U)
+  let result = try? replay.step_line(config)
+  assert_true(result is Err(@json.DepthLimitExceeded))
+}

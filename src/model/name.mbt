@@ -1,14 +1,16 @@
 ///|
+#derive(Debug)
 pub suberror InputError {
   InvalidInput(String)
-} derive(Debug)
+}
 
 ///|
 /// DNS labels as immutable octets. Never split an instance label on dots.
+#derive(Debug)
 pub struct DnsName {
   priv labels : Array[Bytes]
   priv key : Bytes
-} derive(Debug)
+}
 
 ///|
 pub fn DnsName::from_labels(labels : Array[Bytes]) -> DnsName raise InputError {

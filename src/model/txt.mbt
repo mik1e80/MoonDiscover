@@ -1,14 +1,16 @@
 ///|
+#derive(Eq, Debug)
 pub(all) enum TxtValue {
   Missing
   Flag
   Value(Bytes)
-} derive(Eq, Debug)
+}
 
 ///|
+#derive(Debug)
 pub struct TxtRecord {
   priv entries : Array[Bytes]
-} derive(Debug)
+}
 
 ///|
 pub fn TxtRecord::from_entries(

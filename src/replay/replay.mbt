@@ -111,6 +111,15 @@ fn text(object : Map[String, Json], key : String) -> String raise {
 }
 
 ///|
+// Preserve the replay depth budget while the core parser still supports it.
+#warnings("-deprecated")
+fn parse_replay_object(line : String) -> Map[String, Json] raise {
+  @json.from_json(
+    @json.parse(line, max_nesting_depth=16, reject_duplicate_keys=true),
+  )
+}
+
+///|
 pub fn Replay::step_line(self : Replay, line : String) -> Array[Json] raise {
   guard !self.exhausted else {
     raise InvalidCommand("replay already exhausted")
@@ -125,9 +134,7 @@ pub fn Replay::step_line(self : Replay, line : String) -> Array[Json] raise {
   }
   self.frames += 1
   self.input_bytes += input_size
-  let object : Map[String, Json] = @json.from_json(
-    @json.parse(line, max_nesting_depth=16, reject_duplicate_keys=true),
-  )
+  let object = parse_replay_object(line)
   let kind = text(object, "kind")
   let numeric_time : Double = @json.from_json(field(object, "at_ms"))
   guard numeric_time >= 0.0 && numeric_time <= 9007199254740991.0 else {
@@ -293,8 +300,6 @@ pub fn Replay::from_config(line : String) -> Replay raise {
   guard line.length() <= 32768 else {
     raise InvalidCommand("config line too long")
   }
-  let object : Map[String, Json] = @json.from_json(
-    @json.parse(line, max_nesting_depth=16, reject_duplicate_keys=true),
-  )
+  let object = parse_replay_object(line)
   Replay::new(seed=read_config_seed(object))
 }

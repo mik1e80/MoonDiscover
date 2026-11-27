@@ -4,6 +4,13 @@ extern "js" fn install_replay(callback : (String) -> String) -> Unit =
   #| (callback) => { globalThis.moonDiscoverReplay = callback; }
 
 ///|
+// Use the same parser budget for the initial config probe as for replay.
+#warnings("-deprecated")
+fn parse_first_command(line : String) -> Json raise @json.ParseError {
+  @json.parse(line, max_nesting_depth=16, reject_duplicate_keys=true)
+}
+
+///|
 fn replay_text(content : String) -> String {
   let mut source_line = 0
   let result = try {
@@ -27,11 +34,7 @@ fn replay_text(content : String) -> String {
     guard commands[0].1.length() <= 32768 else {
       fail("line exceeds 32768 characters")
     }
-    let first = @json.parse(
-      commands[0].1,
-      max_nesting_depth=16,
-      reject_duplicate_keys=true,
-    )
+    let first = parse_first_command(commands[0].1)
     let mut seed = Json(1)
     let replay = if first is { "kind": "config", "seed": value, .. } {
       seed = value
