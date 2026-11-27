@@ -78,6 +78,12 @@
 .\scripts\moon.ps1 run scripts/registry-native-acceptance.mbtx -- hourly ../moondiscover-registry-native .tools/moon/bin/moon.exe .venv/Scripts/python.exe 6 3600
 ```
 
+## 2026-11-27 MoonBit 1.0 RC 验收复核
+
+在 Windows 使用 `moonc v1.0.0-rc1+3c0520448` 完成 Native 严格类型检查、84 项 JS 测试、5 项 Native 重点测试、最小编码示例、浏览器回放和 CLI 版本验证。仓库为回放入口保留了 16 层 JSON 限制，并测试带引号、转义和括号的字符串及超深输入。
+
+另建独立工程从 Mooncakes 安装原版 `0.3.0`，用同一编译器重复上文的 `nsec` 实验。同机 IPv4 组播下接受 Additional 区段中的 NSEC，设置 TTL 1 秒，发送后 1125 ms 首次观察到恢复的 AAAA 查询，随后接受正向响应并完成解析。该轮使用受控对端与独立的出站问题解析器，范围为同机 IPv4。原版发布包的这个实测与仓库主分支的回放修复分别对应各自源码。
+
 ## 开发阶段与专项实测
 
 | 项目 | 当前可复现证据 |
