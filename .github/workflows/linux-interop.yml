@@ -55,6 +55,11 @@ jobs:
         run: |
           ip=$(_build/native/debug/build/tests/native_ttl/native_ttl.exe --interface | python3 -c 'import sys,json; print(json.load(sys.stdin)["interface_ipv4"])')
           _build/native/debug/build/tests/protocol_live/protocol_live.exe nsec-expiry "$ip" | tee .tools/protocol-live-nsec-expiry.json
+      - name: Verify reordered responses around TTL expiry and goodbye
+        shell: bash
+        run: |
+          ip=$(_build/native/debug/build/tests/native_ttl/native_ttl.exe --interface | python3 -c 'import sys,json; print(json.load(sys.stdin)["interface_ipv4"])')
+          _build/native/debug/build/tests/protocol_live/protocol_live.exe reordered-lifecycle "$ip" | tee .tools/protocol-live-reordered-lifecycle.json
       - name: Verify independent zeroconf NSEC through actual UDP and replay
         run: |
           python3 -m venv .venv
