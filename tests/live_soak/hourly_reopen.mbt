@@ -68,6 +68,24 @@ async fn timed_pair(
 }
 
 ///|
+async fn write_hourly_report(
+  rounds : Int32,
+  seconds : Int32,
+  results : Array[Json],
+) -> Unit {
+  let report = Json::object({
+    "requested_rounds": Json(rounds),
+    "seconds_per_round": Json(seconds),
+    "rounds_completed": Json(results.length()),
+    "rounds": Json::array(results),
+  })
+  @fs.write_file(
+    ".tools/live-soak-hourly-report.json",
+    report.stringify(indent=2) + "\n",
+  )
+}
+
+///|
 async fn hourly_reopen(
   ip : UInt32,
   service : @dnssd.DnsName,
@@ -89,19 +107,11 @@ async fn hourly_reopen(
     path=".tools/live-soak-hourly-handles.json",
   )
   let results : Array[Json] = []
+  write_hourly_report(rounds, seconds, results)
   for round in 1..<=rounds {
     let result = timed_pair(ip, service, seconds, round, phases)
     results.push(result)
-    let report = Json::object({
-      "requested_rounds": Json(rounds),
-      "seconds_per_round": Json(seconds),
-      "rounds_completed": Json(results.length()),
-      "rounds": Json::array(results),
-    })
-    @fs.write_file(
-      ".tools/live-soak-hourly-report.json",
-      report.stringify(indent=2) + "\n",
-    )
+    write_hourly_report(rounds, seconds, results)
     guard result is { "cache_after_close": 0, .. } else {
       fail("cache retained after close")
     }

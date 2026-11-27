@@ -58,6 +58,24 @@
 
 发布源码 `fb3df9f` 的轻量 CI 和 Avahi 专项通过。TC 专项首次未满足恢复断言：8 轮中 7 轮解析，唯一首包丢失的一轮在 7.8 秒内的 4 次查询全部丢失。单独复跑失败作业后，首包丢失的 6 轮都重试并解析，8 轮均完整解析。两次结果均保留。[轻量 CI](https://github.com/mik1e80/MoonDiscover/actions/runs/45757868524) · [Avahi 专项](https://github.com/mik1e80/MoonDiscover/actions/runs/45757800864) · [TC 首轮](https://github.com/mik1e80/MoonDiscover/actions/runs/45757800889/job/139700439654) · [TC 复跑](https://github.com/mik1e80/MoonDiscover/actions/runs/45757800889/job/139849551763)
 
+## 2026-11-27 工作线程分配栈与多轮启停
+
+在单独的临时工程验证 `moonbitlang/async@0.22.5` 的分配调用栈。在该工程的依赖副本加入探针，紧随 `CreateThread` 和唤醒用的 `CreateEventA` 记录返回句柄及调用栈。测试只执行三次并发异步文件写入。进程句柄从 121 增至 125，四个新增对象逐个匹配分配记录：
+
+| 新增对象 | 首帧经 Windows 展开信息校验 | 配对方法 |
+| --- | --- | --- |
+| 两个 Thread | `moonbitlang_async_spawn_worker + 188` | 记录新线程 ID |
+| 两个 Event | `worker_loop + 136` | 记录创建事件的线程 ID，分别与上面两个线程匹配 |
+
+该记录确认异步文件对照中四个对象均来自 `moonbitlang/async`。此前一小时实验只保留了进程快照，历史对象的分配栈无法回溯。独立安装的长测使用未经插桩的依赖，未使用上述临时工程。[对象、模块偏移和依赖散列](evidence/windows-async-worker-stacks-20261127.json) · [Windows 栈捕获 API](https://learn.microsoft.com/en-us/windows/win32/debug/capturestackbacktrace)
+
+在已安装固定工具链的 Windows 环境中，使用以下命令复现两项实验，替换为不同的仓库外工作目录。`hourly` 使用已按上文完成 `nsec` 准备的原版注册表工程。
+
+```powershell
+.\scripts\moon.ps1 run scripts/trace-async-workers.mbtx -- ../moondiscover-worker-trace .tools/moon/bin/moon.exe
+.\scripts\moon.ps1 run scripts/registry-native-acceptance.mbtx -- hourly ../moondiscover-registry-native .tools/moon/bin/moon.exe .venv/Scripts/python.exe 6 3600
+```
+
 ## 开发阶段与专项实测
 
 | 项目 | 当前可复现证据 |

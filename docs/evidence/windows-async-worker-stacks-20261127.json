@@ -1,0 +1,68 @@
+{
+  "observed_beijing_date": "2026-11-27",
+  "harness_commit": "9b3909ee826fb21775b8f2c51a97d37dc2dfebec",
+  "condition": "Windows disposable registry consumer, instrumented async 0.22.5, three concurrent file writes, no Browser",
+  "warm_count": 121,
+  "after_count": 125,
+  "retained_allocations": [
+    {
+      "kind": "Thread",
+      "handle": 504,
+      "worker_thread_id": 70944,
+      "allocation_function": "moonbitlang_async_spawn_worker",
+      "frames": 3,
+      "first_frame_verified": true,
+      "function_offset": 188,
+      "module_offsets": [
+        "live_soak.exe+0xd90dc",
+        "live_soak.exe+0x3b6e5",
+        "unknown"
+      ]
+    },
+    {
+      "kind": "Thread",
+      "handle": 184,
+      "worker_thread_id": 81664,
+      "allocation_function": "moonbitlang_async_spawn_worker",
+      "frames": 3,
+      "first_frame_verified": true,
+      "function_offset": 188,
+      "module_offsets": [
+        "live_soak.exe+0xd90dc",
+        "live_soak.exe+0x3b6e5",
+        "unknown"
+      ]
+    },
+    {
+      "kind": "Event",
+      "handle": 188,
+      "worker_thread_id": 70944,
+      "allocation_function": "worker_loop",
+      "frames": 3,
+      "first_frame_verified": true,
+      "function_offset": 136,
+      "module_offsets": [
+        "live_soak.exe+0xd8c28",
+        "KERNEL32.DLL+0x2dda7",
+        "ntdll.dll+0xc9c5c"
+      ]
+    },
+    {
+      "kind": "Event",
+      "handle": 508,
+      "worker_thread_id": 81664,
+      "allocation_function": "worker_loop",
+      "frames": 3,
+      "first_frame_verified": true,
+      "function_offset": 136,
+      "module_offsets": [
+        "live_soak.exe+0xd8c28",
+        "KERNEL32.DLL+0x2dda7",
+        "ntdll.dll+0xc9c5c"
+      ]
+    }
+  ],
+  "source_file": "moonbitlang/async@0.22.5/src/internal/event_loop/thread_pool.c",
+  "verified_uninstrumented_sha256": "6c7529d164c5fbbcee32284e96c5b55e8cde91cb1f93097884d7dead9a8fadb1",
+  "instrumented_sha256": "aca0c48e4baf1775e8625ef4d715bcd18fbe8c37acd8edd8d32c7d65b5a0ba2c"
+}
