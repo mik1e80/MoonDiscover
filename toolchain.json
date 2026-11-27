@@ -1,9 +1,8 @@
 {
-  "release": "0.10.17+d971670cd",
-  "moon": "0.1.20261023",
-  "moonc": "v0.10.17+d971670cd",
-  "windows_archive_sha256": "1be9d7f2fb47ec2f4b23cecc7bc3a775361993f07235e59ba5d7da38c5e877de",
-  "core_archive_sha256": "80db8f2a2621b3ec358a495c390a0dfbd8ddafdd87a6f69142f069937e2fe40c",
+  "release": "1.0.0-rc1+3c0520448",
+  "moonc": "v1.0.0-rc1+3c0520448",
+  "windows_archive_sha256": "6f2d0b32a2327decbcee14b39bd037c831ab055b6faf5bb9d1afe5db28fda0ab",
+  "core_archive_sha256": "77e1b9c73a9aba7bfa7a5c06687ba7ab2335305c8328e168bdc25d9f6237a08c",
   "async_version": "0.22.5",
   "async_archive_sha256": "142776b3fac385b8ee97e62fb3213b02a80595ae1a4a80ede6419f452eab01c2"
 }

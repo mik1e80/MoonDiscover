@@ -1,6 +1,6 @@
 # 轻量开发与复现
 
-固定版本与散列见 `toolchain.json`：moon `0.1.20261023`、moonc `v0.10.17+d971670cd`、async `0.22.5`。旧的 2026-09 工具链不能读取此 async 版本的配置。不要修改已安装依赖源码来掩盖不兼容。
+开发与 CI 使用 `moonc v1.0.0-rc1+3c0520448` 和 `async 0.22.5`，版本与 Windows 归档散列见 `toolchain.json`。
 
 ## 工具链与最小检查
 
@@ -16,10 +16,10 @@ Windows 已安装 Visual Studio C++ 工具和 Windows SDK 时：
 
 bootstrap 将官方固定工具链装在项目 `.tools/moon`，校验归档散列并构建 core bundle；不会升级全局工具链。工具链和依赖已安装时，可用 `bootstrap.ps1 -Offline`。
 
-按改动选择相关包或具体测试文件。需要复现当前 CI 核心范围时运行：
+按改动选择相关包或具体测试文件。复现 CI 的可移植核心测试时运行：
 
 ```powershell
-.\scripts\moon.ps1 test dnssd_test.mbt src/model src/wire src/cache src/engine src/replay --target js --frozen --filter 'smoke:*'
+.\scripts\moon.ps1 test --target js --frozen --deny-warn
 ```
 
 提交前运行 `scripts/moon.ps1 info --frozen` 和 `scripts/moon.ps1 fmt`，检查生成接口差异。不以重复全量测试增加提交步骤。

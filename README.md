@@ -95,7 +95,7 @@ git clone https://github.com/mik1e80/MoonDiscover.git moondiscover
 cd moondiscover
 ```
 
-固定工具链为 `moon 0.1.20261023` / `moonc v0.10.17+d971670cd`，依赖 `async 0.22.5`，见 [toolchain.json](toolchain.json)。旧工具链可能无法读取依赖配置，建议使用已验证的固定版本。
+开发与 CI 固定使用 `moonc v1.0.0-rc1+3c0520448`，依赖 `async 0.22.5`。版本和 Windows 归档校验值见 [toolchain.json](toolchain.json)。
 
 #### Windows / PowerShell
 
@@ -118,7 +118,7 @@ _build/native/debug/build/cmd/moondiscover/moondiscover.exe
 需要可用的 C 编译工具链。以下安装和构建方式与 Linux CI 一致，使用当前用户的 `~/.moon`：
 
 ```bash
-curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- '0.10.17+d971670cd'
+curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash -s -- '1.0.0-rc1+3c0520448'
 export PATH="$HOME/.moon/bin:$PATH"
 moon update
 moon build cmd/moondiscover --target native --frozen

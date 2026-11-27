@@ -7,40 +7,61 @@ $toolsDir = Join-Path $projectRoot '.tools'
 $localMoon = Join-Path $toolsDir 'moon'
 New-Item -ItemType Directory -Force -Path $toolsDir | Out-Null
 $versionPath = $config.release.Replace('+', '%2B')
+$originalPath = $env:PATH
 
 function Get-VerifiedArchive($url, $path, $expected) {
-    if (-not (Test-Path -LiteralPath $path)) {
-        if ($Offline) { throw "Missing archive in offline mode: $path" }
-        Invoke-WebRequest -Uri $url -OutFile $path
+    if (Test-Path -LiteralPath $path) {
+        $actual = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash
+        if ($actual -ne $expected) { throw "Archive checksum mismatch: $path" }
+        return
     }
-    $actual = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
-    if ($actual -ne $expected) { throw "Archive checksum mismatch: $path" }
+    if ($Offline) { throw "Missing archive in offline mode: $path" }
+    $partial = "$path.download"
+    Invoke-WebRequest -Uri $url -OutFile $partial
+    $actual = (Get-FileHash -LiteralPath $partial -Algorithm SHA256).Hash
+    if ($actual -ne $expected) { throw "Archive checksum mismatch: $partial" }
+    Move-Item -LiteralPath $partial -Destination $path
 }
 
-if (-not (Test-Path -LiteralPath (Join-Path $localMoon 'bin\moon.exe'))) {
-    $binaryZip = Join-Path $toolsDir 'moonbit.zip'
-    $coreZip = Join-Path $toolsDir 'core.zip'
+$compiler = Join-Path $localMoon 'bin\moonc.exe'
+$installed = if (Test-Path -LiteralPath $compiler) { (& $compiler -v) -join "`n" } else { '' }
+$installMoon = $localMoon
+if (-not $installed.Contains($config.moonc)) {
+    $binaryZip = Join-Path $toolsDir "moonbit-$($config.release).zip"
+    $coreZip = Join-Path $toolsDir "core-$($config.release).zip"
     Get-VerifiedArchive "https://cli.moonbitlang.com/binaries/$versionPath/moonbit-windows-x86_64.zip" $binaryZip $config.windows_archive_sha256
     Get-VerifiedArchive "https://cli.moonbitlang.com/cores/core-$versionPath.zip" $coreZip $config.core_archive_sha256
-    Expand-Archive -LiteralPath $binaryZip -DestinationPath $localMoon
-    Expand-Archive -LiteralPath $coreZip -DestinationPath (Join-Path $localMoon 'lib')
+    $installMoon = Join-Path $toolsDir ("moon-stage-" + [guid]::NewGuid().ToString('N'))
+    Expand-Archive -LiteralPath $binaryZip -DestinationPath $installMoon
+    Expand-Archive -LiteralPath $coreZip -DestinationPath (Join-Path $installMoon 'lib')
 }
-$env:MOON_HOME = $localMoon
-$env:PATH = (Join-Path $localMoon 'bin') + ';' + $env:PATH
-$versions = (& moon version --all) -join "`n"
+$env:MOON_HOME = $installMoon
+$env:PATH = (Join-Path $installMoon 'bin') + ';' + $originalPath
+$moonExe = Join-Path $installMoon 'bin\moon.exe'
+$versions = (& $moonExe version --all) -join "`n"
 if ($LASTEXITCODE -ne 0 -or -not $versions.Contains($config.moonc)) { throw 'Unexpected toolchain version' }
 Write-Output $versions
-Push-Location (Join-Path $localMoon 'lib\core')
+Push-Location (Join-Path $installMoon 'lib\core')
 try {
     foreach ($target in @('js', 'native', 'wasm', 'wasm-gc')) {
-        & moon bundle --target $target --quiet
+        & $moonExe bundle --target $target --quiet
         if ($LASTEXITCODE -ne 0) { throw "Core bundle failed: $target" }
     }
 } finally { Pop-Location }
+if ($installMoon -ne $localMoon) {
+    if (Test-Path -LiteralPath $localMoon) {
+        $backup = Join-Path $toolsDir ("moon-previous-" + [guid]::NewGuid().ToString('N'))
+        Move-Item -LiteralPath $localMoon -Destination $backup
+    }
+    Move-Item -LiteralPath $installMoon -Destination $localMoon
+}
+$env:MOON_HOME = $localMoon
+$env:PATH = (Join-Path $localMoon 'bin') + ';' + $originalPath
+$moonExe = Join-Path $localMoon 'bin\moon.exe'
 if (-not $Offline) {
     Push-Location $projectRoot
     try {
-        & moon update
+        & $moonExe update
         if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed' }
     } finally { Pop-Location }
 }

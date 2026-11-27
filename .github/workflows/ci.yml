@@ -24,7 +24,8 @@ jobs:
       - name: Resolve dependencies and check version
         run: |
           moon version --all
-          moonc -v | grep -F 'v0.10.17+d971670cd'
+          expected=$(python3 -c 'import json; print(json.load(open("toolchain.json"))["moonc"])')
+          moonc -v | grep -F -- "$expected"
           moon update
       - name: Explicit type format and public interface checks
         run: |
@@ -32,10 +33,10 @@ jobs:
           moon fmt --check
           moon info
           git diff --exit-code -- '*.mbti'
-      - name: Focused portable smoke tests
-        run: moon test dnssd_test.mbt src/model src/wire src/cache src/engine src/replay --target js --filter 'smoke:*'
-      - name: Independently parse Engine Known-Answer output
-        run: moon test tests/protocol_probe --target js --filter 'smoke:*'
+      - name: Portable core tests and runnable example
+        run: |
+          moon test --target js --deny-warn
+          moon run examples/encode_query --target js --frozen
       - name: Compile Linux native transport probes
         run: moon build cmd/native_spike cmd/transport_spike cmd/moondiscover cmd/replay_guard examples/http_connect examples/watch_events tests/native_cancel tests/native_ttl tests/native_fault tests/live_soak tests/guard_probe tests/resource_soak tests/security_fuzz --target native
       - name: Bounded native input fuzz with reproducible fixed and changing seeds
