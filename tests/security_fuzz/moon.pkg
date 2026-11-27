@@ -1,5 +1,4 @@
 import {
-  "moonbitlang/async",
   "moonbitlang/async/fs",
   "mik1e80/dnssd/src/model",
   "mik1e80/dnssd/src/wire",

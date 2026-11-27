@@ -4,6 +4,7 @@ package "mik1e80/dnssd/src/native"
 import {
   "mik1e80/dnssd/src/engine",
   "mik1e80/dnssd/src/model",
+  "moonbitlang/core/json",
 }
 
 // Values
@@ -36,8 +37,8 @@ pub struct Browser {
 }
 pub fn Browser::browse(Self, @model.DnsName) -> Int32 raise
 pub fn Browser::cancel(Self, Int32) -> Unit raise
-pub fn Browser::capture_config(Self) -> Json
-pub fn Browser::capture_json(Self, CaptureFrame) -> Json
+pub fn Browser::capture_config(Self) -> @json.Json
+pub fn Browser::capture_json(Self, CaptureFrame) -> @json.Json
 pub fn Browser::close(Self) -> Unit
 pub fn Browser::dropped_captures(Self) -> Int64
 pub fn Browser::elapsed(Self) -> Int64

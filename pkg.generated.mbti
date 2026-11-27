@@ -6,16 +6,17 @@ import {
   "mik1e80/dnssd/src/model",
   "mik1e80/dnssd/src/replay",
   "mik1e80/dnssd/src/wire",
+  "moonbitlang/core/json",
 }
 
 // Values
 pub fn decode_packet(Bytes) -> @wire.Message raise @wire.WireError
 
-pub fn event_json(@engine.Event) -> Json
+pub fn event_json(@engine.Event) -> @json.Json
 
 pub fn qm_query(@model.DnsName, Int32) -> Bytes raise @wire.WireError
 
-pub fn snapshot_json(@engine.ServiceSnapshot) -> Json
+pub fn snapshot_json(@engine.ServiceSnapshot) -> @json.Json
 
 // Errors
 

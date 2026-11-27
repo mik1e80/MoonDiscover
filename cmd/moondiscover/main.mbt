@@ -178,8 +178,7 @@ async fn run_command(args : Array[String]) -> Unit {
           )
         None =>
           if first_line is Some(line) &&
-            @json.parse(line, max_nesting_depth=16, reject_duplicate_keys=true)
-            is { "kind": "config", .. } {
+            @replay.parse_trace_line(line) is { "kind": "config", .. } {
             @dnssd.Replay::from_config(line)
           } else {
             @dnssd.Replay::new(seed=1U)

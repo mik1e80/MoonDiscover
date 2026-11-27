@@ -3,14 +3,17 @@ package "mik1e80/dnssd/src/replay"
 
 import {
   "mik1e80/dnssd/src/engine",
+  "moonbitlang/core/json",
 }
 
 // Values
-pub fn event_json(@engine.Event) -> Json
+pub fn event_json(@engine.Event) -> @json.Json
 
-pub fn redacted_output(Json) -> Json
+pub fn parse_trace_line(String) -> @json.Json raise
 
-pub fn snapshot_json(@engine.ServiceSnapshot) -> Json
+pub fn redacted_output(@json.Json) -> @json.Json
+
+pub fn snapshot_json(@engine.ServiceSnapshot) -> @json.Json
 
 // Errors
 pub suberror ReplayError {
@@ -29,7 +32,7 @@ pub struct Replay {
 }
 pub fn Replay::from_config(String) -> Self raise
 pub fn Replay::new(seed? : UInt32, max_frames? : Int32, max_input_bytes? : Int32, max_packet_bytes? : Int32, max_output_events? : Int32, max_output_bytes? : Int32) -> Self raise
-pub fn Replay::step_line(Self, String) -> Array[Json] raise
+pub fn Replay::step_line(Self, String) -> Array[@json.Json] raise
 
 // Type aliases
 

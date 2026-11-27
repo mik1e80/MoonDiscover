@@ -1,6 +1,6 @@
 import {
   "mik1e80/dnssd",
-  "moonbitlang/core/json",
+  "mik1e80/dnssd/src/replay",
   "moonbitlang/core/encoding/utf8",
 }
 

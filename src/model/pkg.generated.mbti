@@ -13,9 +13,10 @@ pub fn bytes_from_hex(String) -> Bytes raise InputError
 pub fn bytes_hex(Bytes) -> String
 
 // Errors
+#derive(@debug.Debug)
 pub suberror InputError {
   InvalidInput(String)
-} derive(@debug.Debug)
+}
 #deprecated
 pub fn InputError::output(Self, &Logger) -> Unit
 #deprecated
@@ -25,9 +26,10 @@ pub fn InputError::to_string(Self) -> String
 pub impl Show for InputError
 
 // Types and methods
+#derive(@debug.Debug)
 pub struct DnsName {
   // private fields
-} derive(@debug.Debug)
+}
 pub fn DnsName::canonical_key(Self) -> Bytes
 pub fn DnsName::from_labels(Array[Bytes]) -> Self raise InputError
 pub fn DnsName::from_utf8_labels(Array[String]) -> Self raise InputError
@@ -47,19 +49,21 @@ pub fn PacketBudget::available(Self, Int64) -> Bool raise InputError
 pub fn PacketBudget::dropped(Self) -> Int64
 pub fn PacketBudget::new(limit? : Int32) -> Self raise InputError
 
+#derive(Eq)
 pub(all) struct PacketSource {
   source_ipv4 : UInt32
   source_port : Int32
   interface_index : Int32
   destination_ipv4 : UInt32
   ip_ttl : Int32?
-} derive(Eq)
+}
 pub fn PacketSource::equal(Self, Self) -> Bool
 pub fn PacketSource::not_equal(Self, Self) -> Bool
 
+#derive(@debug.Debug)
 pub struct TxtRecord {
   // private fields
-} derive(@debug.Debug)
+}
 pub fn TxtRecord::entries(Self) -> Array[Bytes]
 pub fn TxtRecord::from_entries(Array[Bytes]) -> Self raise InputError
 pub fn TxtRecord::from_wire(Bytes) -> Self raise InputError
@@ -68,11 +72,12 @@ pub fn TxtRecord::lookup(Self, String) -> TxtValue raise InputError
 pub fn TxtRecord::to_repr(Self) -> @debug.Repr
 pub fn TxtRecord::to_wire(Self) -> Bytes
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TxtValue {
   Missing
   Flag
   Value(Bytes)
-} derive(Eq, @debug.Debug)
+}
 #deprecated
 pub fn TxtValue::equal(Self, Self) -> Bool
 #deprecated
