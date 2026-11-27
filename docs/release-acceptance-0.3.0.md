@@ -69,6 +69,8 @@
 
 该记录确认异步文件对照中四个对象均来自 `moonbitlang/async`。此前一小时实验只保留了进程快照，历史对象的分配栈无法回溯。独立安装的长测使用未经插桩的依赖，未使用上述临时工程。[对象、模块偏移和依赖散列](evidence/windows-async-worker-stacks-20261127.json) · [Windows 栈捕获 API](https://learn.microsoft.com/en-us/windows/win32/debug/capturestackbacktrace)
 
+原版 Mooncakes 0.3.0 在 Windows 同机 IPv4 组播中完成了两个一小时轮次。每轮打开同一进程内的两个 Browser，两者在十分钟采样及轮末均完整解析了两个服务，关闭后缓存均归零。第一轮的打开前、立即关闭、关闭后一秒句柄总数为 151 / 155 / 155，第二轮为 155 / 155 / 155。两轮每轮运行 3,600,000 ms，最大轮询间隔分别为 47 ms、63 ms。第三轮因所选 IPv4 接口失效或变化报告 `interface_unavailable`，实验中止。六小时句柄趋势仍待验证，当前证据覆盖两个完整轮次。
+
 在已安装固定工具链的 Windows 环境中，使用以下命令复现两项实验，替换为不同的仓库外工作目录。`hourly` 使用已按上文完成 `nsec` 准备的原版注册表工程。
 
 ```powershell
