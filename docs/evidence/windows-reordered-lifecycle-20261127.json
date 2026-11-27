@@ -1,0 +1,57 @@
+{
+  "observed_at": "2026-11-27T23:32:06.8753490+08:00",
+  "toolchain": "v1.0.0-rc1+3c0520448",
+  "package": "repository source",
+  "executable_sha256": "1b9e5afcc912d14e92f644e91cbc40f3868211f6edd153f5b3b1d8e7c2c3b616",
+  "result": {
+    "passed": true,
+    "trials": [
+      {
+        "case": "srv_expired_before_delayed_ptr",
+        "srv_ttl_seconds": 1,
+        "ptr_sent_after_components_ms": 1125,
+        "partial_without_expired_srv": true,
+        "resolved_with_fresh_srv": true
+      },
+      {
+        "case": "late_components_during_ptr_goodbye",
+        "ptr_sent_after_components_ms": 63,
+        "duplicate_components_after_goodbye_ms": 203,
+        "removed_after_goodbye_ms": 1000,
+        "removed_reason": "goodbye",
+        "resolved_again_after_fresh_ptr": true
+      },
+      {
+        "case": "srv_expired_before_delayed_ptr",
+        "srv_ttl_seconds": 1,
+        "ptr_sent_after_components_ms": 1109,
+        "partial_without_expired_srv": true,
+        "resolved_with_fresh_srv": true
+      },
+      {
+        "case": "late_components_during_ptr_goodbye",
+        "ptr_sent_after_components_ms": 63,
+        "duplicate_components_after_goodbye_ms": 203,
+        "removed_after_goodbye_ms": 1000,
+        "removed_reason": "goodbye",
+        "resolved_again_after_fresh_ptr": true
+      },
+      {
+        "case": "srv_expired_before_delayed_ptr",
+        "srv_ttl_seconds": 1,
+        "ptr_sent_after_components_ms": 1109,
+        "partial_without_expired_srv": true,
+        "resolved_with_fresh_srv": true
+      },
+      {
+        "case": "late_components_during_ptr_goodbye",
+        "ptr_sent_after_components_ms": 62,
+        "duplicate_components_after_goodbye_ms": 203,
+        "removed_after_goodbye_ms": 1000,
+        "removed_reason": "goodbye",
+        "resolved_again_after_fresh_ptr": true
+      }
+    ],
+    "transport": "same-host IPv4 multicast, fixture-controlled arrival order"
+  }
+}
