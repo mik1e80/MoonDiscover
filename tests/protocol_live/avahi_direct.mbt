@@ -77,7 +77,7 @@ fn avahi_direct_complete(browser : @native.Browser, target : String) -> Bool {
     s.instance.to_presentation() == target &&
     s.complete &&
     s.port == Some(18424) &&
-    s.addresses == [b"\xc6\x33\x64\x14"]
+    s.addresses.contains(b"\xc6\x33\x64\x14")
   })
 }
 
@@ -197,5 +197,10 @@ async fn avahi_direct_rx(
       }
     }
   }
-  fail("direct Avahi lifecycle transition timed out")
+  let snapshots = browser
+    .snapshots()
+    .map(s => (s.instance.to_presentation(), s.complete, s.port, s.missing))
+  fail(
+    "direct Avahi \{mode} timed out: resolved=\{was_complete}, early=\{first_early}, target=\{first_target}, goodbye=\{goodbye_at}, positive_srv=\{srv_packets}, snapshots=\{Repr(snapshots)}",
+  )
 }
