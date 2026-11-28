@@ -1,0 +1,607 @@
+{
+  "environment": "Windows same-host IPv4 multicast; two Browsers per round; uninstrumented published Mooncakes package and independent python-zeroconf 0.148.0 fixtures",
+  "package": "mik1e80/dnssd@0.3.0",
+  "compiler": "v1.0.0-rc1+3c0520448",
+  "requested_rounds_per_attempt": 6,
+  "seconds_per_round": 3600,
+  "attempts": [
+    {
+      "launcher_started_at": "2026-11-27T23:28:43.6984325+08:00",
+      "completed_rounds": [
+        {
+          "round": 1,
+          "actual_ms": 3600000,
+          "max_poll_gap_ms": 47,
+          "before_open": 157,
+          "after_close": 161,
+          "settled_after_1s": 161,
+          "rss_after_close_bytes": 4202496,
+          "cache_after_close": 0,
+          "samples": [
+            {
+              "services": 0,
+              "complete_services": 0,
+              "cached_records": 0,
+              "query_jobs": 1,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 11,
+              "at_ms": 0,
+              "rss_bytes": 11096064,
+              "handles_or_fds": 159,
+              "network_errors": 0,
+              "events": 0,
+              "second_browser": {
+                "services": 0,
+                "complete_services": 0,
+                "cached_records": 0,
+                "query_jobs": 1,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 11
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 9,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 11,
+              "at_ms": 600000,
+              "rss_bytes": 12070912,
+              "handles_or_fds": 163,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 9,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 11
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 8,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 11,
+              "at_ms": 1200000,
+              "rss_bytes": 12124160,
+              "handles_or_fds": 163,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 8,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 11
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 9,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 11,
+              "at_ms": 1800000,
+              "rss_bytes": 12128256,
+              "handles_or_fds": 163,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 9,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 11
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 9,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 11,
+              "at_ms": 2400000,
+              "rss_bytes": 11403264,
+              "handles_or_fds": 163,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 9,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 11
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 9,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 11,
+              "at_ms": 3000000,
+              "rss_bytes": 3522560,
+              "handles_or_fds": 163,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 9,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 11
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 8,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 11,
+              "at_ms": 3600000,
+              "rss_bytes": 3772416,
+              "handles_or_fds": 163,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 8,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 11
+              }
+            }
+          ]
+        }
+      ],
+      "latest_partial_round": {
+        "round": 2,
+        "samples": [
+          {
+            "services": 0,
+            "complete_services": 0,
+            "cached_records": 0,
+            "query_jobs": 1,
+            "dropped_events": 0,
+            "rate_dropped": 0,
+            "interface_index": 11,
+            "at_ms": 0,
+            "rss_bytes": 4587520,
+            "handles_or_fds": 163,
+            "network_errors": 0,
+            "events": 0,
+            "second_browser": {
+              "services": 0,
+              "complete_services": 0,
+              "cached_records": 0,
+              "query_jobs": 1,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 11
+            }
+          },
+          {
+            "services": 2,
+            "complete_services": 2,
+            "cached_records": 9,
+            "query_jobs": 7,
+            "dropped_events": 0,
+            "rate_dropped": 0,
+            "interface_index": 11,
+            "at_ms": 600000,
+            "rss_bytes": 4587520,
+            "handles_or_fds": 163,
+            "network_errors": 0,
+            "events": 8,
+            "second_browser": {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 9,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 11
+            }
+          }
+        ]
+      },
+      "last_partial_sample_written_at": "2026-11-28T00:38:51.2934142+08:00",
+      "end": {
+        "kind": "windows_shutdown",
+        "observed_system_event_id": 6006,
+        "local_time": "2026-11-28 00:43:54 +08:00",
+        "scope": "System Event Log service shutdown; probe left no exit message"
+      }
+    },
+    {
+      "launcher_started_at": "2026-11-28T12:19:28.6653876+08:00",
+      "completed_rounds": [
+        {
+          "round": 1,
+          "actual_ms": 3600000,
+          "max_poll_gap_ms": 156,
+          "before_open": 151,
+          "after_close": 155,
+          "settled_after_1s": 155,
+          "rss_after_close_bytes": 11329536,
+          "cache_after_close": 0,
+          "samples": [
+            {
+              "services": 0,
+              "complete_services": 0,
+              "cached_records": 0,
+              "query_jobs": 1,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43,
+              "at_ms": 0,
+              "rss_bytes": 10194944,
+              "handles_or_fds": 153,
+              "network_errors": 0,
+              "events": 0,
+              "second_browser": {
+                "services": 0,
+                "complete_services": 0,
+                "cached_records": 0,
+                "query_jobs": 1,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 43
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 10,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43,
+              "at_ms": 600000,
+              "rss_bytes": 11075584,
+              "handles_or_fds": 157,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 10,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 43
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 10,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43,
+              "at_ms": 1200000,
+              "rss_bytes": 11100160,
+              "handles_or_fds": 157,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 10,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 43
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 10,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43,
+              "at_ms": 1800000,
+              "rss_bytes": 11063296,
+              "handles_or_fds": 157,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 10,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 43
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 9,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43,
+              "at_ms": 2400000,
+              "rss_bytes": 11116544,
+              "handles_or_fds": 157,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 9,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 43
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 10,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43,
+              "at_ms": 3000000,
+              "rss_bytes": 11177984,
+              "handles_or_fds": 157,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 10,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 43
+              }
+            },
+            {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 9,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43,
+              "at_ms": 3600000,
+              "rss_bytes": 11186176,
+              "handles_or_fds": 157,
+              "network_errors": 0,
+              "events": 8,
+              "second_browser": {
+                "services": 2,
+                "complete_services": 2,
+                "cached_records": 9,
+                "query_jobs": 7,
+                "dropped_events": 0,
+                "rate_dropped": 0,
+                "interface_index": 43
+              }
+            }
+          ]
+        }
+      ],
+      "latest_partial_round": {
+        "round": 2,
+        "samples": [
+          {
+            "services": 0,
+            "complete_services": 0,
+            "cached_records": 0,
+            "query_jobs": 1,
+            "dropped_events": 0,
+            "rate_dropped": 0,
+            "interface_index": 43,
+            "at_ms": 0,
+            "rss_bytes": 11120640,
+            "handles_or_fds": 157,
+            "network_errors": 0,
+            "events": 0,
+            "second_browser": {
+              "services": 0,
+              "complete_services": 0,
+              "cached_records": 0,
+              "query_jobs": 1,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43
+            }
+          },
+          {
+            "services": 2,
+            "complete_services": 2,
+            "cached_records": 9,
+            "query_jobs": 7,
+            "dropped_events": 0,
+            "rate_dropped": 0,
+            "interface_index": 43,
+            "at_ms": 600000,
+            "rss_bytes": 11313152,
+            "handles_or_fds": 157,
+            "network_errors": 0,
+            "events": 8,
+            "second_browser": {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 9,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43
+            }
+          },
+          {
+            "services": 2,
+            "complete_services": 2,
+            "cached_records": 8,
+            "query_jobs": 7,
+            "dropped_events": 0,
+            "rate_dropped": 0,
+            "interface_index": 43,
+            "at_ms": 1200000,
+            "rss_bytes": 11329536,
+            "handles_or_fds": 157,
+            "network_errors": 0,
+            "events": 8,
+            "second_browser": {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 8,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43
+            }
+          },
+          {
+            "services": 2,
+            "complete_services": 2,
+            "cached_records": 9,
+            "query_jobs": 7,
+            "dropped_events": 0,
+            "rate_dropped": 0,
+            "interface_index": 43,
+            "at_ms": 1800000,
+            "rss_bytes": 11190272,
+            "handles_or_fds": 157,
+            "network_errors": 0,
+            "events": 8,
+            "second_browser": {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 9,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43
+            }
+          },
+          {
+            "services": 2,
+            "complete_services": 2,
+            "cached_records": 11,
+            "query_jobs": 7,
+            "dropped_events": 0,
+            "rate_dropped": 0,
+            "interface_index": 43,
+            "at_ms": 2400000,
+            "rss_bytes": 11268096,
+            "handles_or_fds": 157,
+            "network_errors": 0,
+            "events": 8,
+            "second_browser": {
+              "services": 2,
+              "complete_services": 2,
+              "cached_records": 11,
+              "query_jobs": 7,
+              "dropped_events": 0,
+              "rate_dropped": 0,
+              "interface_index": 43
+            }
+          }
+        ]
+      },
+      "last_partial_sample_written_at": "2026-11-28T13:59:42.4146196+08:00",
+      "handle_type_snapshots": [
+        {
+          "phase": "warm_baseline",
+          "count_before": 149,
+          "count_after": 149,
+          "types": {
+            "File": 9,
+            "Thread": 2,
+            "Event": 21
+          }
+        },
+        {
+          "phase": "round_1_open",
+          "count_before": 153,
+          "count_after": 153,
+          "types": {
+            "File": 11,
+            "Thread": 3,
+            "Event": 22
+          }
+        },
+        {
+          "phase": "round_1_before_close",
+          "count_before": 157,
+          "count_after": 157,
+          "types": {
+            "File": 11,
+            "Thread": 5,
+            "Event": 24
+          }
+        },
+        {
+          "phase": "round_1_closed",
+          "count_before": 155,
+          "count_after": 155,
+          "types": {
+            "File": 9,
+            "Thread": 5,
+            "Event": 24
+          }
+        },
+        {
+          "phase": "round_2_open",
+          "count_before": 157,
+          "count_after": 157,
+          "types": {
+            "File": 11,
+            "Thread": 5,
+            "Event": 24
+          }
+        }
+      ],
+      "end": {
+        "kind": "interface_unavailable",
+        "signal": "selected interface inactive or changed",
+        "probe_error_logged_at": "2026-11-28T14:03:25.5516224+08:00",
+        "wlan_events_local": [
+          "13:56:50 event 8003",
+          "13:57:00 event 8002",
+          "14:05:07 event 8001"
+        ]
+      }
+    }
+  ],
+  "six_hour_same_process_run_completed": false
+}
