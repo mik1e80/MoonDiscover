@@ -1,0 +1,176 @@
+----
+import {
+  "moonbitlang/async@0.22.5",
+  "moonbitlang/async@0.22.5/fs",
+  "moonbitlang/async@0.22.5/process",
+  "moonbitlang/async@0.22.5/shell",
+  "moonbitlang/core/env",
+  "moonbitlang/core/json",
+}
+----
+
+async fn command(program : String, args : Array[String]) -> String {
+  let result = @shell.Cmd(program, args).output(timeout_ms=20000)
+  guard result.exit_code() == 0 else { fail(program + ": " + result.stderr()) }
+  result.stdout().trim().to_owned()
+}
+
+fn in_ns(ns : String, program : String, args : Array[String]) -> Array[String] {
+  ["netns", "exec", ns, program, ..args]
+}
+
+async fn ready(marker : String, child : @process.Process, log : String) -> Unit {
+  for _ in 0..<400 {
+    if @fs.exists(marker) { return }
+    if child.try_wait() is Some(code) {
+      fail("process exited \{code} while waiting for \{marker}: " + @fs.read_file(log).text())
+    }
+    @async.sleep(20)
+  }
+  fail("marker timeout: " + marker + ": " + @fs.read_file(log).text())
+}
+
+async fn direct_trial(binary : String, run_dir : String, mode : String) -> Json {
+  let tx = "mdavdirect-tx"
+  let rx = "mdavdirect-rx"
+  let tx_ip = "198.51.100.20"
+  let rx_ip = "198.51.100.21"
+  let _ = command("ip", ["netns", "add", tx])
+  defer @async.protect_from_cancel(() => ignore(command("ip", ["netns", "del", tx])))
+  let _ = command("ip", ["netns", "add", rx])
+  defer @async.protect_from_cancel(() => ignore(command("ip", ["netns", "del", rx])))
+  let _ = command("ip", ["-n", tx, "link", "add", "mdadtx", "type", "veth",
+    "peer", "name", "mdadrx", "netns", rx])
+  for (ns, device, ip) in [(tx, "mdadtx", tx_ip), (rx, "mdadrx", rx_ip)] {
+    let _ = command("ip", ["-n", ns, "link", "set", "lo", "up"])
+    let _ = command("ip", ["-n", ns, "addr", "add", ip + "/24", "dev", device])
+    let _ = command("ip", ["-n", ns, "link", "set", device, "up"])
+    let _ = command("ip", ["-n", ns, "route", "add", "224.0.0.251/32", "dev", device, "src", ip])
+  }
+  let _ = command("ip", in_ns(tx, "tc", ["qdisc", "add", "dev", "mdadtx", "root", "handle", "1:", "prio"]))
+  let _ = command("ip", in_ns(tx, "tc", ["qdisc", "add", "dev", "mdadtx", "parent", "1:3",
+    "handle", "20:", "netem", "delay", "5000ms"]))
+  // Keep the receive-side Browser's QM packets off the link. In the expiry
+  // arm, this avoids refresh responses changing the last observed SRV time.
+  let _ = command("ip", in_ns(rx, "tc", ["qdisc", "add", "dev", "mdadrx", "clsact"]))
+  let _ = command("ip", in_ns(rx, "tc", ["filter", "add", "dev", "mdadrx", "egress",
+    "protocol", "ip", "flower", "ip_proto", "udp", "dst_ip", "224.0.0.251", "dst_port", "5353",
+    "action", "drop"]))
+  let stem = run_dir + "/" + mode
+  let bus_path = "/run/avahi-daemon/probe-bus"
+  let bus_address = "unix:path=" + bus_path
+  let env = Map([("DBUS_SYSTEM_BUS_ADDRESS", bus_address)])
+  @async.with_task_group(group => {
+    let bus = @process.spawn(group, "ip", in_ns(tx, "dbus-daemon", ["--session", "--nofork",
+      "--address=" + bus_address]), stderr=@process.redirect_to_file(stem + "-bus.log"), no_wait=true)
+    defer bus.cancel()
+    ready(bus_path, bus, stem + "-bus.log")
+    let daemon_log = @process.redirect_to_file(stem + "-avahi.log")
+    let daemon = @process.spawn(group, "ip", in_ns(tx, "avahi-daemon", ["--no-chroot",
+      "--no-drop-root", "--no-rlimits", "--debug", "-f", run_dir + "/avahi.conf"]),
+      extra_env=env, stdout=daemon_log, stderr=daemon_log, no_wait=true)
+    defer daemon.cancel()
+    ready("/run/avahi-daemon/pid", daemon, stem + "-avahi.log")
+    @async.sleep(200)
+    let tx_probe = @process.spawn(group, "ip", in_ns(tx, binary, ["avahi-direct-tx", tx_ip,
+      mode, stem + "-tx"]), stdout=@process.redirect_to_file(stem + "-tx.json"),
+      stderr=@process.redirect_to_file(stem + "-tx.log"), no_wait=true)
+    defer tx_probe.cancel()
+    let rx_probe = @process.spawn(group, "ip", in_ns(rx, binary, ["avahi-direct-rx", rx_ip,
+      mode, stem + "-rx", tx_ip]), stdout=@process.redirect_to_file(stem + "-rx.json"),
+      stderr=@process.redirect_to_file(stem + "-rx.log"), no_wait=true)
+    defer rx_probe.cancel()
+    ready(stem + "-tx.ready", tx_probe, stem + "-tx.log")
+    ready(stem + "-rx.ready", rx_probe, stem + "-rx.log")
+    // Allow initial host-address publication before delaying service replies.
+    @async.sleep(1600)
+    let _ = command("ip", in_ns(tx, "tc", ["filter", "add", "dev", "mdadtx", "parent", "1:",
+      "protocol", "ip", "prio", "1", "u32", "match", "ip", "protocol", "17", "0xff",
+      "match", "ip", "src", tx_ip + "/32", "match", "ip", "dst", "224.0.0.251/32",
+      "match", "ip", "sport", "5353", "0xffff", "match", "ip", "dport", "5353", "0xffff",
+      "match", "u16", "0x8000", "0x8000", "at", "30", "flowid", "1:3"]))
+    let early = @process.spawn(group, "ip", in_ns(tx, "avahi-publish-service", ["early",
+      "_mdavdirect._tcp", "18423", "stage=early"]), extra_env=env,
+      stderr=@process.redirect_to_file(stem + "-early.log"), no_wait=true)
+    defer early.cancel()
+    ready(stem + "-tx.early", tx_probe, stem + "-tx.log")
+    early.cancel()
+    ready(stem + "-tx.early_goodbye", tx_probe, stem + "-tx.log")
+    // Remove the classifier, preserving packets already in the delay queue.
+    let _ = command("ip", in_ns(tx, "tc", ["filter", "del", "dev", "mdadtx", "parent",
+      "1:", "protocol", "ip", "prio", "1"]))
+    let target = @process.spawn(group, "ip", in_ns(tx, "avahi-publish-service", ["target",
+      "_mdavdirect._tcp", "18424", "stage=target"]), extra_env=env,
+      stderr=@process.redirect_to_file(stem + "-target.log"), no_wait=true)
+    defer target.cancel()
+    if mode == "goodbye" {
+      @async.sleep(4400)
+      ready(stem + "-rx.resolved", rx_probe, stem + "-rx.log")
+      target.cancel()
+    }
+    guard tx_probe.wait() == 0 else { fail(@fs.read_file(stem + "-tx.log").text()) }
+    guard rx_probe.wait() == 0 else { fail(@fs.read_file(stem + "-rx.log").text()) }
+    let transmitted = @fs.read_file(stem + "-tx.json").json()
+    let received = @fs.read_file(stem + "-rx.json").json()
+    guard transmitted is { "observed": { "early": { "at_ms": Number(txa, ..), "udp_hex": tx_early, .. },
+      "target": { "at_ms": Number(txb, ..), "udp_hex": tx_target, .. }, .. }, .. } &&
+      received is { "observed": { "early": { "at_ms": Number(rxa, ..), "udp_hex": rx_early, .. },
+      "target": { "at_ms": Number(rxb, ..), "udp_hex": rx_target, .. }, .. }, .. } &&
+      txa < txb && rxb < rxa && tx_early == rx_early && tx_target == rx_target else {
+      fail("original Avahi bytes or packet order did not match")
+    }
+    if mode == "goodbye" {
+      guard transmitted is { "observed": { "target_goodbye": { "udp_hex": sent, .. }, .. }, .. } &&
+        received is { "observed": { "target_goodbye": { "udp_hex": got, .. }, .. }, .. } &&
+        sent == got else { fail("original Avahi goodbye bytes did not match") }
+    }
+    let queues = @json.parse(command("ip", in_ns(tx, "tc", ["-j", "-s", "qdisc", "show", "dev", "mdadtx"])))
+    guard queues is Array(all) && all.filter(q => q is { "kind": "netem", "handle": "20:", .. }) is [
+      { "packets": Number(n, ..), "drops": 0, .. } as queue
+    ] && n >= 2.0 else { fail("unexpected isolated netem statistics") }
+    let query_filter = @json.parse(command("ip", in_ns(rx, "tc", ["-j", "-s", "filter",
+      "show", "dev", "mdadrx", "egress"])))
+    Json::object({
+      "mode": Json(mode), "transmitted": transmitted, "received": received,
+      "netem": queue, "receiver_query_filter": query_filter,
+      "original_bytes_matched": Json(true),
+      "receive_order_reversed": Json(true),
+    })
+  })
+}
+
+async fn main {
+  let isolated = command("readlink", ["/proc/self/ns/mnt"])
+  let host = command("readlink", ["/proc/1/ns/mnt"])
+  guard isolated != host else { fail("requires a private mount namespace") }
+  let mount = "/run/avahi-daemon"
+  @fs.mkdir(mount, allow_exist=true)
+  let _ = command("mount", ["-t", "tmpfs", "-o", "mode=0755,size=1m", "tmpfs", mount])
+  @fs.mkdir(".tools", allow_exist=true)
+  let folder = @fs.realpath(".tools")
+  let run_dir = folder + "/protocol-avahi-direct-" + command("date", ["+%s%N"])
+  @fs.mkdir(run_dir)
+  @fs.write_file(run_dir + "/avahi.conf",
+    "[server]\nhost-name=mdavdirect\nallow-interfaces=mdadtx\nuse-ipv4=yes\nuse-ipv6=no\n[wide-area]\nenable-wide-area=no\n[publish]\npublish-workstation=no\n")
+  let binary = @fs.realpath("_build/native/debug/build/tests/protocol_live/protocol_live.exe")
+  let expiry = direct_trial(binary, run_dir, "expiry")
+  // Each daemon is stopped with its associated private D-Bus process.
+  for name in ["pid", "probe-bus", "socket"] {
+    let path = mount + "/" + name
+    if @fs.exists(path) { @fs.remove(path) }
+  }
+  let goodbye = direct_trial(binary, run_dir, "goodbye")
+  let report = Json::object({
+    "passed": Json(true),
+    "publisher": Json(command("avahi-daemon", ["--version"])),
+    "source_commit": Json(command("git", ["rev-parse", "HEAD"])),
+    "system": Json(command("uname", ["-srm"])),
+    "link": Json("direct Avahi multicast over isolated veth; UDP payloads neither split nor rewritten"),
+    "ci_run_url": Json(@env.get_env_var("GITHUB_SERVER_URL").unwrap_or("") + "/" +
+      @env.get_env_var("GITHUB_REPOSITORY").unwrap_or("") + "/actions/runs/" +
+      @env.get_env_var("GITHUB_RUN_ID").unwrap_or("")),
+    "expiry": expiry, "goodbye": goodbye,
+  })
+  @fs.write_file(".tools/protocol-live-avahi-direct-lifecycle.json", report.stringify(indent=2) + "\n")
+  println(report.stringify())
+}

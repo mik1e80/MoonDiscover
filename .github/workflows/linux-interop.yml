@@ -14,6 +14,7 @@ on:
       - tests/protocol_live/**
       - tests/protocol_probe/**
       - scripts/protocol-live.mbtx
+      - scripts/avahi-direct-lifecycle.mbtx
       - scripts/nsec-live.mbtx
       - tests/nsec_probe/**
       - fixtures/**
@@ -62,6 +63,8 @@ jobs:
           _build/native/debug/build/tests/protocol_live/protocol_live.exe reordered-lifecycle "$ip" | tee .tools/protocol-live-reordered-lifecycle.json
       - name: Replay Avahi responses across an isolated reordered link
         run: sudo --preserve-env=HOME,PATH,GITHUB_SERVER_URL,GITHUB_REPOSITORY,GITHUB_RUN_ID "$HOME/.moon/bin/moon" run scripts/protocol-live.mbtx -- avahi-link-lifecycle
+      - name: Observe original Avahi datagrams and 120-second TTL across isolated link
+        run: sudo --preserve-env=HOME,PATH,GITHUB_SERVER_URL,GITHUB_REPOSITORY,GITHUB_RUN_ID unshare --mount --propagation private "$HOME/.moon/bin/moon" run scripts/avahi-direct-lifecycle.mbtx
       - name: Verify independent zeroconf NSEC through actual UDP and replay
         run: |
           python3 -m venv .venv

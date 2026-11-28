@@ -14,6 +14,20 @@ async fn main {
     "ingress" => ingress_checks(ip)
     "nsec-expiry" => nsec_expiry_checks(ip)
     "reordered-lifecycle" => reordered_lifecycle_checks(ip)
+    "avahi-direct-tx" => {
+      guard args.length() == 5 else {
+        fail("direct TX mode and report prefix required")
+      }
+      avahi_direct_tx(ip, args[3], args[4])
+    }
+    "avahi-direct-rx" => {
+      guard args.length() == 6 else {
+        fail("direct RX mode, report prefix and peer required")
+      }
+      let peer = @socket.Addr::parse(args[5] + ":0")
+      guard !peer.is_ipv6() else { fail("IPv4 peer required") }
+      avahi_direct_rx(ip, peer.ip(), args[3], args[4])
+    }
     "avahi-lifecycle-capture" => {
       guard args.length() == 4 else { fail("capture marker required") }
       avahi_lifecycle_capture(ip, args[3])
