@@ -1,0 +1,391 @@
+{
+  "passed": true,
+  "source_commit": "5faea5e8a3559a6bf22090fdfa8c9324e741da0f",
+  "source_dirty": false,
+  "binary_sha256": "fb6a5836b1f1eb26e15baf2b8ea59a12920f98890494b0504241369782836c5a",
+  "system": "Linux 7.0.0-1020-azure x86_64",
+  "ci_run_url": "https://github.com/mik1e80/MoonDiscover/actions/runs/46118326087",
+  "experiment": "avahi-link-lifecycle",
+  "result": {
+    "publisher": "avahi-daemon 0.8",
+    "capture": {
+      "ptr": "000084000000000100000000095f6d6461766c696665045f746370056c6f63616c00000c000100001194001f0869736f6c61746564095f6d6461766c696665045f746370056c6f63616c00",
+      "srv": "0000840000000001000000000869736f6c61746564095f6d6461766c696665045f746370056c6f63616c000021800100000078001b0000000047f80d6d642d61766168692d6c696665056c6f63616c00",
+      "components": "0000840000000003000000000869736f6c61746564095f6d6461766c696665045f746370056c6f63616c000021800100000078001b0000000047f80d6d642d61766168692d6c696665056c6f63616c000869736f6c61746564095f6d6461766c696665045f746370056c6f63616c000010800100001194000c0b73746167653d61766168690d6d642d61766168692d6c696665056c6f63616c0000018001000000780004c0000214",
+      "short_components": "0000840000000003000000000869736f6c61746564095f6d6461766c696665045f746370056c6f63616c000021800100000001001b0000000047f80d6d642d61766168692d6c696665056c6f63616c000869736f6c61746564095f6d6461766c696665045f746370056c6f63616c000010800100001194000c0b73746167653d61766168690d6d642d61766168692d6c696665056c6f63616c0000018001000000780004c0000214",
+      "goodbye": "000084000000000100000000095f6d6461766c696665045f746370056c6f63616c00000c000100000000001f0869736f6c61746564095f6d6461766c696665045f746370056c6f63616c00",
+      "avahi_srv_ttl_seconds": 120,
+      "avahi_goodbye_ttl_seconds": 0,
+      "avahi_srv_cache_flush": true,
+      "avahi_positive_udp": "000084000000000600000000023230013201300331393207696e2d61646472046172706100000c80010000007800150d6d642d61766168692d6c696665056c6f63616c00095f6d6461766c696665045f746370c03d000c000100001194000b0869736f6c61746564c044c05f002180010000007800080000000047f8c02fc05f0010800100001194000c0b73746167653d6176616869095f7365727669636573075f646e732d7364045f756470c03d000c0001000011940002c044c02f00018001000000780004c0000214",
+      "avahi_srv_udp": "000084000000000600000000023230013201300331393207696e2d61646472046172706100000c80010000007800150d6d642d61766168692d6c696665056c6f63616c00095f6d6461766c696665045f746370c03d000c000100001194000b0869736f6c61746564c044c05f002180010000007800080000000047f8c02fc05f0010800100001194000c0b73746167653d6176616869095f7365727669636573075f646e732d7364045f756470c03d000c0001000011940002c044c02f00018001000000780004c0000214",
+      "avahi_txt_udp": "000084000000000600000000023230013201300331393207696e2d61646472046172706100000c80010000007800150d6d642d61766168692d6c696665056c6f63616c00095f6d6461766c696665045f746370c03d000c000100001194000b0869736f6c61746564c044c05f002180010000007800080000000047f8c02fc05f0010800100001194000c0b73746167653d6176616869095f7365727669636573075f646e732d7364045f756470c03d000c0001000011940002c044c02f00018001000000780004c0000214",
+      "avahi_address_udp": "000084000000000600000000023230013201300331393207696e2d61646472046172706100000c80010000007800150d6d642d61766168692d6c696665056c6f63616c00095f6d6461766c696665045f746370c03d000c000100001194000b0869736f6c61746564c044c05f002180010000007800080000000047f8c02fc05f0010800100001194000c0b73746167653d6176616869095f7365727669636573075f646e732d7364045f756470c03d000c0001000011940002c044c02f00018001000000780004c0000214",
+      "avahi_goodbye_udp": "000084000000000400000000095f7365727669636573075f646e732d7364045f756470056c6f63616c00000c0001000000000011095f6d6461766c696665045f746370c023c034000c000100000000000b0869736f6c61746564c034c051002180010000000000160000000047f80d6d642d61766168692d6c696665c023c0510010800100000000000c0b73746167653d6176616869"
+    },
+    "trials": [
+      {
+        "mode": "expiry",
+        "trial": 1,
+        "netem_delay": "1250ms",
+        "sender": {
+          "sent": [
+            {
+              "packet": "ptr",
+              "ms": 0
+            },
+            {
+              "packet": "components",
+              "ms": 30
+            },
+            {
+              "packet": "fresh_srv",
+              "ms": 1481
+            }
+          ]
+        },
+        "receiver": {
+          "arrival": [
+            "components",
+            "ptr",
+            "fresh_srv"
+          ],
+          "ptr_after_components_ms": 1221,
+          "fresh_srv_after_components_ms": 2701,
+          "observed_partial_then_resolved": true
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "delay": {
+              "delay": 1.25,
+              "jitter": 0,
+              "correlation": 0
+            },
+            "seed": "3952776579932941603",
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 239,
+          "packets": 2,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "goodbye",
+        "trial": 1,
+        "netem_delay": "125ms",
+        "sender": {
+          "sent": [
+            {
+              "packet": "ptr",
+              "ms": 0
+            },
+            {
+              "packet": "components",
+              "ms": 30
+            },
+            {
+              "packet": "goodbye",
+              "ms": 320
+            },
+            {
+              "packet": "late_components",
+              "ms": 651
+            },
+            {
+              "packet": "fresh_ptr",
+              "ms": 2052
+            }
+          ]
+        },
+        "receiver": {
+          "arrival": [
+            "components",
+            "ptr",
+            "goodbye",
+            "late_components",
+            "fresh_ptr"
+          ],
+          "ptr_after_components_ms": 95,
+          "late_components_after_goodbye_ms": 205,
+          "removed_after_goodbye_ms": 1001,
+          "removed_reason": "goodbye",
+          "resolved_again": true
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "delay": {
+              "delay": 0.125,
+              "jitter": 0,
+              "correlation": 0
+            },
+            "seed": "3043256084504673920",
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 351,
+          "packets": 3,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "expiry",
+        "trial": 2,
+        "netem_delay": "1250ms",
+        "sender": {
+          "sent": [
+            {
+              "packet": "ptr",
+              "ms": 1
+            },
+            {
+              "packet": "components",
+              "ms": 31
+            },
+            {
+              "packet": "fresh_srv",
+              "ms": 1482
+            }
+          ]
+        },
+        "receiver": {
+          "arrival": [
+            "components",
+            "ptr",
+            "fresh_srv"
+          ],
+          "ptr_after_components_ms": 1220,
+          "fresh_srv_after_components_ms": 2701,
+          "observed_partial_then_resolved": true
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "delay": {
+              "delay": 1.25,
+              "jitter": 0,
+              "correlation": 0
+            },
+            "seed": "6622294810136109724",
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 239,
+          "packets": 2,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "goodbye",
+        "trial": 2,
+        "netem_delay": "125ms",
+        "sender": {
+          "sent": [
+            {
+              "packet": "ptr",
+              "ms": 0
+            },
+            {
+              "packet": "components",
+              "ms": 31
+            },
+            {
+              "packet": "goodbye",
+              "ms": 321
+            },
+            {
+              "packet": "late_components",
+              "ms": 651
+            },
+            {
+              "packet": "fresh_ptr",
+              "ms": 2053
+            }
+          ]
+        },
+        "receiver": {
+          "arrival": [
+            "components",
+            "ptr",
+            "goodbye",
+            "late_components",
+            "fresh_ptr"
+          ],
+          "ptr_after_components_ms": 95,
+          "late_components_after_goodbye_ms": 205,
+          "removed_after_goodbye_ms": 1000,
+          "removed_reason": "goodbye",
+          "resolved_again": true
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "delay": {
+              "delay": 0.125,
+              "jitter": 0,
+              "correlation": 0
+            },
+            "seed": "17412883969774555173",
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 351,
+          "packets": 3,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "expiry",
+        "trial": 3,
+        "netem_delay": "1250ms",
+        "sender": {
+          "sent": [
+            {
+              "packet": "ptr",
+              "ms": 0
+            },
+            {
+              "packet": "components",
+              "ms": 30
+            },
+            {
+              "packet": "fresh_srv",
+              "ms": 1481
+            }
+          ]
+        },
+        "receiver": {
+          "arrival": [
+            "components",
+            "ptr",
+            "fresh_srv"
+          ],
+          "ptr_after_components_ms": 1220,
+          "fresh_srv_after_components_ms": 2701,
+          "observed_partial_then_resolved": true
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "delay": {
+              "delay": 1.25,
+              "jitter": 0,
+              "correlation": 0
+            },
+            "seed": "17434418669490091867",
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 239,
+          "packets": 2,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      },
+      {
+        "mode": "goodbye",
+        "trial": 3,
+        "netem_delay": "125ms",
+        "sender": {
+          "sent": [
+            {
+              "packet": "ptr",
+              "ms": 0
+            },
+            {
+              "packet": "components",
+              "ms": 30
+            },
+            {
+              "packet": "goodbye",
+              "ms": 321
+            },
+            {
+              "packet": "late_components",
+              "ms": 651
+            },
+            {
+              "packet": "fresh_ptr",
+              "ms": 2053
+            }
+          ]
+        },
+        "receiver": {
+          "arrival": [
+            "components",
+            "ptr",
+            "goodbye",
+            "late_components",
+            "fresh_ptr"
+          ],
+          "ptr_after_components_ms": 95,
+          "late_components_after_goodbye_ms": 205,
+          "removed_after_goodbye_ms": 1000,
+          "removed_reason": "goodbye",
+          "resolved_again": true
+        },
+        "netem": {
+          "kind": "netem",
+          "handle": "20:",
+          "parent": "1:3",
+          "options": {
+            "limit": 1000,
+            "delay": {
+              "delay": 0.125,
+              "jitter": 0,
+              "correlation": 0
+            },
+            "seed": "10235325770315249019",
+            "ecn": false,
+            "gap": 0
+          },
+          "bytes": 351,
+          "packets": 3,
+          "drops": 0,
+          "overlimits": 0,
+          "requeues": 0,
+          "backlog": 0,
+          "qlen": 0
+        }
+      }
+    ],
+    "link": "isolated veth between two Linux network namespaces",
+    "fixture": "Captured Avahi records replayed in separate responses. The expiry arm sets SRV TTL to one second."
+  }
+}

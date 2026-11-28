@@ -285,7 +285,18 @@ A 三轮分别在 34ms、34ms、20ms 观察到 Avahi 回包，均早于末包。
 - SRV 的 TTL 为 1 秒。三轮延迟 1109–1125 ms 发送 PTR，均只得到缺少 SRV 的未完成实例，补发新 SRV 后均恢复完整解析。
 - 三轮均先通过反序到达的正向响应成功解析，再接收 PTR goodbye。发出 goodbye 后 203 ms 补发重复的 SRV、TXT 和 A，接收端确认收到。实例仍在 1000 ms 时按 `goodbye` 移除，新的正向 PTR 均重新触发完整解析。
 
-相同探针在 Linux CI 也通过了各三轮。延迟 PTR 的窗口为 1100–1114 ms，三轮 goodbye 移除均在 1000 ms 观测到。这两组覆盖受控到达次序下的 Browser 生命周期。隔离链路注入、独立发布者和跨设备下的同类组合仍待验证。[Windows 逐轮数据](evidence/windows-reordered-lifecycle-20261127.json) · [Linux 定向验证](https://github.com/mik1e80/MoonDiscover/actions/runs/46025979109/job/140597367122)
+相同探针在 Linux CI 也通过了各三轮。延迟 PTR 的窗口为 1100–1114 ms，三轮 goodbye 移除均在 1000 ms 观测到。两组均覆盖受控到达次序下的 Browser 生命周期。[Windows 逐轮数据](evidence/windows-reordered-lifecycle-20261127.json) · [Linux 定向验证](https://github.com/mik1e80/MoonDiscover/actions/runs/46025979109/job/140597367122)
+
+### Avahi 实际记录经隔离链路乱序回放
+
+2026-11-28（北京时间），在 Linux CI 抓取 Avahi 0.8 的 IPv4 组播公告和撤销报文，确认原始 SRV TTL 为 120 秒、SRV 携带 cache-flush、PTR goodbye 的 TTL 为 0。测试将捕获记录重新编码成独立的 PTR、SRV/TXT/A 和撤销响应，在同一台 Linux VM 的两个 network namespace 间通过 veth 发送。TTL 实验将初始 SRV 的 TTL 设为 1 秒。发送侧均先发 PTR，`netem` 延迟单答案包。接收侧另用套接字核对来源、接口及完整字节，确认组件实际先到。[逐轮数据及原始报文](evidence/linux-avahi-reordered-lifecycle-20261128.json) · [Linux CI](https://github.com/mik1e80/MoonDiscover/actions/runs/46118326087)
+
+| 场景 | 三轮实测 |
+| --- | --- |
+| 乱序叠加 SRV 到期 | PTR 比组件晚 1220–1221 ms。三轮均仅得到缺少过期 SRV 的未完成实例，补发的新 SRV 均恢复完整解析。延迟队列每轮放行 2 包，丢包 0。 |
+| 乱序叠加 PTR goodbye | PTR 比组件晚 95 ms。重复组件均在收到 goodbye 后 205 ms 到达，实例仍在 1000–1001 ms 按 `goodbye` 移除。三轮均由新的 PTR 恢复。延迟队列每轮放行 3 包，丢包 0。 |
+
+这个实验验证 Browser 处理 Avahi 记录在受控链路乱序下的生命周期。Avahi 守护进程实时跨隔离链路发送原封包的同类组合、原始 120 秒 TTL 的长窗口，以及跨设备和 Bonjour 仍待验证。
 
 ## 查询方向随机丢包
 
@@ -409,7 +420,7 @@ A 三轮分别在 34ms、34ms、20ms 观察到 Avahi 回包，均早于末包。
 
 使用 MoonBit 1.0 RC 的后续 CI 中，另取八轮独立随机样本，均在 1920 秒内完成解析，耗时 148–127180 ms。固定种子补充轮在 1023087 ms 重发，1023178 ms 完成解析。十二 Browser 的双向 160 秒突发丢包三轮均为 12/12 完整解析，耗时 511137–511155 ms。[RC 专项日志](https://github.com/mik1e80/MoonDiscover/actions/runs/46022698012/job/140586095417)
 
-仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的同类隔离链路实验、不同双向丢包率、其他突发持续时间和相关丢包模型、独立随机样本在 960 秒后的完整解析、超过 1920 秒的恢复、其他并发规模、隔离链路及独立发布者下的乱序和生命周期组合、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
+仍待验证十四个及以上查询器、十三个及以上查询器叠加链路故障、Avahi 的隔离链路 TC 续包故障、不同双向丢包率、其他突发持续时间和相关丢包模型、独立随机样本在 960 秒后的完整解析、超过 1920 秒的恢复、其他并发规模、实时独立发布者原封包下的乱序和生命周期组合、两台物理设备，以及 Windows 与 Bonjour 的同类 TC 实验。长期实网与正式发布验收另行跟踪。
 
 复现使用仓库固定 MoonBit 工具链、正在运行的 Avahi daemon、avahi-publish-service 和已安装 tests/interop/requirements.txt 的 Python。脚本会探测主 IPv4，命令中的附加地址需预先配置在同一测试接口上。以下地址为专用 CI 示例。报告位于 `.tools/tc-interop.json`。传入四至十二个附加地址分别运行五至十三查询器，传入三个运行四查询器和续包顺序实验，传入两个运行连续 TC 与三查询器实验，传入一个运行双查询器与首包复测。
 
