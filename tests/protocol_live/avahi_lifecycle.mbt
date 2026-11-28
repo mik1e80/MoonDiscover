@@ -58,6 +58,7 @@ async fn avahi_lifecycle_capture(ip : UInt32, marker : String) -> Json {
           "goodbye": @model.bytes_hex(expiry_response([goodbye], [])),
           "avahi_srv_ttl_seconds": srv.ttl.to_double(),
           "avahi_goodbye_ttl_seconds": goodbye.ttl.to_double(),
+          "avahi_srv_cache_flush": srv.cache_flush,
           "avahi_positive_udp": wire_samples[12],
           "avahi_srv_udp": wire_samples[33],
           "avahi_txt_udp": wire_samples[16],
@@ -188,6 +189,10 @@ async fn avahi_lifecycle_receive(
     s.complete &&
     s.instance.to_presentation() == "isolated._mdavlife._tcp.local." &&
     s.port == Some(18424) &&
+    s.target is Some(target) &&
+    target.to_presentation() == "md-avahi-life.local." &&
+    s.txt is Some(txt) &&
+    txt.entries() == [b"stage=avahi"] &&
     s.addresses == [b"\xc0\x00\x02\x14"]
   }
   @fs.write_file(marker, "")

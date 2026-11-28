@@ -10,9 +10,15 @@ fn expiry_response(
   for section in [answers, additional] {
     for record in section {
       let query = @wire.query_with_answers(record.name, record.rr_type, [record])
-      let start = 16 + record.name.to_wire().length()
+      let name_length = record.name.to_wire().length()
+      let start = 16 + name_length
+      let class_high = bytes.length() + name_length + 2
       for i in start..<query.length() {
         bytes.push(query[i])
+      }
+      // The query encoder clears this response-only bit.
+      if record.cache_flush {
+        bytes[class_high] = b'\x80'
       }
     }
   }
