@@ -60,6 +60,8 @@ jobs:
         run: |
           ip=$(_build/native/debug/build/tests/native_ttl/native_ttl.exe --interface | python3 -c 'import sys,json; print(json.load(sys.stdin)["interface_ipv4"])')
           _build/native/debug/build/tests/protocol_live/protocol_live.exe reordered-lifecycle "$ip" | tee .tools/protocol-live-reordered-lifecycle.json
+      - name: Replay Avahi responses across an isolated reordered link
+        run: sudo --preserve-env=HOME,PATH,GITHUB_SERVER_URL,GITHUB_REPOSITORY,GITHUB_RUN_ID "$HOME/.moon/bin/moon" run scripts/protocol-live.mbtx -- avahi-link-lifecycle
       - name: Verify independent zeroconf NSEC through actual UDP and replay
         run: |
           python3 -m venv .venv
@@ -76,6 +78,7 @@ jobs:
           path: |
             .tools/avahi-linux.json
             .tools/protocol-live-*.json
+            .tools/protocol-avahi-*
             .tools/nsec-live-*.json
             .tools/interface-probe-*.log
             .tools/protocol-*.log

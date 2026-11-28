@@ -77,14 +77,136 @@ async fn interface(binary : String) -> Json {
   })
 }
 
+async fn capture_avahi_lifecycle(binary : String, capture : String) -> Json {
+  let route = @json.parse(command("ip", ["-j", "-4", "route", "get", "224.0.0.251"]))
+  guard route is [{ "prefsrc": String(ip), .. }, ..] else { fail("no IPv4 multicast route") }
+  let marker = ".tools/protocol-avahi-capture-ready"
+  let errors = ".tools/protocol-avahi-capture-errors.log"
+  @async.with_task_group(group => {
+    let probe = @process.spawn(group, binary, ["avahi-lifecycle-capture", ip, marker],
+      stdout=@process.redirect_to_file(capture), stderr=@process.redirect_to_file(errors), no_wait=true)
+    defer probe.cancel()
+    avahi_lifecycle_ready(marker, probe, errors)
+    let address_log = @process.redirect_to_file(".tools/protocol-avahi-address.log")
+    let address = @process.spawn(group, "avahi-publish-address", ["md-avahi-life.local", "192.0.2.20"],
+      stdout=address_log, stderr=address_log, no_wait=true)
+    defer address.cancel()
+    let service_log = @process.redirect_to_file(".tools/protocol-avahi-service.log")
+    let service = @process.spawn(group, "avahi-publish-service", ["--host=md-avahi-life.local",
+      "isolated", "_mdavlife._tcp", "18424", "stage=avahi"],
+      stdout=service_log, stderr=service_log, no_wait=true)
+    defer service.cancel()
+    avahi_lifecycle_ready(marker + ".positive", probe, errors)
+    guard address.try_wait() is None && service.try_wait() is None else { fail("Avahi publisher exited") }
+    service.cancel()
+    guard probe.wait() == 0 else { fail(@fs.read_file(errors).text()) }
+    @fs.read_file(capture).json()
+  })
+}
+
+async fn avahi_lifecycle_ready(marker : String, child : @process.Process, errors : String) -> Unit {
+  for _ in 0..<600 {
+    if @fs.exists(marker) { return }
+    guard child.try_wait() is None else { fail(@fs.read_file(errors).text()) }
+    @async.sleep(20)
+  }
+  fail("timed out waiting for " + marker)
+}
+
+async fn avahi_link_trial(
+  binary : String,
+  capture : String,
+  mode : String,
+  trial : Int,
+) -> Json {
+  let send_ns = "mdavlife-tx"
+  let recv_ns = "mdavlife-rx"
+  let sender = "198.51.100.20"
+  let receiver = "198.51.100.21"
+  let _ = command("ip", ["netns", "add", send_ns])
+  defer @async.protect_from_cancel(() => ignore(command("ip", ["netns", "del", send_ns])))
+  let _ = command("ip", ["netns", "add", recv_ns])
+  defer @async.protect_from_cancel(() => ignore(command("ip", ["netns", "del", recv_ns])))
+  let _ = command("ip", ["-n", send_ns, "link", "add", "mdaltx", "type", "veth",
+    "peer", "name", "mdalrx", "netns", recv_ns])
+  for (ns, device, ip) in [(send_ns, "mdaltx", sender), (recv_ns, "mdalrx", receiver)] {
+    let _ = command("ip", ["-n", ns, "addr", "add", ip + "/24", "dev", device])
+    let _ = command("ip", ["-n", ns, "link", "set", device, "up"])
+    let _ = command("ip", ["-n", ns, "route", "add", "224.0.0.251/32", "dev", device, "src", ip])
+  }
+  let delay = if mode == "expiry" { "1250ms" } else { "125ms" }
+  let _ = command("ip", ["netns", "exec", send_ns, "tc", "qdisc", "add", "dev", "mdaltx",
+    "root", "handle", "1:", "prio"])
+  let _ = command("ip", ["netns", "exec", send_ns, "tc", "qdisc", "add", "dev", "mdaltx",
+    "parent", "1:3", "handle", "20:", "netem", "delay", delay])
+  // Only single-answer fixture replies cross the delay queue. The three-record
+  // reply takes the unmodified class and overtakes the original PTR.
+  let _ = command("ip", ["netns", "exec", send_ns, "tc", "filter", "add", "dev", "mdaltx",
+    "parent", "1:", "protocol", "ip", "prio", "1", "u32", "match", "ip", "protocol", "17", "0xff",
+    "match", "ip", "src", sender + "/32", "match", "ip", "dst", "224.0.0.251/32",
+    "match", "ip", "sport", "5353", "0xffff", "match", "ip", "dport", "5353", "0xffff",
+    "match", "u16", "0x8000", "0x8000", "at", "30",
+    "match", "u16", "1", "0xffff", "at", "34", "flowid", "1:3"])
+  let stem = ".tools/protocol-avahi-link-" + mode + "-" + trial.to_string()
+  let marker = stem + ".ready"
+  @async.with_task_group(group => {
+    let out = stem + "-stdout.log"
+    let err = stem + "-stderr.log"
+    let probe = @process.spawn(group, "ip", ["netns", "exec", recv_ns, binary, "avahi-lifecycle-receive",
+      receiver, capture, mode, marker, sender], stdout=@process.redirect_to_file(out),
+      stderr=@process.redirect_to_file(err), no_wait=true)
+    defer probe.cancel()
+    avahi_lifecycle_ready(marker, probe, err)
+    let sent = @json.parse(command("ip", ["netns", "exec", send_ns, binary,
+      "avahi-lifecycle-send", sender, capture, mode]))
+    guard probe.wait() == 0 else { fail(@fs.read_file(err).text()) }
+    let received = @fs.read_file(out).json()
+    let queues = @json.parse(command("ip", ["netns", "exec", send_ns, "tc", "-j", "-s",
+      "qdisc", "show", "dev", "mdaltx"]))
+    let expected = if mode == "expiry" { 2.0 } else { 3.0 }
+    guard queues is Array(all) else { fail("missing netem statistics") }
+    guard all.filter(q => q is { "kind": "netem", "handle": "20:", .. }) is [queue] else {
+      fail("missing lifecycle delay queue")
+    }
+    guard queue is { "packets": Number(n, ..), "drops": 0, .. } && n == expected else {
+      fail("unexpected lifecycle netem counters: " + queue.stringify())
+    }
+    Json::object({ "mode": Json(mode), "trial": Json(trial), "netem_delay": Json(delay),
+      "sender": sent, "receiver": received, "netem": queue })
+  })
+}
+
+async fn avahi_link_lifecycle(binary : String) -> Json {
+  let capture_path = ".tools/protocol-avahi-wire.json"
+  for marker in [".tools/protocol-avahi-capture-ready", ".tools/protocol-avahi-capture-ready.positive"] {
+    if @fs.exists(marker) { @fs.remove(marker) }
+  }
+  let capture = capture_avahi_lifecycle(binary, capture_path)
+  let trials : Array[Json] = []
+  for trial in 1..=3 {
+    for mode in ["expiry", "goodbye"] {
+      let marker = ".tools/protocol-avahi-link-" + mode + "-" + trial.to_string() + ".ready"
+      if @fs.exists(marker) { @fs.remove(marker) }
+      trials.push(avahi_link_trial(binary, capture_path, mode, trial))
+    }
+  }
+  Json::object({
+    "publisher": Json(command("avahi-daemon", ["--version"])),
+    "capture": capture, "trials": Json::array(trials),
+    "link": Json("isolated veth between two Linux network namespaces"),
+    "fixture": Json("Captured Avahi records replayed in separate responses. The expiry arm sets SRV TTL to one second."),
+  })
+}
+
 async fn main {
   let args = @env.args()
-  guard args.length() == 2 else { fail("usage: protocol-live.mbtx <avahi|interface>") }
+  guard args.length() == 2 else { fail("usage: protocol-live.mbtx <avahi|interface|avahi-link-lifecycle>") }
   @fs.mkdir(".tools", recursive=true, allow_exist=true)
   let base = "_build/native/debug/build/tests/protocol_live/protocol_live"
   let binary = @fs.realpath(if @fs.exists(base) { base } else { base + ".exe" })
   let result = match args[1] {
     "avahi" => avahi(binary)
+    "avahi-link-lifecycle" => avahi_link_lifecycle(binary)
     "interface" => interface(binary)
     _ => fail("unknown protocol experiment")
   }
@@ -96,5 +218,6 @@ async fn main {
   if result is {"subtypes": {"known_answer_observation": observed, ..}, ..} {
     println(Json::object({"avahi_known_answer_observation": observed}).stringify())
   }
+  if args[1] == "avahi-link-lifecycle" { println(report.stringify()) }
   println(Json::object({"passed": Json(true), "experiment": Json(args[1])}).stringify())
 }

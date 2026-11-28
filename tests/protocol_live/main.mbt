@@ -14,6 +14,22 @@ async fn main {
     "ingress" => ingress_checks(ip)
     "nsec-expiry" => nsec_expiry_checks(ip)
     "reordered-lifecycle" => reordered_lifecycle_checks(ip)
+    "avahi-lifecycle-capture" => {
+      guard args.length() == 4 else { fail("capture marker required") }
+      avahi_lifecycle_capture(ip, args[3])
+    }
+    "avahi-lifecycle-send" => {
+      guard args.length() == 5 else { fail("capture path and case required") }
+      avahi_lifecycle_send(ip, args[3], args[4])
+    }
+    "avahi-lifecycle-receive" => {
+      guard args.length() == 7 else {
+        fail("capture path, case, marker and peer required")
+      }
+      let peer = @socket.Addr::parse(args[6] + ":0")
+      guard !peer.is_ipv6() else { fail("IPv4 peer required") }
+      avahi_lifecycle_receive(ip, peer.ip(), args[3], args[4], args[5])
+    }
     "peer-query" => {
       guard args.length() == 4 else { fail("peer IPv4 required") }
       let peer = @socket.Addr::parse(args[3] + ":0")
